@@ -126,6 +126,20 @@ current releases as of 2026-11-21.
 - **Decision**: Out of v1 build scope (spec: optional, off by default, design deferred). The data
   model reserves `users.notification_prefs` so it can be added later without migration churn.
 
+## 11. Ionic Framework (added 2026-11-21 at the product owner's request)
+
+- **Decision**: `@ionic/react` 9.0.13 with `ionicons` 8, iOS mode everywhere, initialized once on the
+  client (`src/components/ionic/IonicSetup.tsx`); only `@ionic/react/css/core.css` is loaded.
+  Ionic's theme variables (`--ion-*`) are mapped to the app's palette and font in
+  `src/app/globals.css`, so Ionic components match the existing design.
+- **Scope**: installed and configured only; existing screens are unchanged. Ionic components are
+  client components; use them inside `"use client"` files.
+- **Not loaded**: `structure.css` (it sets `html`/`body` to fixed, non-scrolling layout, which would
+  break the current pages) and the optional utility CSS (Tailwind covers those).
+- **RTL**: Ionic follows `<html dir="rtl">`; logical CSS rules (constitution I) still apply.
+- **Checked**: build passes; sign-in renders identically; Ionic initializes (`ios` mode classes);
+  axe reports no violations; no CSP or console errors.
+
 ## Resolved items
 
 | Item | Resolution |

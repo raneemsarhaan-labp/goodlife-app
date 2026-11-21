@@ -23,7 +23,7 @@ challenge check-offs. All stats computed in SQL from raw records.
 
 **Language/Version**: TypeScript (strict) on Node.js 22 LTS+; SQL (PostgreSQL 17)
 
-**Primary Dependencies**: Next.js 16.4, React 19.3, `@supabase/supabase-js` 2.x + `@supabase/ssr`,
+**Primary Dependencies**: Next.js 16.4, React 19.3, `@ionic/react` 9 + `ionicons` 8 (research §11), `@supabase/supabase-js` 2.x + `@supabase/ssr`,
 `next-intl` 4, Tailwind CSS 4, `@serwist/next` 9, `idb` 8, Zod 4
 
 **Storage**: Supabase PostgreSQL 17 (RLS on every table); Supabase Storage private buckets for

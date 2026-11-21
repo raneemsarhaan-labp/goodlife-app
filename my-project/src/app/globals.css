@@ -21,6 +21,26 @@
 
 :root {
   color-scheme: light;
+
+  /* Ionic theme mapped to the app's palette, so Ionic components look like the rest of the app. */
+  --ion-font-family: var(--font-sans);
+  --ion-background-color: var(--color-sand-50);
+  --ion-background-color-rgb: 250, 248, 244;
+  --ion-text-color: var(--color-ink-900);
+  --ion-text-color-rgb: 31, 42, 43;
+  --ion-color-primary: var(--color-sage-700);
+  --ion-color-primary-rgb: 37, 90, 70;
+  --ion-color-primary-contrast: #ffffff;
+  --ion-color-primary-contrast-rgb: 255, 255, 255;
+  --ion-color-primary-shade: #20503e;
+  --ion-color-primary-tint: #3b6b59;
+  --ion-color-secondary: var(--color-dawn-700);
+  --ion-color-secondary-rgb: 125, 72, 15;
+  --ion-color-secondary-contrast: #ffffff;
+  --ion-color-secondary-contrast-rgb: 255, 255, 255;
+  --ion-color-secondary-shade: #6e3f0d;
+  --ion-color-secondary-tint: #8a5a27;
+  --ion-border-color: var(--color-sand-200);
 }
 
 html {

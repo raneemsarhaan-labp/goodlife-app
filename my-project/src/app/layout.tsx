@@ -2,7 +2,10 @@ import type { Metadata, Viewport } from "next";
 import localFont from "next/font/local";
 import { NextIntlClientProvider } from "next-intl";
 import { getTranslations } from "next-intl/server";
+import { IonicSetup } from "@/components/ionic/IonicSetup";
 import { LOCALE } from "@/i18n/request";
+// Ionic component base styles first, so the app's own styles (globals.css) win.
+import "@ionic/react/css/core.css";
 import "./globals.css";
 
 // Self-hosted IBM Plex Sans Arabic (SIL OFL 1.1, see fonts/OFL-LICENSE.txt).
@@ -45,6 +48,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
         >
           {t("skipToContent")}
         </a>
+        <IonicSetup />
         <NextIntlClientProvider>{children}</NextIntlClientProvider>
       </body>
     </html>
