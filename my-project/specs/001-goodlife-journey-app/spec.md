@@ -13,6 +13,18 @@ of a cohort-based group led by a facilitator." (full description: onboarding, To
 habits, monthly review, stats, community and groups, resources, admin panel, account, installable
 app; Arabic RTL only; calm tone; no payments.)
 
+## Clarifications
+
+### Session 2026-11-21
+
+- Q: Who writes the daily challenge? → A: Both. Admins write the journey challenge
+  (تحدّي الرحلة) and each member can write their own challenge (تحدّي ذاتي); the two are clearly
+  distinguished in the interface.
+- Q: What does "interact with fellow participants" include? → A: Encouragement only: members
+  send preset words of encouragement to each other; no free text and no private messages.
+- Q: What can a facilitator see about an individual member? → A: Activity signals only: last
+  active date, days closed, and overall completion rate.
+
 ## User Scenarios & Testing *(mandatory)*
 
 ### User Story 1 - Join the journey and live the day on «يومك» (Priority: P1)
@@ -20,16 +32,17 @@ app; Arabic RTL only; calm tone; no payments.)
 A new member receives an invitation or access code, joins, enters their personal data, sees a
 welcome screen, and lands on «يومك» (Today). Each day they open the app, see a greeting suited to
 the time of day with the date and their journey day ("اليوم ١٢"), tap «ابدأ يومي» to write the
-day's intention, check off their habits as they do them (progress shown as e.g. ٢/٦), see and
-complete the daily challenge, glance at upcoming activities, and close with «ختام اليوم», which
-summarizes what they did and ends with a calm closing message.
+day's intention, check off their habits as they do them (progress shown as e.g. ٢/٦), see the
+day's journey challenge from the program and, if they wish, write their own challenge for the day,
+mark challenges done, glance at upcoming activities, and close with «ختام اليوم», which summarizes
+what they did and ends with a calm closing message.
 
 **Why this priority**: This is the core daily loop the whole program depends on. Without it there
 is no practice to plan, review, or measure.
 
-**Independent Test**: With one cohort, one group, a valid invitation code, and challenges for the
-first days already in place, a tester can join, complete a full day (intention → habits →
-challenge → close), return the next day, and see the journey day advance.
+**Independent Test**: With one cohort, one group, a valid invitation code, and journey challenges
+for the first days already in place, a tester can join, complete a full day (intention → habits →
+journey challenge and own challenge → close), return the next day, and see the journey day advance.
 
 **Acceptance Scenarios**:
 
@@ -47,10 +60,17 @@ challenge → close), return the next day, and see the journey day advance.
 6. **Given** the member has not started their day, **When** they tap «ابدأ يومي» and write an
    intention, **Then** the intention is saved and shown on «يومك» for the rest of the day.
 7. **Given** a member during the day, **When** they open «ختام اليوم», **Then** they see their
-   intention, habits done out of total, the challenge status, an optional space for a short
-   reflection, and a closing message such as «ما نويته اليوم تمّ. وغدًا يبدأ من حيث توقفت.»
+   intention, habits done out of total, the status of each of the day's challenges, an optional
+   space for a short reflection, and a closing message such as «ما نويته اليوم تمّ. وغدًا يبدأ
+   من حيث توقفت.»
 8. **Given** an activity scheduled for the member's group in the next 7 days, **When** they open
    «يومك», **Then** it appears under upcoming activities with its title, date, and time.
+9. **Given** an admin has written a journey challenge for today's journey day, **When** the member
+   opens «يومك», **Then** they see it labelled as the journey challenge («تحدّي الرحلة») and can mark
+   it done.
+10. **Given** a member on «يومك», **When** they write their own challenge for the day, **Then** it
+    appears labelled as their own challenge («تحدّي ذاتي»), visually distinct from the journey
+    challenge, and can be edited, removed, or marked done that day.
 
 ---
 
@@ -58,8 +78,8 @@ challenge → close), return the next day, and see the journey day advance.
 
 An admin creates a cohort (e.g., «الدفعة الثالثة») with a start date, creates groups inside it,
 assigns facilitators, generates invitation codes that place people in a cohort and group, moves
-members between groups, schedules activities for groups or whole cohorts, and authors the daily
-challenges for the journey.
+members between groups, schedules activities for groups or whole cohorts, and writes the journey
+challenges for the days of the journey.
 
 **Why this priority**: Members cannot join, and Today has no challenge or activities, until an
 admin sets up the program. It is required for any real launch.
@@ -131,7 +151,8 @@ completes it, and can open it again later alongside the month's figures.
 1. **Given** the last days of a month, **When** the member opens the app, **Then** «يومك» shows a
    gentle invitation to the monthly review.
 2. **Given** an open review, **When** the member starts it, **Then** they see the month's habit
-   completion per habit, challenges completed, and days closed, followed by reflection questions.
+   completion per habit, journey challenges completed, own challenges written and completed, and
+   days closed, followed by reflection questions.
 3. **Given** a completed review, **When** the member opens past reviews, **Then** they can read it
    with the month's figures as they were at the time.
 4. **Given** a member who skipped a review, **When** the review window ends, **Then** the review
@@ -166,16 +187,17 @@ records, and a facilitator sees group totals without access to any member's priv
 
 ### User Story 6 - Walk together: community and groups (Priority: P3)
 
-Members see their group and cohort and interact with fellow participants. Facilitators see the
-groups they lead and their members, follow each member's participation, and run group activities.
-«مجموعاتي» lists both the groups a user leads and the group they belong to.
+Members see their group and cohort and encourage fellow participants by sending short, preset
+words of encouragement (no free text, no private messages). Facilitators see the groups they lead
+and their members, follow each member's participation through activity signals only, and run
+group activities. «مجموعاتي» lists both the groups a user leads and the group they belong to.
 
 **Why this priority**: Group belonging is central to the program, but the individual practice
 (Stories 1–5) must work first.
 
 **Independent Test**: Two members and a facilitator of the same group can see each other in the
-group, interact as defined in FR-040, and the facilitator can schedule a session that both members
-then see on «يومك».
+group, one member sends the other a preset encouragement that the recipient then sees, and the
+facilitator can schedule a session that both members then see on «يومك».
 
 **Acceptance Scenarios**:
 
@@ -185,10 +207,14 @@ then see on «يومك».
    members or content of other groups.
 3. **Given** a person who is a member of one group and facilitator of two others, **When** they
    open «مجموعاتي», **Then** they see all three, labelled by their role in each.
-4. **Given** a facilitator, **When** they open a member of their group, **Then** they see that
-   member's participation as defined in FR-043.
+4. **Given** a facilitator, **When** they open a member of their group, **Then** they see only
+   that member's last active date, days closed, and overall completion rate, and nothing of their
+   habits by name, challenges, intentions, reflections, plan, or reviews.
 5. **Given** a facilitator, **When** they schedule an activity for their group, **Then** group
    members see it under upcoming activities.
+6. **Given** a member viewing a fellow group member, **When** they choose an encouragement from
+   the preset list (e.g. «بارك الله في سعيك»، «ثبّتك الله»), **Then** the recipient sees it with
+   the sender's name, and there is no way to type free text or start a private conversation.
 
 ---
 
@@ -255,7 +281,10 @@ facilitator view and back, opens archived habits, and installs the app from a ph
   joins on day 30 → sees "اليوم ٣٠") and the stats start from their join date.
 - **No habits yet**: «يومك» invites the member to create their first habit or plan instead of
   showing ٠/٠.
-- **No challenge for today**: the challenge card is hidden rather than showing an empty card.
+- **No journey challenge for today**: the journey challenge card is hidden rather than shown
+  empty; the member can still write their own challenge.
+- **Own challenge left unfinished**: it is recorded as not done for that day and does not carry
+  over; the member may write it again the next day.
 - **Journey end**: after day 365 the member keeps read access to their history, plan, reviews, and
   stats; new daily entries stop unless they join a new cohort.
 - **Member moved between groups**: personal history stays with the member; group stats count them
@@ -297,17 +326,20 @@ facilitator view and back, opens archived habits, and installs the app from a ph
 
 - **FR-010**: «يومك» MUST be the member's home screen and show: a greeting by time of day (morning,
   afternoon, evening), today's date, the journey day, today's habits with progress (done/total),
-  the daily challenge, and upcoming activities for the next 7 days.
+  the day's challenges (journey and own), and upcoming activities for the next 7 days.
 - **FR-011**: Members MUST be able to check and uncheck each active habit for today and yesterday.
 - **FR-012**: «ابدأ يومي» MUST let the member write one short intention for the day, editable that
   day.
-- **FR-013**: The daily challenge for each journey day MUST be shown to members, and members MUST be
-  able to mark it done. Challenges are authored as defined in [NEEDS CLARIFICATION: who writes the
-  daily challenge — one admin-authored challenge per journey day shared by all cohorts, a separate
-  set per cohort, or set by each group's facilitator?].
-- **FR-014**: «ختام اليوم» MUST show the day's intention, habits done/total, challenge status, an
-  optional short reflection, and a closing message from a set of calm Arabic messages (e.g.
-  «ما نويته اليوم تمّ. وغدًا يبدأ من حيث توقفت.»).
+- **FR-013**: Daily challenges MUST come from two sources, always shown with distinct labels and
+  visual treatment so the member can tell them apart:
+  - **Journey challenge (تحدّي الرحلة)**: written by admins, at most one per journey day, shown to
+    every member on that journey day.
+  - **Own challenge (تحدّي ذاتي)**: written by the member for a given day, private to them; the
+    member can add, edit, and remove it during that day.
+  Members MUST be able to mark each challenge done for that day.
+- **FR-014**: «ختام اليوم» MUST show the day's intention, habits done/total, the status of each of
+  the day's challenges, an optional short reflection, and a closing message from a set of calm
+  Arabic messages (e.g. «ما نويته اليوم تمّ. وغدًا يبدأ من حيث توقفت.»).
 
 **My Plan and habits**
 
@@ -324,8 +356,8 @@ facilitator view and back, opens archived habits, and installs the app from a ph
 
 - **FR-030**: From the last 3 days of each calendar month through the 7th day of the next, «يومك»
   MUST show an invitation to that month's review.
-- **FR-031**: The review MUST show that month's completion rate per habit, challenges completed,
-  and days closed, followed by a set of reflection questions defined by admins, with free-text
+- **FR-031**: The review MUST show that month's completion rate per habit, journey challenges
+  completed, own challenges written and completed, and days closed, followed by a set of reflection questions defined by admins, with free-text
   answers.
 - **FR-032**: Completed reviews MUST be saved with a snapshot of the month's figures and remain
   readable for the whole journey; unfinished past reviews can still be completed.
@@ -333,26 +365,30 @@ facilitator view and back, opens archived habits, and installs the app from a ph
 **Stats**
 
 - **FR-035**: Members MUST see, for a chosen period (this week, this month, whole journey): overall
-  and per-habit completion rate, current and longest streak per habit, and challenges completed.
+  and per-habit completion rate, current and longest streak per habit, and challenges completed,
+  shown separately for journey challenges and own challenges.
 - **FR-036**: All figures MUST be computed from the actual records, so stats, reviews, and «يومك»
   never disagree.
-- **FR-037**: Facilitators MUST see, per group they lead: average habit completion, challenge
-  completion, and members active in the last 7 days. Group stats MUST NOT expose any member's
-  written intentions, reflections, plan text, or review answers.
+- **FR-037**: Facilitators MUST see, per group they lead: average habit completion, journey
+  challenge completion, and members active in the last 7 days. Group stats MUST NOT expose any
+  member's habit names, own challenges, written intentions, reflections, plan text, or review
+  answers.
 
 **Community and groups**
 
-- **FR-040**: Members MUST see their group (name, facilitator, members) and cohort, and interact
-  with fellow participants as defined in [NEEDS CLARIFICATION: what does "interact" include — a
-  shared group feed with posts and comments, reactions/encouragement only, direct messages between
-  members, or a mix?].
+- **FR-040**: Members MUST see their group (name, facilitator, members) and cohort, and MUST be
+  able to send a fellow group member an encouragement chosen from a preset list of short Arabic
+  phrases managed by admins. Recipients MUST see the encouragements they received with the
+  sender's name and date. There MUST be no free-text posts, comments, or private messages.
+- **FR-040a**: A member MUST be able to send the same person at most one encouragement per day, to
+  keep the space calm.
 - **FR-041**: Members MUST NOT see members or content of groups they do not belong to.
 - **FR-042**: «مجموعاتي» MUST list every group the user leads and the group they belong to, with
   their role in each.
-- **FR-043**: Facilitators MUST see the members of their groups and each member's participation,
-  where participation means [NEEDS CLARIFICATION: what may a facilitator see about an individual
-  member — only activity signals (last active, days closed, completion rate), or also their
-  habits by name, or also their written intentions, reflections, plan, and reviews?].
+- **FR-043**: Facilitators MUST see the members of their groups and, for each member, activity
+  signals only: last active date, number of days closed in a chosen period, and overall habit
+  completion rate. Facilitators MUST NOT see a member's habits by name, own challenges,
+  intentions, reflections, plan, or monthly review answers.
 - **FR-044**: Facilitators MUST be able to create, edit, and cancel activities for groups they
   lead.
 
@@ -372,7 +408,8 @@ facilitator view and back, opens archived habits, and installs the app from a ph
   date, time, location or link) for a group, several groups, or a whole cohort.
 - **FR-063**: Admins MUST be able to upload, organize (categories, order), edit, and remove
   recordings, files, and references, and edit the journey stages, the ten guidelines, the monthly
-  review questions, and the closing messages.
+  review questions, the closing messages, the preset encouragement phrases, and the journey
+  challenge for each journey day.
 
 **Account**
 
@@ -408,7 +445,12 @@ facilitator view and back, opens archived habits, and installs the app from a ph
 - **Habit (عادة)**: belongs to a member; name, optional description, optional focus area, order,
   active or archived.
 - **Habit completion**: a habit marked done on a given date.
-- **Daily challenge (تحدّي اليوم)**: content for a journey day; members can mark it done.
+- **Journey challenge (تحدّي الرحلة)**: admin-written text for one journey day, shared by all
+  members.
+- **Own challenge (تحدّي ذاتي)**: member-written text for one date, private to that member.
+- **Challenge completion**: a member marking a journey or own challenge done for a date.
+- **Encouragement (تشجيع)**: a preset phrase sent from one group member to another, with date.
+- **Encouragement phrase**: an admin-managed preset phrase available to send.
 - **Day entry**: a member's intention, closing reflection, and closed status for a date.
 - **Monthly review (مراجعة الشهر)**: a member's answers for a month plus a snapshot of that month's
   figures; done or not done.
@@ -457,6 +499,9 @@ facilitator view and back, opens archived habits, and installs the app from a ph
 - Push or email reminders are optional and off by default; their exact design is left to a later
   feature.
 - Recordings are hosted by the app; links to outside platforms are also allowed as references.
-- Programme content (stages, guidelines, review questions, closing messages, challenges) is entered
-  by admins; the app ships with editable defaults.
+- Programme content (stages, guidelines, review questions, closing messages, journey challenges,
+  encouragement phrases) is entered by admins; the app ships with editable defaults.
+- Journey challenges are one set for the whole program, keyed by journey day, so every cohort sees
+  the same challenge on the same journey day.
+- A member writes at most one own challenge per day.
 - Out of scope: payments and subscriptions, languages other than Arabic, native app-store apps.

@@ -13,7 +13,7 @@
 
 ## Requirement Completeness
 
-- [ ] No [NEEDS CLARIFICATION] markers remain
+- [x] No [NEEDS CLARIFICATION] markers remain
 - [x] Requirements are testable and unambiguous
 - [x] Success criteria are measurable
 - [x] Success criteria are technology-agnostic (no implementation details)
@@ -33,9 +33,6 @@
 
 - Iteration 1: FR-005 said "on the server side" (implementation detail); reworded to a behavioural
   requirement. All other items pass.
-- 3 open [NEEDS CLARIFICATION] markers awaiting the product owner:
-  - FR-013: who authors the daily challenge.
-  - FR-040: what "interact with fellow participants" includes.
-  - FR-043: what a facilitator may see about an individual member (also constitution
-    TODO(FACILITATOR_VISIBILITY)).
+- Iteration 2 (2026-11-21): the 3 clarifications were answered and written into the spec
+  (Clarifications section, FR-013, FR-040/040a, FR-043, FR-037, entities). All items pass.
 - Items marked incomplete require spec updates before `/speckit-clarify` or `/speckit-plan`
