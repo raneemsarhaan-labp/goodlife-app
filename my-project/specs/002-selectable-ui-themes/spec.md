@@ -14,6 +14,16 @@ language; «يومك» content shown in the designs; Arabic RTL, calm tone, WCAG
 reduced-transparency and reduced-motion fallbacks, 3-second «يومك», browser-only rendering of the
 component framework; the choice follows the person across devices.)
 
+## Clarifications
+
+### Session 2026-11-21
+
+- Q: Which screens get the three versions? → A: Every screen — member screens, setup and sign-in,
+  and the facilitator and admin areas.
+- Q: Is the new content shown in the designs («حالي المنشود» with quick reflection, registered-activity
+  card, «اجعلها عادة») part of this feature? → A: No. This feature restyles existing content only; the
+  new content goes to a separate, later specification. The designs' card slots for it are left out.
+
 **Design sources** (supplied by the product owner, 2026-11-21): `Glass_Edition_Standalone_1.html`,
 `My_Day_Journey_Standalone.html`, `Full_Glass_Standalone.html` — three versions of the same «يومك»
 screen in a phone frame.
@@ -145,31 +155,6 @@ animation.
 
 ---
 
-### User Story 6 - New «يومك» content from the designs (Priority: P3)
-
-The designs introduce content the current app does not have: a «حالي المنشود» (desired state) card
-with a quick «اكتب تأمّلك» reflection field, a card for an activity the member registered for, and
-«اجعلها عادة» to turn today's challenge into a daily habit. [NEEDS CLARIFICATION: Is this new content
-part of this feature, or should this feature only restyle what already exists and leave new content
-for a separate spec?]
-
-**Why this priority**: The versions can ship on existing content; the new content adds value but also
-adds data and behavior.
-
-**Independent Test**: (If in scope.) Write a desired state in «خطتي» and see it on «يومك»; add a quick
-reflection from the card; turn the day's challenge into a habit and see it in tomorrow's habits.
-
-**Acceptance Scenarios** (if in scope):
-
-1. **Given** a member who wrote their desired state, **When** «يومك» opens, **Then** «حالي المنشود»
-   shows it, with a short reflection field that saves to today's reflection.
-2. **Given** today's challenge, **When** the member taps «اجعلها عادة», **Then** a new habit with the
-   challenge's text is added to their current plan and appears from tomorrow.
-3. **Given** an activity the member registered for, **When** «يومك» opens, **Then** a card shows it
-   and can be dismissed for the day.
-
----
-
 ### Edge Cases
 
 - **No choice yet** (existing members from before this feature): they get the default version and a
@@ -184,8 +169,9 @@ reflection from the card; turn the day's challenge into a habit and see it in to
 - **No habits / no challenge today**: the same empty and hidden states as today, styled per version.
 - **Journey not started or ended**: the same states as today, styled per version.
 - **Version removed or renamed later**: members on it fall back to the default with a calm notice.
-- **Other roles' screens** (admin panel, facilitator pages): not themed by this feature unless scope
-  below says otherwise.
+- **Dense admin screens** (tables, long forms): use the chosen version's surfaces and colors, but
+  keep tables and forms on solid surfaces for legibility even in the glass versions.
+- **Several roles**: one person has one chosen version, used in every role they switch to.
 
 ## Requirements *(mandatory)*
 
@@ -203,18 +189,22 @@ reflection from the card; turn the day's challenge into a habit and see it in to
   every device the person signs in on, and be remembered on the device for offline use.
 - **FR-005**: Members MUST be able to change version from «حسابي» at any time; the change MUST apply
   immediately without signing out and without losing unsaved input.
-- **FR-006**: Each version MUST apply to the screens in scope: [NEEDS CLARIFICATION: Which screens
-  get the three versions — only «يومك» and the shared navigation, all member screens, or every screen
-  including the facilitator and admin areas?]
+- **FR-006**: Each version MUST apply to every screen of the app: setup, joining and sign-in; all
+  member screens («يومك»، «خطتي»، الإحصاءات، المجتمع، مجموعاتي، المراجعات، الموارد، حسابي، المزيد);
+  the facilitator's group pages; and the admin panel. Signed-out screens (joining, sign-in) use the
+  default version until a person has chosen.
+- **FR-007**: Dense data screens (admin tables and long forms) MUST keep text on solid surfaces in
+  every version; glass treatment applies to their page background, headers, and navigation.
 
 **Shared design language**
 
 - **FR-010**: All versions MUST use the same design tokens from the designs: green, terracotta, gold,
   and ink color scales; the warm canvas color; the Cairo Arabic typeface; rounded cards and controls;
   and the same icon family.
-- **FR-011**: All versions MUST share the same layout and navigation: bottom navigation يومي · خطتي ·
-  الإحصاءات · المجتمع · المزيد and a floating + button; only surfaces, background imagery, and the
-  opening ritual differ.
+- **FR-011**: All versions MUST share the same layout and navigation: member screens use the bottom
+  navigation يومي · خطتي · الإحصاءات · المجتمع · المزيد and a floating + button on «يومك»; the admin and
+  facilitator areas keep their own navigation; only surfaces, background imagery, and the opening
+  ritual differ between versions.
 - **FR-012**: Surface treatment per version:
   - «زجاجي»: translucent white cards with frosted blur over a soft painted botanical background.
   - «رحلة يومي»: solid white/cream cards on the plain warm canvas; no blur.
@@ -222,14 +212,16 @@ reflection from the card; turn the day's challenge into a habit and see it in to
 
 **«يومك» content (all versions)**
 
-- **FR-020**: «يومك» MUST present, in every version: greeting with day name, Gregorian date and journey
-  day; the day's intention / «ابدأ يومي»; «عاداتي اليومية»; «تقدمك اليوم»; «تحدّي اليوم» (journey and own
+- **FR-020**: «يومك» MUST present, in every version, the content it has today (spec 001) and nothing
+  new beyond FR-021–FR-024: greeting with day name, Gregorian date and journey day; the day's
+  intention / «ابدأ يومي»; the review prompt when due; «عاداتي اليومية»; «تقدمك اليوم»; «تحدّي اليوم» (journey and own
   challenge, still visually distinct per FR-013 of spec 001); upcoming activities; «ختام اليوم».
 - **FR-021**: «عاداتي اليومية» MUST show habits as a horizontally scrollable row of labelled circular
   icons with a clear done state and a done/total count, and MUST be expandable to show each habit's
   description, this week's done days out of 7, and its current streak.
-- **FR-022**: Each habit MUST be able to show an icon chosen by the member from a curated set; habits
-  without one show a default icon.
+- **FR-022**: Each habit MUST be able to show an icon chosen by the member from a curated set (when
+  creating or editing the habit); habits without one show a default icon. This is the only new habit
+  data, needed by the circular habit row.
 - **FR-023**: «تقدمك اليوم» MUST show today's habit completion as a percentage, computed from the same
   records as «الإحصاءات» (spec 001 FR-036).
 - **FR-024**: The floating + button MUST open quick actions: add a habit, write today's own challenge,
@@ -256,15 +248,6 @@ reflection from the card; turn the day's challenge into a habit and see it in to
   connection in every version; background images MUST NOT block content.
 - **FR-043**: All text MUST remain Arabic, right-to-left, and come from the app's message catalog.
 
-**New content (only if in scope — see User Story 6)**
-
-- **FR-050**: Members MUST be able to write a «حالي المنشود» (desired state) in «خطتي»; «يومك» shows it
-  with a quick reflection field that saves to today's reflection.
-- **FR-051**: «اجعلها عادة» MUST add a habit with the challenge's text to the member's current plan,
-  starting the next day.
-- **FR-052**: Members MUST be able to register for an activity; «يومك» shows registered activities as a
-  dismissible card.
-
 ### Key Entities *(include if feature involves data)*
 
 - **Appearance preference**: per user — chosen version (one of three), whether the opening ritual is
@@ -274,8 +257,6 @@ reflection from the card; turn the day's challenge into a habit and see it in to
 - **Daily quote**: admin-managed text with optional source; one is selected per date.
 - **Ritual seen**: per user and date — the quote card was dismissed or acted on.
 - **Habit icon**: an icon from a curated set, optionally attached to a habit.
-- **Desired state** *(if in scope)*: per plan — a short text describing the member's hoped-for day.
-- **Activity registration** *(if in scope)*: member ↔ activity.
 
 ## Success Criteria *(mandatory)*
 
@@ -287,8 +268,10 @@ reflection from the card; turn the day's challenge into a habit and see it in to
   versions (checked by running the same scenario in each).
 - **SC-003**: «يومك» is usable within 3 seconds on a mid-range phone over a typical mobile connection
   in each version.
-- **SC-004**: Automated accessibility checks report 0 WCAG 2.1 AA violations on every in-scope screen
-  in each version, with and without reduced transparency and reduced motion.
+- **SC-004**: Automated accessibility checks report 0 WCAG 2.1 AA violations on every screen in each
+  version, with and without reduced transparency and reduced motion.
+- **SC-007**: Every existing end-to-end scenario of spec 001 passes unchanged in each of the three
+  versions.
 - **SC-005**: A version change made on one device appears on the person's other device on its next
   open in 100% of tests.
 - **SC-006**: In usability sessions, at least 80% of participants say their chosen version feels calm
@@ -301,9 +284,10 @@ reflection from the card; turn the day's challenge into a habit and see it in to
   style.
 - The product owner asked that the versions be built with the Ionic component framework already
   added to the app (spec 001 research §11); the implications are handled in the plan, not here.
-- The current app's design (spec 001) is replaced by these versions on the screens in scope; there is
-  no fourth "classic" option.
+- The current app's design (spec 001) is replaced by these versions on every screen; there is no
+  fourth "classic" option.
+- Out of scope (separate future spec): «حالي المنشود» with quick reflection, activity registration and
+  its «يومك» card, and «اجعلها عادة».
 - Icons come from one rounded icon family across all versions; the designs use the same family.
 - Quotes ship with a small editable default set in Arabic.
 - Dark mode is out of scope for this feature.
-- Facilitator and admin screens keep the current design unless FR-006 says otherwise.

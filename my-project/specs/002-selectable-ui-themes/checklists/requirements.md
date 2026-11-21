@@ -13,13 +13,13 @@
 
 ## Requirement Completeness
 
-- [ ] No [NEEDS CLARIFICATION] markers remain
+- [x] No [NEEDS CLARIFICATION] markers remain
 - [x] Requirements are testable and unambiguous
 - [x] Success criteria are measurable
 - [x] Success criteria are technology-agnostic (no implementation details)
 - [x] All acceptance scenarios are defined
 - [x] Edge cases are identified
-- [ ] Scope is clearly bounded
+- [x] Scope is clearly bounded
 - [x] Dependencies and assumptions identified
 
 ## Feature Readiness
@@ -33,7 +33,6 @@
 
 - Iteration 1: the component framework (Ionic) is named only in the Input line and in Assumptions, as
   a product-owner constraint; requirements and success criteria stay technology-agnostic.
-- Open: 2 [NEEDS CLARIFICATION] markers, both scope: which screens get the three versions (FR-006),
-  and whether the new «يومك» content from the designs is in this feature (User Story 6). "Scope is
-  clearly bounded" passes once they are answered.
+- Iteration 2 (2026-11-21): answers recorded — every screen gets the versions (FR-006, FR-007); new
+  content from the designs is out of scope (User Story 6 removed; FR-050–052 removed). All items pass.
 - Items marked incomplete require spec updates before `/speckit-clarify` or `/speckit-plan`
