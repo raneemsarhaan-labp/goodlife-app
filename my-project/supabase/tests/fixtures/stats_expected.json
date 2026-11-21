@@ -1,0 +1,18 @@
+{
+  "_about": "Expected figures for supabase/tests/stats.test.sql (SC-004). Period: the last 30 days. Dates are relative to the member's today (T).",
+  "member_m1": {
+    "habits": {
+      "reading": { "done_days": 20, "possible_days": 30, "rate": 0.67, "note": "done T-29..T-10" },
+      "walking": { "done_days": 12, "possible_days": 30, "current_streak": 5, "longest_streak": 7, "note": "done T-4..T and T-20..T-14" },
+      "archived_sleep": { "done_days": 5, "possible_days": 20, "note": "archived on T-10; done T-15..T-11" }
+    },
+    "journey_done": 3,
+    "own_written": 2,
+    "own_done": 1,
+    "days_closed": 4,
+    "completion_rate": 0.46
+  },
+  "member_m2": { "completion_rate": 0.33, "note": "one habit done 10 of 30 days, no activity in the last 7 days" },
+  "member_m3_moved": { "completion_rate_in_g1": 1.0, "counted_days_in_g1": 10, "note": "moved from G2 to G1 on T-9; done every day" },
+  "group_g1": { "members": 3, "avg_completion": 0.6, "active_last_7_days": 2 }
+}

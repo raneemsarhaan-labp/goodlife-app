@@ -359,5 +359,31 @@
     "readOnly": "هذه المراجعة مكتملة ولا يمكن تعديلها.",
     "noAnswer": "—",
     "snapshotNote": "الأرقام كما كانت عند إكمال المراجعة."
+  },
+  "stats": {
+    "title": "الإحصاءات",
+    "intro": "صورة عن التزامك وتقدّمك مع الوقت.",
+    "periodsLabel": "الفترة",
+    "periods": {
+      "week": "هذا الأسبوع",
+      "month": "هذا الشهر",
+      "journey": "الرحلة كلها"
+    },
+    "range": "من {from} إلى {to}",
+    "overallTitle": "الالتزام بالعادات",
+    "overall": "{rate} من أيام عاداتك",
+    "overallDetail": "{done} من {possible} يوم-عادة",
+    "habitsTitle": "عاداتك",
+    "habitRate": "{done} من {possible} يومًا ({rate})",
+    "streak": "المتتالية الحالية: {current} · الأطول: {longest}",
+    "bestStreakTitle": "أطول متتالية حالية",
+    "bestStreak": "{days} أيام متتالية في «{name}»",
+    "noStreak": "ابدأ اليوم، وتبدأ المتتالية معك.",
+    "challengesTitle": "التحدّيات",
+    "journey": "تحدّيات الرحلة: {done} من {total}",
+    "own": "تحدّياتك الذاتية: أنجزت {done} من {written}",
+    "daysClosed": "أيام ختمتها: {count} من {days}",
+    "archived": "مؤرشفة",
+    "noHabits": "لا عادات في هذه الفترة بعد."
   }
 }

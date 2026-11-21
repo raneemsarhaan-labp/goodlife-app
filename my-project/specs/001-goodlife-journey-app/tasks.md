@@ -218,16 +218,16 @@ and confirm they fail.
 
 ### Tests for User Story 5 ⚠️
 
-- [ ] T097 [P] [US5] pgTAP tests for `member_stats`, `group_stats`, `group_member_signals` against fixtures in `supabase/tests/fixtures/stats_expected.json` (20/30 days → 67%, current streak 5, longest streak, archived habits, journey vs own challenge counts), plus denial for non-facilitators and other groups' facilitators, in `supabase/tests/stats.test.sql`
-- [ ] T098 [P] [US5] Playwright e2e for quickstart scenarios 6 and 7 in `tests/e2e/us5-stats.spec.ts`
+- [X] T097 [P] [US5] pgTAP tests for `member_stats`, `group_stats`, `group_member_signals` against fixtures in `supabase/tests/fixtures/stats_expected.json` (20/30 days → 67%, current streak 5, longest streak, archived habits, journey vs own challenge counts), plus denial for non-facilitators and other groups' facilitators, in `supabase/tests/stats.test.sql`
+- [X] T098 [P] [US5] Playwright e2e for quickstart scenarios 6 and 7 in `tests/e2e/us5-stats.spec.ts`
 
 ### Implementation for User Story 5
 
-- [ ] T099 [US5] Create `supabase/migrations/0011_stats.sql`: security-definer functions `member_stats(from, to)` (self, current cohort, dates clamped to the member's join date and the journey window), `group_stats(group_id, from, to)` and `group_member_signals(group_id, from, to)` (facilitator of group or admin; each member counted only for dates inside their membership in that group; signals limited to last_active, days_closed, completion_rate) built on `daily_activity`
-- [ ] T100 [US5] Implement `getMemberStats`, `getGroupStats`, `getGroupMemberSignals` in `src/server/queries/stats.ts`
-- [ ] T101 [P] [US5] Build stats components with text equivalents for every visual in `src/components/features/stats/` (`PeriodTabs.tsx`, `HabitRateList.tsx`, `StreakCard.tsx`, `ChallengeSummary.tsx` with journey/own split)
-- [ ] T102 [US5] Build «الإحصاءات» page (this week, this month, whole journey) in `src/app/(member)/stats/page.tsx`
-- [ ] T103 [US5] Add US5 Arabic strings to `messages/ar.json`
+- [X] T099 [US5] Create `supabase/migrations/0011_stats.sql`: security-definer functions `member_stats(from, to)` (self, current cohort, dates clamped to the member's join date and the journey window), `group_stats(group_id, from, to)` and `group_member_signals(group_id, from, to)` (facilitator of group or admin; each member counted only for dates inside their membership in that group; signals limited to last_active, days_closed, completion_rate) built on `daily_activity`
+- [X] T100 [US5] Implement `getMemberStats`, `getGroupStats`, `getGroupMemberSignals` in `src/server/queries/stats.ts`
+- [X] T101 [P] [US5] Build stats components with text equivalents for every visual in `src/components/features/stats/` (`PeriodTabs.tsx`, `HabitRateList.tsx`, `StreakCard.tsx`, `ChallengeSummary.tsx` with journey/own split)
+- [X] T102 [US5] Build «الإحصاءات» page (this week, this month, whole journey) in `src/app/(member)/stats/page.tsx`
+- [X] T103 [US5] Add US5 Arabic strings to `messages/ar.json`
 
 **Checkpoint**: Progress is visible; figures match monthly reviews and Today.
 

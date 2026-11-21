@@ -515,9 +515,27 @@ isOneToOne: false
 "grant_admin":
 { Args: { "p_user": string }; Returns: undefined
                            },
+"group_member_signals":
+{ Args: { "p_from": string,"p_group": string,"p_to": string }; Returns: {
+              "completion_rate": number,"days_closed": number,"full_name": string,"last_active": string,"user_id": string
+            }[]
+                           },
+"group_stats":
+{ Args: { "p_from": string,"p_group": string,"p_to": string }; Returns: Json
+                           },
+"group_windows":
+{ Args: { "p_from": string,"p_group": string,"p_to": string }; Returns: {
+              "active": boolean,"d_from": string,"d_to": string,"user_id": string
+            }[]
+                           },
 "habit_rates":
 { Args: { "p_cohort": string,"p_from": string,"p_to": string,"p_user": string }; Returns: {
               "archived": boolean,"done_days": number,"habit_id": string,"name": string,"possible_days": number
+            }[]
+                           },
+"habit_streaks":
+{ Args: { "p_cohort": string,"p_user": string }; Returns: {
+              "current_streak": number,"habit_id": string,"longest_streak": number
             }[]
                            },
 "has_role":
@@ -540,6 +558,9 @@ isOneToOne: false
                            },
 "journey_day":
 { Args: { "p_local_date": string,"p_user": string }; Returns: number
+                           },
+"member_stats":
+{ Args: { "p_from": string,"p_to": string }; Returns: Json
                            },
 "month_figures":
 { Args: { "p_month": string }; Returns: Json
@@ -570,6 +591,9 @@ isOneToOne: false
                            },
 "require_admin":
 { Args: Record<PropertyKey, never>; Returns: undefined
+                           },
+"require_group_reader":
+{ Args: { "p_group": string }; Returns: undefined
                            },
 "revoke_admin":
 { Args: { "p_user": string }; Returns: undefined
