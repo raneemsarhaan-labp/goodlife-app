@@ -5,7 +5,7 @@ import { signIn } from "./helpers/auth";
 // Seeded member1 has four habits in the seed cohort.
 
 async function queue(page: Page, daysAgo: number, habitName: string) {
-  const habitId = await page.getByRole("checkbox", { name: habitName }).evaluate((el) => el.closest("li")?.dataset.habitId ?? "");
+  const habitId = await page.getByRole("button", { name: habitName, exact: true }).evaluate((el) => el.closest("li")?.dataset.habitId ?? "");
   await page.evaluate(
     async ({ daysAgo, habitId }) => {
       const tapped = new Date(Date.now() - daysAgo * 86_400_000);
@@ -31,19 +31,19 @@ async function queue(page: Page, daysAgo: number, habitName: string) {
 
 test("offline check-off is saved once on reconnect; late replays follow the 7-day rule", async ({ page, context }) => {
   await signIn(page, "member1@example.test");
-  const habit = page.getByRole("checkbox", { name: "قراءة عشر صفحات" });
+  const habit = page.getByRole("button", { name: "قراءة عشر صفحات", exact: true });
   await expect(habit).toBeVisible();
-  const wasChecked = await habit.isChecked();
+  const wasChecked = (await habit.getAttribute("aria-pressed")) === "true";
 
   // Offline tap → pending; back online → saved once.
   await context.setOffline(true);
-  await habit.setChecked(!wasChecked);
+  await habit.click();
   await expect(page.getByText("سيُحفظ عند عودة الاتصال").first()).toBeVisible();
   await context.setOffline(false);
   await page.evaluate(() => window.dispatchEvent(new Event("online")));
   await expect(page.locator("li", { hasText: "قراءة عشر صفحات" }).getByText("سيُحفظ عند عودة الاتصال")).toHaveCount(0);
   await page.reload();
-  await expect(page.getByRole("checkbox", { name: "قراءة عشر صفحات" })).toBeChecked({ checked: !wasChecked });
+  await expect(page.getByRole("button", { name: "قراءة عشر صفحات", exact: true })).toHaveAttribute("aria-pressed", String(!wasChecked));
 
   // A queued tap from 2 days ago is accepted for its own day (no "not saved" notice).
   await queue(page, 2, "مشي عشرين دقيقة");

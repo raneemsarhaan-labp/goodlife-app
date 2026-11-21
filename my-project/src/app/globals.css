@@ -4,63 +4,35 @@
 @import "./tailwind-preflight.css" layer(base);
 @import "tailwindcss/utilities.css" layer(utilities);
 
-/* Calm palette with WCAG 2.1 AA contrast (constitution VI). */
+/* Design tokens from the supplied designs (spec 002); versions and fallbacks are separate files. */
+@import "../ui/theme/tokens.css";
+@import "../ui/theme/versions.css";
+@import "../ui/theme/fallbacks.css";
+
+/* Tailwind color names mapped onto the designs' palette, so every screen follows it. */
 @theme {
-  --color-sand-50: #faf8f4;
-  --color-sand-100: #f2eee5;
-  --color-sand-200: #e4ddcd;
-  --color-ink-900: #1f2a2b;
-  --color-ink-700: #3a4748;
-  --color-ink-500: #5b6869;
-  --color-sage-50: #eef5f1;
-  --color-sage-100: #d7e9df;
-  --color-sage-600: #2f6f57;
-  --color-sage-700: #255a46;
-  --color-dawn-50: #fdf3e7;
-  --color-dawn-600: #9a5a14;
-  --color-dawn-700: #7d480f;
-  --font-sans: var(--font-plex-arabic), system-ui, sans-serif;
-  --radius-card: 1.25rem;
-}
-
-:root {
-  color-scheme: light;
-
-  /* Ionic theme mapped to the app's palette, so Ionic components look like the rest of the app. */
-  --ion-font-family: var(--font-sans);
-  --ion-background-color: var(--color-sand-50);
-  --ion-background-color-rgb: 250, 248, 244;
-  --ion-text-color: var(--color-ink-900);
-  --ion-text-color-rgb: 31, 42, 43;
-  --ion-color-primary: var(--color-sage-700);
-  --ion-color-primary-rgb: 37, 90, 70;
-  --ion-color-primary-contrast: #ffffff;
-  --ion-color-primary-contrast-rgb: 255, 255, 255;
-  --ion-color-primary-shade: #20503e;
-  --ion-color-primary-tint: #3b6b59;
-  --ion-color-secondary: var(--color-dawn-700);
-  --ion-color-secondary-rgb: 125, 72, 15;
-  --ion-color-secondary-contrast: #ffffff;
-  --ion-color-secondary-contrast-rgb: 255, 255, 255;
-  --ion-color-secondary-shade: #6e3f0d;
-  --ion-color-secondary-tint: #8a5a27;
-  --ion-border-color: var(--color-sand-200);
-  --ion-item-background: #ffffff;
-  --ion-item-border-color: var(--color-sand-100);
-}
-
-/* Tailwind's preflight resets margins on every element, which beats Ionic's ::slotted spacing
-   (light-DOM rules win over ::slotted). Restore the spacing Ionic expects inside items. */
-ion-item > [slot="start"] {
-  margin-inline-end: 16px;
-}
-ion-item > [slot="end"] {
-  margin-inline-start: 16px;
+  --color-sand-50: #f7f4ed; /* canvas */
+  --color-sand-100: #f0efe8; /* ink-50 */
+  --color-sand-200: #e3e8e1; /* ink-100 */
+  --color-ink-900: #1b2b22;
+  --color-ink-700: #2e4a3d;
+  --color-ink-500: #5c6e62;
+  --color-sage-50: #eef3ef;
+  --color-sage-100: #dce6df; /* green-100 */
+  --color-sage-600: #2e4a3d; /* green-500 */
+  --color-sage-700: #1f3329; /* green-700 */
+  --color-dawn-50: #fbe3d6; /* terracotta-100 */
+  --color-dawn-600: #d6764f; /* terracotta-500: graphics only */
+  --color-dawn-700: #a85332; /* terracotta-700: text and buttons */
+  --color-gold-100: #fbedd1;
+  --color-gold-500: #dba649;
+  --color-gold-700: #ad7e2e;
+  --font-sans: "Cairo", system-ui, sans-serif;
+  --radius-card: 20px;
 }
 
 html {
-  background: var(--color-sand-50);
-  color: var(--color-ink-900);
+  color: var(--ink-900);
 }
 
 body {
@@ -70,7 +42,7 @@ body {
 }
 
 :focus-visible {
-  outline: 3px solid var(--color-sage-600);
+  outline: 3px solid var(--terracotta-700);
   outline-offset: 2px;
 }
 

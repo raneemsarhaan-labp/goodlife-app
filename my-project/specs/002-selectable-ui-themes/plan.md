@@ -122,6 +122,33 @@ the old components are deleted at the end (no dead code).
 **Structure Decision**: one Next.js project; a new `src/ui/` layer holds the theme, the Ionic-based
 component set, and the client views; routes keep their server responsibilities.
 
+### Implementation note (2026-11-21): what was actually built
+
+Building every screen as a client-only Ionic view (above) was replaced during implementation by a
+lighter design that meets the same requirements:
+
+- **Every screen is themed by tokens, not rewritten.** The existing server-rendered primitives
+  (`Card`, `Button`, `Field`, `EmptyState`, `BottomNav`, …) use the shared surfaces `.gl-surface` /
+  `.gl-surface-strong` / `.gl-nav`, whose look comes from the version tokens. All member,
+  facilitator and admin screens (FR-006) therefore change with `data-ui`, and keep server rendering,
+  no skeleton flash, and no extra JavaScript. Admin keeps solid surfaces via `[data-area=admin]`
+  (FR-007).
+- **Ionic is used where the designs need it**, in client-only islands loaded with `clientView`:
+  the «يومك» island (`src/ui/views/TodayIsland.tsx`: `HabitRow`, `ProgressCard`, `ActivitiesCard`,
+  `QuickActions` (`IonFab`), `QuoteModal` (`IonModal`)). Greeting, day tabs, intention, review
+  prompt and «ختام اليوم» stay server-rendered around it.
+- **`BottomNav` stays a semantic `<nav>` of links**, themed with `.gl-nav` and Material Symbols,
+  instead of `IonTabBar` (page navigation, no Ionic router).
+- Themes live in `src/ui/theme/versions.css` (one file, three `[data-ui]` blocks) rather than three
+  files; Ionic variables are mapped once in `tokens.css`.
+- Seeded users have **no** version choice; e2e selects the version per Playwright project with the
+  `gl_ui` cookie (the account wins only after a choice).
+- Text colour on terracotta buttons uses `--terracotta-700` (#A85332, 5.3:1); `--terracotta-500`
+  (3.2:1 with white) is for graphics only. Off-card text over the backgrounds is protected by a
+  per-version `--page-scrim`.
+
+Measured: first-load JS of «يومك» 163.6 KB gzipped (budget 200 KB); the Ionic island loads after.
+
 ### Delivery order (for /speckit-tasks)
 
 1. Foundation: tokens + three themes + fallbacks, Cairo, icons, `IonicRoot`, `clientView`, skeletons,

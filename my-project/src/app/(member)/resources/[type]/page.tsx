@@ -30,7 +30,7 @@ export default async function ResourceListPage({ params }: { params: Promise<{ t
           <h2 id={`cat-${category}`} className="font-semibold text-sage-700">{category}</h2>
           <ul className="flex flex-col gap-3">
             {items.map((r) => (
-              <li key={r.id} className="flex flex-col gap-2 rounded-2xl border border-sand-200 bg-white p-4">
+              <li key={r.id} className="flex flex-col gap-2 rounded-2xl gl-surface p-4">
                 <p className="font-medium">{r.title}</p>
                 {r.description && <p className="text-sm text-ink-700">{r.description}</p>}
                 <OpenResource id={r.id} type={kind} title={r.title} />

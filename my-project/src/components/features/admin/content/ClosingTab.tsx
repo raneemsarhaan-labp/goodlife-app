@@ -24,10 +24,10 @@ export async function ClosingTab() {
       <p className="text-ink-700">{t("closingIntro")}</p>
       <ul className="flex flex-col gap-3">
         {(data ?? []).map((m) => (
-          <li key={m.id} className="rounded-2xl border border-sand-200 bg-white p-4">{row(m)}</li>
+          <li key={m.id} className="rounded-2xl gl-surface p-4">{row(m)}</li>
         ))}
       </ul>
-      <div className="rounded-2xl border border-dashed border-sand-200 bg-white p-4">{row()}</div>
+      <div className="rounded-2xl border border-dashed border-sand-200 gl-surface p-4">{row()}</div>
     </div>
   );
 }

@@ -14,7 +14,7 @@ export default async function EditHabitPage({ params }: { params: Promise<{ id: 
   const { id } = await params;
   const supabase = await createClient();
   const [{ data: habit }, { data: planId }, areas, t] = await Promise.all([
-    supabase.from("habits").select("id, name, description, focus_area_id, plan_id, archived_at").eq("id", id).maybeSingle(),
+    supabase.from("habits").select("id, name, description, icon, focus_area_id, plan_id, archived_at").eq("id", id).maybeSingle(),
     supabase.rpc("current_plan_id"),
     getFocusAreas(),
     getTranslations("habits"),

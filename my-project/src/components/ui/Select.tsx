@@ -7,7 +7,7 @@ export function Select({ label, className = "", children, ...props }: { label: s
       <label htmlFor={id} className="font-medium">
         {label}
       </label>
-      <select id={id} className={`min-h-11 rounded-xl border border-sand-200 bg-white px-3 ${className}`} {...props}>
+      <select id={id} className={`min-h-11 rounded-xl gl-surface px-3 ${className}`} {...props}>
         {children}
       </select>
     </div>

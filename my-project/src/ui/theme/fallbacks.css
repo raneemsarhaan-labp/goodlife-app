@@ -1,0 +1,41 @@
+/* Accessibility and capability fallbacks (spec 002 FR-041, research §5–6). */
+
+/* In-app "reduce transparency" (iOS Safari has no media query for it). */
+[data-reduce-transparency="true"] {
+  --card-bg: var(--surface);
+  --card-bg-strong: var(--surface);
+  --card-blur: 0px;
+  --nav-bg: var(--surface);
+  --nav-blur: 0px;
+}
+
+@media (prefers-reduced-transparency: reduce) {
+  :root {
+    --card-bg: var(--surface);
+    --card-bg-strong: var(--surface);
+    --card-blur: 0px;
+    --nav-bg: var(--surface);
+    --nav-blur: 0px;
+  }
+}
+
+/* Browsers without backdrop blur: solid surfaces rather than unreadable translucency. */
+@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+  :root {
+    --card-bg: var(--surface);
+    --card-bg-strong: var(--surface);
+    --nav-bg: var(--surface);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --card-blur: 0px;
+    --nav-blur: 0px;
+  }
+}
+
+/* Save-Data: no background imagery (server sets data-save-data from the Save-Data header). */
+[data-save-data="true"] {
+  --page-image: none;
+}

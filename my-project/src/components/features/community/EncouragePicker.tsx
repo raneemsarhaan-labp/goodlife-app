@@ -20,7 +20,7 @@ export function EncouragePicker({ recipient, phrases, alreadyToday }: { recipien
         <label htmlFor={`phrase-${recipient.id}`} className="text-sm text-ink-700">
           {t("encourage", { name: recipient.name })}
         </label>
-        <select id={`phrase-${recipient.id}`} name="phraseId" className="min-h-11 rounded-xl border border-sand-200 bg-white px-3">
+        <select id={`phrase-${recipient.id}`} name="phraseId" className="min-h-11 rounded-xl gl-surface px-3">
           {phrases.map((p) => (
             <option key={p.id} value={p.id}>{p.text}</option>
           ))}

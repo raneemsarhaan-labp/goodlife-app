@@ -29,7 +29,7 @@ export default async function JourneyMapPage() {
           {(stages ?? []).map((s) => {
             const current = day !== undefined && day >= s.from_day && day <= s.to_day;
             return (
-              <li key={s.id} aria-current={current ? "step" : undefined} className={`relative rounded-2xl border p-4 ${current ? "border-sage-600 bg-sage-50" : "border-sand-200 bg-white"}`}>
+              <li key={s.id} aria-current={current ? "step" : undefined} className={`relative rounded-2xl border p-4 ${current ? "border-sage-600 bg-sage-50" : "gl-surface"}`}>
                 <span aria-hidden="true" className={`absolute -start-[1.95rem] top-5 size-4 rounded-full border-2 ${current ? "border-sage-700 bg-sage-700" : "border-sage-600 bg-white"}`} />
                 <p className="text-sm text-ink-500">{t("stageDays", { from: formatNumber(s.from_day), to: formatNumber(s.to_day) })}</p>
                 <h2 className="text-lg font-semibold">{s.title}</h2>

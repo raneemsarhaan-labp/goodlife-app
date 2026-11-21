@@ -24,7 +24,7 @@ export async function ChallengesTab({ page }: { page: number }) {
       <p className="font-medium">{t("pageLabel", { from: formatNumber(from), to: formatNumber(to) })}</p>
       <ol className="flex flex-col gap-3">
         {Array.from({ length: to - from + 1 }, (_, i) => from + i).map((day) => (
-          <li key={day} className="rounded-2xl border border-sand-200 bg-white p-4">
+          <li key={day} className="rounded-2xl gl-surface p-4">
             <ActionForm action={upsertJourneyChallenge} submitLabel={t("save")} successText={ts("saved")} className="flex flex-col gap-2">
               <input type="hidden" name="journeyDay" value={day} />
               <TextArea name="text" label={t("day", { day: formatNumber(day) })} defaultValue={byDay.get(day) ?? ""} maxLength={500} className="min-h-16" />

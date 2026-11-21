@@ -43,7 +43,7 @@ export function InstallHint() {
     setMode("hidden");
   };
   return (
-    <section aria-labelledby="install-hint" className="flex flex-col gap-2 rounded-[var(--radius-card)] border border-sand-200 bg-white p-4">
+    <section aria-labelledby="install-hint" className="flex flex-col gap-2 rounded-[var(--radius-card)] gl-surface p-4">
       <h2 id="install-hint" className="font-semibold">{t("title")}</h2>
       <p className="text-sm text-ink-700">{mode === "android" ? t("android") : t("ios")}</p>
       <div className="flex gap-2">

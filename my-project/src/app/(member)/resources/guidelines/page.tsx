@@ -20,7 +20,7 @@ export default async function GuidelinesPage() {
       ) : (
         <ol className="flex flex-col gap-3">
           {(data ?? []).map((g) => (
-            <li key={g.number} className="flex gap-3 rounded-2xl border border-sand-200 bg-white p-4">
+            <li key={g.number} className="flex gap-3 rounded-2xl gl-surface p-4">
               <span aria-hidden="true" className="flex size-9 shrink-0 items-center justify-center rounded-full bg-sage-50 font-semibold text-sage-700">
                 {new Intl.NumberFormat("ar-u-nu-arab").format(g.number)}
               </span>

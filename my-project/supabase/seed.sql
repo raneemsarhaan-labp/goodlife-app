@@ -165,4 +165,24 @@ insert into public.resources (type, title, description, category, url, audience,
   ('reference', 'كتاب مقترح: العادات الذرية', 'عن بناء العادات الصغيرة.', 'كتب', 'https://example.org/atomic-habits', 'program', 1),
   ('reference', 'مقالة: كيف نراجع شهرنا', 'أفكار لمراجعة شهرية هادئة.', 'مقالات', 'https://example.org/monthly-review', 'program', 2);
 
+-- ── Spec 002: daily quotes and habit icons ────────────────────────────────────
+insert into public.quotes (text, source, sort_order) values
+  ('الحياة الطيّبة: رحلةُ سعيٍ حثيث، لمقصدٍ معتبَر، بوعيٍ ناقدٍ مستبصر، ونفسٍ توّاقةٍ مطمئنّة، وقلبٍ سليم.', null, 1),
+  ('قليلٌ دائم خيرٌ من كثيرٍ منقطع.', null, 2),
+  ('ابدأ صغيرًا، واثبت طويلًا.', null, 3),
+  ('النيّة الصادقة تجعل العادة عبادة.', null, 4),
+  ('كل يومٍ صفحةٌ جديدة، فاكتبها بهدوء.', null, 5),
+  ('ليس المطلوب أن تكمل كل شيء، بل أن تستمر.', null, 6),
+  ('من عرف وجهته هانت عليه الطريق.', null, 7),
+  ('الطمأنينة ثمرة الخطوات الصغيرة المتكررة.', null, 8),
+  ('أحسن إلى نفسك كما تحسن إلى غيرك.', null, 9),
+  ('ما تفعله كل يوم أهم مما تفعله أحيانًا.', null, 10),
+  ('الرفيق قبل الطريق، فاختر من يعينك.', null, 11),
+  ('اشكر على القليل يُبارَك لك فيه.', null, 12);
+
+update public.habits set icon = 'menu_book' where id = '00000000-0000-4000-8000-000000000d01';
+update public.habits set icon = 'directions_walk' where id = '00000000-0000-4000-8000-000000000d02';
+update public.habits set icon = 'bedtime' where id = '00000000-0000-4000-8000-000000000d03';
+update public.habits set icon = 'self_improvement' where id = '00000000-0000-4000-8000-000000000d04';
+
 commit;

@@ -82,7 +82,7 @@ export default async function CohortDetailPage({ params }: { params: Promise<{ i
                       <form action={moveMember} className="flex items-center gap-2">
                         <input type="hidden" name="userId" value={m.id} />
                         <label className="sr-only" htmlFor={`move-${m.id}`}>{t("groups.moveTo")}</label>
-                        <select id={`move-${m.id}`} name="groupId" className="min-h-11 rounded-xl border border-sand-200 bg-white px-2 text-sm">
+                        <select id={`move-${m.id}`} name="groupId" className="min-h-11 rounded-xl gl-surface px-2 text-sm">
                           {others.map((o) => (
                             <option key={o.id} value={o.id}>{`${t("groups.moveTo")} ${o.name}`}</option>
                           ))}

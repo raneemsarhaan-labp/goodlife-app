@@ -309,14 +309,14 @@ isOneToOne: false
                   ]
                 },"habits": {
                   Row: {
-                    "archived_at": string | null,"created_at": string,"description": string | null,"focus_area_id": string | null,"id": string,"name": string,"plan_id": string,"sort_order": number,"updated_at": string
+                    "archived_at": string | null,"created_at": string,"description": string | null,"focus_area_id": string | null,"icon": string | null,"id": string,"name": string,"plan_id": string,"sort_order": number,"updated_at": string
                   }
                   ComputedFields: never
                   Insert: {
-                    "archived_at"?: string | null,"created_at"?: string,"description"?: string | null,"focus_area_id"?: string | null,"id"?: string,"name": string,"plan_id": string,"sort_order"?: number,"updated_at"?: string
+                    "archived_at"?: string | null,"created_at"?: string,"description"?: string | null,"focus_area_id"?: string | null,"icon"?: string | null,"id"?: string,"name": string,"plan_id": string,"sort_order"?: number,"updated_at"?: string
                   }
                   Update: {
-                    "archived_at"?: string | null,"created_at"?: string,"description"?: string | null,"focus_area_id"?: string | null,"id"?: string,"name"?: string,"plan_id"?: string,"sort_order"?: number,"updated_at"?: string
+                    "archived_at"?: string | null,"created_at"?: string,"description"?: string | null,"focus_area_id"?: string | null,"icon"?: string | null,"id"?: string,"name"?: string,"plan_id"?: string,"sort_order"?: number,"updated_at"?: string
                   }
                   Relationships: [
                     {
@@ -471,6 +471,20 @@ isOneToOne: false
       referencedColumns: ["id"]
     }
                   ]
+                },"quotes": {
+                  Row: {
+                    "active": boolean,"created_at": string,"id": string,"sort_order": number,"source": string | null,"text": string,"updated_at": string
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "active"?: boolean,"created_at"?: string,"id"?: string,"sort_order"?: number,"source"?: string | null,"text": string,"updated_at"?: string
+                  }
+                  Update: {
+                    "active"?: boolean,"created_at"?: string,"id"?: string,"sort_order"?: number,"source"?: string | null,"text"?: string,"updated_at"?: string
+                  }
+                  Relationships: [
+                    
+                  ]
                 },"resource_audiences": {
                   Row: {
                     "cohort_id": string | null,"group_id": string | null,"id": string,"resource_id": string
@@ -537,6 +551,26 @@ isOneToOne: false
                   Relationships: [
                     
                   ]
+                },"ritual_seen": {
+                  Row: {
+                    "local_date": string,"seen_at": string,"user_id": string
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "local_date": string,"seen_at"?: string,"user_id": string
+                  }
+                  Update: {
+                    "local_date"?: string,"seen_at"?: string,"user_id"?: string
+                  }
+                  Relationships: [
+                    {
+      foreignKeyName: "ritual_seen_user_id_fkey"
+      columns: ["user_id"]
+isOneToOne: false
+      referencedRelation: "users"
+      referencedColumns: ["id"]
+    }
+                  ]
                 },"user_roles": {
                   Row: {
                     "created_at": string,"role": Database["public"]['Enums']["app_role"],"user_id": string
@@ -559,14 +593,14 @@ isOneToOne: false
                   ]
                 },"users": {
                   Row: {
-                    "active_role": Database["public"]['Enums']["app_role"],"city": string | null,"created_at": string,"deletion_requested_at": string | null,"email": string,"full_name": string,"gender": Database["public"]['Enums']["gender"] | null,"id": string,"notification_prefs": NonNullable<Json>,"phone": string | null,"time_zone": string,"updated_at": string
+                    "active_role": Database["public"]['Enums']["app_role"],"city": string | null,"created_at": string,"deletion_requested_at": string | null,"email": string,"full_name": string,"gender": Database["public"]['Enums']["gender"] | null,"id": string,"notification_prefs": NonNullable<Json>,"phone": string | null,"time_zone": string,"ui_chosen_at": string | null,"ui_reduce_transparency": boolean,"ui_ritual": boolean,"ui_version": Database["public"]['Enums']["ui_version"],"updated_at": string
                   }
                   ComputedFields: never
                   Insert: {
-                    "active_role"?: Database["public"]['Enums']["app_role"],"city"?: string | null,"created_at"?: string,"deletion_requested_at"?: string | null,"email": string,"full_name": string,"gender"?: Database["public"]['Enums']["gender"] | null,"id": string,"notification_prefs"?: NonNullable<Json>,"phone"?: string | null,"time_zone"?: string,"updated_at"?: string
+                    "active_role"?: Database["public"]['Enums']["app_role"],"city"?: string | null,"created_at"?: string,"deletion_requested_at"?: string | null,"email": string,"full_name": string,"gender"?: Database["public"]['Enums']["gender"] | null,"id": string,"notification_prefs"?: NonNullable<Json>,"phone"?: string | null,"time_zone"?: string,"ui_chosen_at"?: string | null,"ui_reduce_transparency"?: boolean,"ui_ritual"?: boolean,"ui_version"?: Database["public"]['Enums']["ui_version"],"updated_at"?: string
                   }
                   Update: {
-                    "active_role"?: Database["public"]['Enums']["app_role"],"city"?: string | null,"created_at"?: string,"deletion_requested_at"?: string | null,"email"?: string,"full_name"?: string,"gender"?: Database["public"]['Enums']["gender"] | null,"id"?: string,"notification_prefs"?: NonNullable<Json>,"phone"?: string | null,"time_zone"?: string,"updated_at"?: string
+                    "active_role"?: Database["public"]['Enums']["app_role"],"city"?: string | null,"created_at"?: string,"deletion_requested_at"?: string | null,"email"?: string,"full_name"?: string,"gender"?: Database["public"]['Enums']["gender"] | null,"id"?: string,"notification_prefs"?: NonNullable<Json>,"phone"?: string | null,"time_zone"?: string,"ui_chosen_at"?: string | null,"ui_reduce_transparency"?: boolean,"ui_ritual"?: boolean,"ui_version"?: Database["public"]['Enums']["ui_version"],"updated_at"?: string
                   }
                   Relationships: [
                     
@@ -685,6 +719,9 @@ isOneToOne: false
 "journey_day":
 { Args: { "p_local_date": string,"p_user": string }; Returns: number
                            },
+"mark_ritual_seen":
+{ Args: Record<PropertyKey, never>; Returns: undefined
+                           },
 "member_stats":
 { Args: { "p_from": string,"p_to": string }; Returns: Json
                            },
@@ -693,6 +730,11 @@ isOneToOne: false
                            },
 "move_member":
 { Args: { "p_group": string,"p_user": string }; Returns: undefined
+                           },
+"my_habit_details":
+{ Args: { "p_date": string }; Returns: {
+              "current_streak": number,"habit_id": string,"week_done": number
+            }[]
                            },
 "normalize_invitation_code":
 { Args: { "p_code": string }; Returns: string
@@ -703,6 +745,22 @@ isOneToOne: false
 "previous_plan_habit_count":
 { Args: Record<PropertyKey, never>; Returns: number
                            },
+"quote_for_date":
+{ Args: { "p_date": string }; Returns: {
+              "active": boolean,
+"created_at": string,
+"id": string,
+"sort_order": number,
+"source": string | null,
+"text": string,
+"updated_at": string
+            }
+                          SetofOptions: {
+        from: "*"
+        to: "quotes"
+        isOneToOne: true
+        isSetofReturn: false
+      } },
 "received_encouragements":
 { Args: { "p_limit"?: number }; Returns: {
               "created_at": string,"id": string,"local_date": string,"phrase": string,"sender_name": string
@@ -762,12 +820,15 @@ isOneToOne: false
 "shares_active_group":
 { Args: { "p_a": string,"p_b": string }; Returns: boolean
                            },
+"today_ritual":
+{ Args: Record<PropertyKey, never>; Returns: Json
+                           },
 "user_local_date":
 { Args: { "p_user": string }; Returns: string
                            }
           }
           Enums: {
-            "app_role": "member"|"facilitator"|"admin","challenge_kind": "journey"|"own","gender": "male"|"female","membership_role": "member"|"facilitator","resource_audience": "program"|"cohorts"|"groups","resource_type": "recording"|"file"|"reference","review_status": "draft"|"completed"
+            "app_role": "member"|"facilitator"|"admin","challenge_kind": "journey"|"own","gender": "male"|"female","membership_role": "member"|"facilitator","resource_audience": "program"|"cohorts"|"groups","resource_type": "recording"|"file"|"reference","review_status": "draft"|"completed","ui_version": "journey"|"glass"|"full_glass"
           }
           CompositeTypes: {
             [_ in never]: never
@@ -883,7 +944,7 @@ export type CompositeTypes<
 export const Constants = {
   "public": {
           Enums: {
-            "app_role": ["member", "facilitator", "admin"],"challenge_kind": ["journey", "own"],"gender": ["male", "female"],"membership_role": ["member", "facilitator"],"resource_audience": ["program", "cohorts", "groups"],"resource_type": ["recording", "file", "reference"],"review_status": ["draft", "completed"]
+            "app_role": ["member", "facilitator", "admin"],"challenge_kind": ["journey", "own"],"gender": ["male", "female"],"membership_role": ["member", "facilitator"],"resource_audience": ["program", "cohorts", "groups"],"resource_type": ["recording", "file", "reference"],"review_status": ["draft", "completed"],"ui_version": ["journey", "glass", "full_glass"]
           }
         }
 } as const

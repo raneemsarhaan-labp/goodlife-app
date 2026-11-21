@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { HABIT_ICON_NAMES } from "@/ui/icons.generated";
 import { emptyToUndefined, localDateSchema, uuidSchema } from "./common";
 
 // data-model.md habit_completions.local_date, habit_completions.client_mutation_id, habit_completions.recorded_at
@@ -28,4 +29,6 @@ export const ownChallengeSchema = z.string().trim().max(300).refine((v) => v ===
 export const habitSchema = z.object({
   name: z.string().trim().min(1).max(80),
   description: z.preprocess(emptyToUndefined, z.string().trim().max(500).optional()),
+  // data-model.md habits.icon (spec 002): one of the curated names, or none
+  icon: z.preprocess(emptyToUndefined, z.enum(HABIT_ICON_NAMES).optional()),
 });

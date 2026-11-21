@@ -71,7 +71,7 @@ export function ActivityForm({
       ) : (
         <div className="flex flex-col gap-1.5">
           <label htmlFor="cohortId" className="font-medium">{t("chooseCohort")}</label>
-          <select id="cohortId" name="cohortId" defaultValue={draft.cohortId ?? undefined} className="min-h-11 rounded-xl border border-sand-200 bg-white px-3">
+          <select id="cohortId" name="cohortId" defaultValue={draft.cohortId ?? undefined} className="min-h-11 rounded-xl gl-surface px-3">
             {cohorts.map((c) => (
               <option key={c.id} value={c.id}>{c.name}</option>
             ))}

@@ -17,7 +17,7 @@ export async function GuidelinesTab() {
       <p className="text-ink-700">{t("guidelinesIntro")}</p>
       <ol className="flex flex-col gap-3">
         {Array.from({ length: 10 }, (_, i) => i + 1).map((n) => (
-          <li key={n} className="rounded-2xl border border-sand-200 bg-white p-4">
+          <li key={n} className="rounded-2xl gl-surface p-4">
             <ActionForm action={upsertGuideline} submitLabel={t("save")} successText={ts("saved")} className="flex flex-col gap-2">
               <input type="hidden" name="number" value={n} />
               <TextArea name="text" label={t("guideline", { number: formatNumber(n) })} defaultValue={byNumber.get(n) ?? ""} maxLength={1000} required className="min-h-16" />

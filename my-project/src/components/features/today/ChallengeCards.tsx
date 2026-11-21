@@ -89,7 +89,7 @@ export function ChallengeCards({ journey, own, localDate }: { journey: TodayChal
               defaultValue={text}
               maxLength={300}
               placeholder={t("ownChallengePlaceholder")}
-              className="min-h-11 rounded-xl border border-sand-200 bg-white px-4"
+              className="min-h-11 rounded-xl gl-surface px-4"
             />
             <Button type="submit" variant="secondary" disabled={saving} className="self-start">
               {t("saveChallenge")}

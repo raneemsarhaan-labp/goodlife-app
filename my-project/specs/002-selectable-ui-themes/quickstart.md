@@ -1,8 +1,10 @@
 # Quickstart & Validation: Selectable Visual Versions
 
 Prerequisites and setup are the same as spec 001 ([quickstart](../001-goodlife-journey-app/quickstart.md)):
-`npx supabase start && npx supabase db reset && npm run dev`. The seed adds daily quotes and sets
-member1 to «زجاجي», member2 to «زجاج كامل», everyone else to the default «رحلة يومي».
+`npx supabase start && npx supabase db reset && npm run dev`. The seed adds 12 daily quotes and habit
+icons. Seeded users have not chosen a version, so they see the device's `gl_ui` cookie or the default
+«رحلة يومي», plus the «اختر شكل تطبيقك» invitation card. e2e picks the version per Playwright project
+with that cookie.
 
 ## Automated checks
 
@@ -11,6 +13,7 @@ npm run lint && npm run typecheck && npm test
 npm run db:test:local                       # includes ui_versions.test.sql
 npm run test:e2e                            # all spec 001 + 002 specs, in each of the 3 versions
 npm run test:e2e -- --project=ui-glass      # one version only
+npm run build && npm run check:bundle       # «يومك» first-load JS ≤ 200 KB gzipped
 ```
 
 ## Manual scenarios (phone-sized viewport)
@@ -19,7 +22,7 @@ npm run test:e2e -- --project=ui-glass      # one version only
    shows three previews → pick «زجاج كامل» → «يومك» opens in Full Glass. Sign in on a second browser:
    same version.
 2. **Skip (US1)**: join again, skip the step → «رحلة يومي».
-3. **Parity (US2)**: as member1 («زجاجي») check two habits, mark the journey challenge done, close the
+3. **Parity (US2)**: as member1 (choose «زجاجي» in «المظهر») check two habits, mark the journey challenge done, close the
    day. Switch to «رحلة يومي» and «زجاج كامل»: the same state shows; «الإحصاءات» figures identical.
 4. **Habit row (US2)**: tap a habit circle (check mark, count and «تقدمك اليوم» update); expand the row
    (description, ٥/٧ أيام-style weekly progress, streak); tap + (quick actions).

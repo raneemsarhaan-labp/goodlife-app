@@ -38,7 +38,7 @@ export function ReorderList({
     <div>
       <ol aria-label={label} className="flex flex-col gap-2">
         {order.map((item, i) => (
-          <li key={item.id} className="flex items-center gap-2 rounded-xl border border-sand-200 bg-white px-3 py-1">
+          <li key={item.id} className="flex items-center gap-2 rounded-xl gl-surface px-3 py-1">
             <span className="flex-1">{item.label}</span>
             <button
               type="button"

@@ -17,7 +17,7 @@ test("«يومك» is interactive within 3 seconds on a throttled mobile profile
 
   const start = Date.now();
   await page.goto("/", { waitUntil: "commit" });
-  const firstHabit = page.getByRole("checkbox").first();
+  const firstHabit = page.locator("[data-habit-id] button[aria-pressed]").first();
   await expect(firstHabit).toBeEnabled();
   // Interactive: a tap is handled (optimistic update) — then undo it.
   await firstHabit.click();

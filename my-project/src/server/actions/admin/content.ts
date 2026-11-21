@@ -2,7 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
-import { closingMessageSchema, encouragementPhraseSchema, journeyChallengeSchema, reviewQuestionSchema } from "@/lib/validation/admin";
+import { closingMessageSchema, encouragementPhraseSchema, journeyChallengeSchema, quoteSchema, reviewQuestionSchema } from "@/lib/validation/admin";
 import { fail, fromDbError, ok, type Result } from "../result";
 import { currentAdmin, firstIssuePath, formObject } from "./guard";
 
@@ -60,6 +60,19 @@ export async function upsertEncouragementPhrase(_prev: State, formData: FormData
   const { error } = parsed.data.id
     ? await supabase.from("encouragement_phrases").update(row).eq("id", parsed.data.id)
     : await supabase.from("encouragement_phrases").insert(row);
+  if (error) return fromDbError(error);
+  revalidatePath("/admin/content");
+  return ok(null);
+}
+
+/** Adds or edits a daily quote for the opening ritual (spec 002 FR-031). */
+export async function upsertQuote(_prev: State, formData: FormData): Promise<State> {
+  if (!(await currentAdmin())) return fail("forbidden");
+  const parsed = quoteSchema.safeParse(formObject(formData));
+  if (!parsed.success) return fail("invalid_input", firstIssuePath(parsed.error));
+  const supabase = await createClient();
+  const row = { text: parsed.data.text, source: parsed.data.source ?? null, sort_order: parsed.data.sortOrder, active: parsed.data.active };
+  const { error } = parsed.data.id ? await supabase.from("quotes").update(row).eq("id", parsed.data.id) : await supabase.from("quotes").insert(row);
   if (error) return fromDbError(error);
   revalidatePath("/admin/content");
   return ok(null);

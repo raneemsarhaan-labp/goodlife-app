@@ -1,0 +1,111 @@
+/* The three visual versions (contracts/ui-themes.md › Per version). One component set; only these
+   tokens differ. Selected by <html data-ui="journey|glass|full-glass">. */
+
+:root,
+[data-ui="journey"] {
+  --page-bg: var(--canvas);
+  --page-image: none;
+  --page-scrim: transparent;
+  --card-bg: var(--surface);
+  --card-bg-strong: var(--surface);
+  --card-blur: 0px;
+  --card-border: var(--ink-100);
+  --card-shadow: var(--shadow-sm);
+  --nav-bg: var(--surface);
+  --nav-blur: 0px;
+}
+
+/* «زجاجي»: translucent white over a soft painted botanical background. Text areas keep ≥ 0.72
+   white so body text stays ≥ 4.5:1 over every part of the image (research §5). */
+[data-ui="glass"] {
+  --page-bg: var(--canvas);
+  --page-image: image-set(url("/ui/bg-glass-828.avif") type("image/avif") 1x, url("/ui/bg-glass-828.webp") type("image/webp") 1x);
+  /* Text placed directly on the page (titles, hints) stays ≥ 4.5:1 over the art. */
+  --page-scrim: rgb(245 241 232 / 0.35);
+  --card-bg: rgb(255 255 255 / 0.72);
+  --card-bg-strong: rgb(255 255 255 / 0.86);
+  --card-blur: 18px;
+  --card-border: rgb(255 255 255 / 0.65);
+  --card-shadow: var(--shadow-md);
+  --nav-bg: rgb(255 255 255 / 0.78);
+  --nav-blur: 18px;
+}
+
+/* «زجاج كامل»: tinted translucent cards over a full botanical photo. */
+[data-ui="full-glass"] {
+  --page-bg: #e9ece4;
+  --page-image: image-set(url("/ui/bg-full-glass-828.avif") type("image/avif") 1x, url("/ui/bg-full-glass-828.webp") type("image/webp") 1x);
+  /* The photo has dark leaves: a stronger scrim keeps off-card text ≥ 4.5:1 (research §5). */
+  --page-scrim: rgb(233 236 228 / 0.7);
+  --card-bg: rgb(247 244 237 / 0.8);
+  --card-bg-strong: rgb(247 244 237 / 0.9);
+  --card-blur: 18px;
+  --card-border: rgb(255 255 255 / 0.55);
+  --card-shadow: var(--shadow-md);
+  --nav-bg: rgb(247 244 237 / 0.82);
+  --nav-blur: 18px;
+}
+
+@media (min-width: 900px) {
+  [data-ui="glass"] {
+    --page-image: image-set(url("/ui/bg-glass-1600.avif") type("image/avif") 1x, url("/ui/bg-glass-1600.webp") type("image/webp") 1x);
+  }
+  [data-ui="full-glass"] {
+    --page-image: image-set(url("/ui/bg-full-glass-1600.avif") type("image/avif") 1x, url("/ui/bg-full-glass-1600.webp") type("image/webp") 1x);
+  }
+}
+
+/* Page background layer: behind everything, never blocks content. */
+body {
+  background-color: var(--page-bg);
+}
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  background-image: linear-gradient(var(--page-scrim), var(--page-scrim)), var(--page-image);
+  background-size: cover;
+  background-position: center;
+  pointer-events: none;
+}
+
+/* Surfaces: every card-like block uses these. */
+.gl-surface {
+  background-color: var(--card-bg);
+  border: 1px solid var(--card-border);
+  box-shadow: var(--card-shadow);
+  -webkit-backdrop-filter: blur(var(--card-blur));
+  backdrop-filter: blur(var(--card-blur));
+}
+.gl-surface-strong {
+  background-color: var(--card-bg-strong);
+  border: 1px solid var(--card-border);
+  -webkit-backdrop-filter: blur(var(--card-blur));
+  backdrop-filter: blur(var(--card-blur));
+}
+.gl-nav {
+  background-color: var(--nav-bg);
+  -webkit-backdrop-filter: blur(var(--nav-blur));
+  backdrop-filter: blur(var(--nav-blur));
+}
+
+/* FR-007: dense admin and data screens keep text on solid surfaces in every version. */
+[data-area="admin"] .gl-surface,
+[data-area="admin"] .gl-surface-strong,
+.gl-solid {
+  background-color: var(--surface);
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
+}
+
+/* Ionic lists and accordions inside a card take the card's surface (scoped Ionic CSS is unlayered,
+   so this must be unlayered too). */
+.gl-surface,
+.gl-surface-strong {
+  --ion-item-background: transparent;
+}
+.gl-surface :is(ion-list, ion-accordion, ion-accordion-group),
+.gl-surface-strong :is(ion-list, ion-accordion, ion-accordion-group) {
+  background: transparent;
+}

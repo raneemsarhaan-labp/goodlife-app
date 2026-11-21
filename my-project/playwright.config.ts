@@ -13,8 +13,16 @@ export default defineConfig({
     timezoneId: "Asia/Riyadh",
     trace: "off",
   },
-  projects: [{ name: "mobile", use: { ...devices["Pixel 7"], locale: "ar" } }],
+  // One project per visual version (spec 002 research §10): every spec runs in all three.
+  projects: (["journey", "glass", "full-glass"] as const).map((ui) => ({
+    name: `ui-${ui}`,
+    use: {
+      ...devices["Pixel 7"],
+      locale: "ar",
+      storageState: { cookies: [{ name: "gl_ui", value: ui, domain: new URL(baseURL).hostname, path: "/", expires: -1, httpOnly: true, secure: false, sameSite: "Lax" as const }], origins: [] },
+    },
+  })),
   webServer: process.env.E2E_BASE_URL
     ? undefined
-    : { command: "npm run build && npm run start", url: baseURL, timeout: 240_000, reuseExistingServer: true },
+    : { command: process.env.CI ? "npm run start" : "npm run build && npm run start", url: baseURL, timeout: 240_000, reuseExistingServer: true },
 });

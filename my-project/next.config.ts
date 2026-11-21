@@ -37,6 +37,8 @@ const csp = [
 const nextConfig: NextConfig = {
   reactStrictMode: true,
   poweredByHeader: false,
+  // Bundle only the Ionic components and icons that are imported (spec 002 research §4).
+  experimental: { optimizePackageImports: ["@ionic/react", "ionicons"] },
   async headers() {
     return [
       {

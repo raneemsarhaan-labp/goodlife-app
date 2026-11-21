@@ -35,7 +35,7 @@ test("plan: current state, focus areas, linked habits, reorder, archive and rest
   await page.getByRole("button", { name: "تحريك «مشي عشرين دقيقة» للأعلى" }).click();
   await expect(page.getByRole("status").filter({ hasText: "حُفظ الترتيب." })).toBeVisible();
   await page.goto("/");
-  await expect(page.getByRole("checkbox").first()).toHaveAccessibleName("مشي عشرين دقيقة");
+  await expect(page.locator("[data-habit-id] button[aria-pressed]").first()).toHaveAccessibleName("مشي عشرين دقيقة");
 
   // Archive → leaves «يومك», appears in archived; restore brings it back.
   await page.goto("/plan");
@@ -43,10 +43,10 @@ test("plan: current state, focus areas, linked habits, reorder, archive and rest
   await page.getByRole("button", { name: "أرشف العادة" }).click();
   await expect(page).toHaveURL("/plan");
   await page.goto("/");
-  await expect(page.getByRole("checkbox", { name: "دقائق من الهدوء والتأمل" })).toHaveCount(0);
+  await expect(page.getByRole("button", { name: "دقائق من الهدوء والتأمل", exact: true })).toHaveCount(0);
   await page.goto("/account/archived-habits");
   await checkA11y(page);
   await page.getByRole("listitem").filter({ hasText: "دقائق من الهدوء والتأمل" }).getByRole("button", { name: "استعادة" }).click();
   await page.goto("/");
-  await expect(page.getByRole("checkbox", { name: "دقائق من الهدوء والتأمل" })).toBeVisible();
+  await expect(page.getByRole("button", { name: "دقائق من الهدوء والتأمل", exact: true })).toBeVisible();
 });

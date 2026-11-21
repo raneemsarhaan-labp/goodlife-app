@@ -16,6 +16,7 @@ export default async function MorePage() {
     { href: "/groups", key: "groups" },
     { href: "/reviews", key: "reviews" },
     { href: "/account", key: "account" },
+    { href: "/account/appearance", key: "appearance" },
     ...(user.roles.includes("admin") ? [{ href: "/admin", key: "admin" }] : []),
   ];
   return (
@@ -25,7 +26,7 @@ export default async function MorePage() {
         {links.map((l) => (
           <li key={l.key}>
             <Link href={l.href} className="block">
-              <Card className="flex min-h-14 items-center py-3 text-lg hover:bg-sage-50">{t(l.key)}</Card>
+              <Card className="flex min-h-14 items-center py-3 text-lg ">{t(l.key)}</Card>
             </Link>
           </li>
         ))}

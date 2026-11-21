@@ -20,7 +20,7 @@ export function Field({ label, hint, error, className = "", ...props }: Common &
         id={id}
         aria-invalid={error ? true : undefined}
         aria-describedby={describedBy}
-        className={`min-h-11 rounded-xl border border-sand-200 bg-white px-4 text-base text-ink-900 placeholder:text-ink-500 aria-invalid:border-dawn-700 ${className}`}
+        className={`min-h-11 rounded-xl gl-surface px-4 text-base text-ink-900 placeholder:text-ink-500 aria-invalid:border-dawn-700 ${className}`}
         {...props}
       />
       {error && (
@@ -49,7 +49,7 @@ export function TextArea({ label, hint, error, className = "", ...props }: Commo
         id={id}
         aria-invalid={error ? true : undefined}
         aria-describedby={describedBy}
-        className={`min-h-28 rounded-xl border border-sand-200 bg-white px-4 py-3 text-base text-ink-900 placeholder:text-ink-500 aria-invalid:border-dawn-700 ${className}`}
+        className={`min-h-28 rounded-xl gl-surface px-4 py-3 text-base text-ink-900 placeholder:text-ink-500 aria-invalid:border-dawn-700 ${className}`}
         {...props}
       />
       {error && (

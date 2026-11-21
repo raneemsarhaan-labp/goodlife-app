@@ -9,7 +9,7 @@ export async function ReviewPrompt({ month }: { month: string }) {
   const t = await getTranslations("review");
   const monthName = new Intl.DateTimeFormat("ar-u-nu-arab", { month: "long", timeZone: "UTC" }).format(new Date(`${month}T12:00:00Z`));
   return (
-    <section aria-labelledby="review-prompt" className="flex flex-col gap-3 rounded-[var(--radius-card)] border border-sage-100 bg-white p-5">
+    <section aria-labelledby="review-prompt" className="gl-surface flex flex-col gap-3 rounded-[var(--radius-card)] p-5">
       <h2 id="review-prompt" className="text-lg font-semibold">{t("promptTitle", { month: monthName })}</h2>
       <p className="text-ink-700">{t("promptBody")}</p>
       <Link href={`/reviews/${monthKey(month)}`} className={buttonClass("secondary", "self-start")} aria-describedby="review-prompt">

@@ -74,3 +74,12 @@ export const encouragementPhraseSchema = z.object({
   sortOrder: z.coerce.number().int().min(0).max(999).default(0),
   active: z.preprocess((v) => v === "on" || v === "true" || v === true, z.boolean()),
 });
+
+// data-model.md quotes.text, quotes.source, quotes.sort_order, quotes.active (spec 002 FR-031)
+export const quoteSchema = z.object({
+  id: z.preprocess(emptyToUndefined, uuidSchema.optional()),
+  text: z.string().trim().min(10).max(400),
+  source: z.preprocess(emptyToUndefined, z.string().trim().max(120).optional()),
+  sortOrder: z.coerce.number().int().min(0).max(9999).default(0),
+  active: z.preprocess((v) => v === "on" || v === "true" || v === true, z.boolean()),
+});

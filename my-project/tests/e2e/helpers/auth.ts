@@ -33,3 +33,28 @@ export async function signIn(page: Page, email: string) {
   // Each role lands on its own home: «يومك», «مجموعاتي», or the admin panel.
   await expect(page).not.toHaveURL(/\/sign-in/);
 }
+
+/** Joins with the seeded invitation code as a brand-new member and stops on /welcome. */
+export async function joinNewMember(page: Page, email = `e2e-${Date.now()}-${Math.random().toString(36).slice(2, 6)}@example.test`) {
+  await page.goto("/join");
+  await page.getByLabel("رمز الدعوة").fill("taybah26");
+  await page.getByRole("button", { name: "تحقّق من الرمز" }).click();
+  await expect(page).toHaveURL("/join/profile");
+  await page.getByLabel("الاسم الكامل").fill("مشارك الاختبار");
+  await page.getByLabel("البريد الإلكتروني").fill(email);
+  const since = new Date(Date.now() - 1000);
+  await page.getByRole("button", { name: "أنشئ حسابي" }).click();
+  const code = await latestSignInCode(email, since);
+  await page.getByLabel("رمز الدخول").fill(code);
+  await page.getByRole("button", { name: "دخول" }).click();
+  await expect(page).toHaveURL("/welcome");
+  return email;
+}
+
+/** Signs in in a fresh context with no `gl_ui` cookie, so only the account decides the version. */
+export async function signInFresh(browser: import("@playwright/test").Browser, email: string) {
+  const context = await browser.newContext({ locale: "ar", timezoneId: "Asia/Riyadh", storageState: { cookies: [], origins: [] } });
+  const page = await context.newPage();
+  await signIn(page, email);
+  return { context, page };
+}

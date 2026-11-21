@@ -10,3 +10,4 @@ public/swe-worker-*.js
 specs/
 src/lib/supabase/database.types.ts
 src/app/tailwind-preflight.css
+src/ui/icons.generated.ts

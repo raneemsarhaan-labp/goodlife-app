@@ -17,7 +17,7 @@ export default async function AdminLayout({ children }: { children: React.ReactN
   const user = await requireRole("admin");
   const t = await getTranslations("admin");
   return (
-    <div className="mx-auto flex min-h-dvh max-w-4xl flex-col gap-6 px-5 pb-16 pt-6">
+    <div data-area="admin" className="mx-auto flex min-h-dvh max-w-4xl flex-col gap-6 px-5 pb-16 pt-6">
       <header className="flex flex-col gap-3">
         <div className="flex items-center justify-between">
           <p className="text-lg font-semibold text-sage-700">{t("title")}</p>

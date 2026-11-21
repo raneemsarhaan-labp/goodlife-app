@@ -27,7 +27,7 @@ export default async function ArchivedHabitsPage() {
       ) : (
         <ul className="flex flex-col gap-2">
           {(habits ?? []).map((h) => (
-            <li key={h.id} className="flex items-center justify-between gap-3 rounded-2xl border border-sand-200 bg-white px-4 py-2">
+            <li key={h.id} className="flex items-center justify-between gap-3 rounded-2xl gl-surface px-4 py-2">
               <div>
                 <p>{h.name}</p>
                 <p className="text-sm text-ink-500">{t("archivedOn", { date: formatDate(localDate(user.timeZone, new Date(h.archived_at!)), { withYear: true }) })}</p>

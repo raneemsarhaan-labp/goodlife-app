@@ -1,0 +1,81 @@
+/* Shared design tokens from the supplied designs (spec 002 research › Findings). */
+
+@font-face {
+  font-family: "Cairo";
+  font-style: normal;
+  font-display: swap;
+  font-weight: 400;
+  src: url("/fonts/cairo-arabic-400.woff2") format("woff2");
+  unicode-range: U+0600-06FF, U+0750-077F, U+0870-088E, U+0890-0891, U+0897-08E1, U+08E3-08FF, U+200C-200E, U+2010-2011, U+204F, U+2E41, U+FB50-FDFF, U+FE70-FE74, U+FE76-FEFC;
+}
+@font-face { font-family: "Cairo"; font-style: normal; font-display: swap; font-weight: 600; src: url("/fonts/cairo-arabic-600.woff2") format("woff2"); unicode-range: U+0600-06FF, U+0750-077F, U+0870-088E, U+0890-0891, U+0897-08E1, U+08E3-08FF, U+200C-200E, U+2010-2011, U+204F, U+2E41, U+FB50-FDFF, U+FE70-FE74, U+FE76-FEFC; }
+@font-face { font-family: "Cairo"; font-style: normal; font-display: swap; font-weight: 700; src: url("/fonts/cairo-arabic-700.woff2") format("woff2"); unicode-range: U+0600-06FF, U+0750-077F, U+0870-088E, U+0890-0891, U+0897-08E1, U+08E3-08FF, U+200C-200E, U+2010-2011, U+204F, U+2E41, U+FB50-FDFF, U+FE70-FE74, U+FE76-FEFC; }
+@font-face { font-family: "Cairo"; font-style: normal; font-display: swap; font-weight: 400; src: url("/fonts/cairo-latin-400.woff2") format("woff2"); unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD; }
+@font-face { font-family: "Cairo"; font-style: normal; font-display: swap; font-weight: 600; src: url("/fonts/cairo-latin-600.woff2") format("woff2"); unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD; }
+@font-face { font-family: "Cairo"; font-style: normal; font-display: swap; font-weight: 700; src: url("/fonts/cairo-latin-700.woff2") format("woff2"); unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD; }
+
+:root {
+  --green-100: #dce6df;
+  --green-300: #96afa0;
+  --green-500: #2e4a3d;
+  --green-700: #1f3329;
+  --green-900: #12201a;
+  --terracotta-100: #fbe3d6;
+  --terracotta-300: #eba98a;
+  --terracotta-500: #d6764f; /* graphics only: 3.2:1 with white */
+  --terracotta-700: #a85332; /* buttons with text: 5.3:1 with white */
+  --gold-100: #fbedd1;
+  --gold-300: #f0cd84;
+  --gold-500: #dba649;
+  --gold-700: #ad7e2e;
+  --ink-900: #1b2b22;
+  --ink-700: #2e4a3d;
+  --ink-500: #5c6e62;
+  --ink-300: #8fa093; /* decorative only: 2.8:1 */
+  --ink-200: #bfcbc2;
+  --ink-100: #e3e8e1;
+  --ink-50: #f0efe8;
+  --canvas: #f7f4ed;
+  --surface: #ffffff;
+  --success: #4c7a52;
+  --shadow-sm: 0 1px 3px rgb(27 43 34 / 0.08), 0 1px 2px rgb(27 43 34 / 0.05);
+  --shadow-md: 0 6px 24px rgb(27 43 34 / 0.08), 0 2px 6px rgb(27 43 34 / 0.05);
+  --radius-card: 20px;
+  --radius-pill: 999px;
+}
+
+/* Ionic theme from the same tokens (contracts/ui-themes.md › Ionic). Ionic's default secondary
+   text is #999 (2.8:1 on white): every text step used for copy maps to ink-500 (≥ 4.5:1). */
+:root {
+  --ion-font-family: "Cairo", system-ui, sans-serif;
+  --ion-text-color: var(--ink-900);
+  --ion-text-color-rgb: 27, 43, 34;
+  --ion-background-color: var(--surface);
+  --ion-color-primary: var(--terracotta-700);
+  --ion-color-primary-rgb: 168, 83, 50;
+  --ion-color-primary-contrast: #ffffff;
+  --ion-color-primary-contrast-rgb: 255, 255, 255;
+  --ion-color-primary-shade: #94492c;
+  --ion-color-primary-tint: #b16447;
+  --ion-color-secondary: var(--green-500);
+  --ion-color-secondary-rgb: 46, 74, 61;
+  --ion-color-secondary-contrast: #ffffff;
+  --ion-color-secondary-contrast-rgb: 255, 255, 255;
+  --ion-color-secondary-shade: #284136;
+  --ion-color-secondary-tint: #435c50;
+  --ion-color-light: var(--ink-50);
+  --ion-color-light-rgb: 240, 239, 232;
+  --ion-color-light-contrast: var(--ink-900);
+  --ion-color-light-contrast-rgb: 27, 43, 34;
+  --ion-color-light-shade: #d3d2cc;
+  --ion-color-light-tint: #f2f1ea;
+  --ion-color-step-300: var(--ink-500);
+  --ion-color-step-400: var(--ink-500);
+  --ion-color-step-500: var(--ink-500);
+  --ion-color-step-600: var(--ink-500);
+  --ion-text-color-step-300: var(--ink-500);
+  --ion-text-color-step-400: var(--ink-500);
+  --ion-text-color-step-500: var(--ink-500);
+  --ion-text-color-step-600: var(--ink-500);
+  --ion-border-color: var(--ink-100);
+}

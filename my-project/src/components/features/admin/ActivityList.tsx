@@ -21,7 +21,7 @@ export async function ActivityList({ rows, timeZone, editHref }: { rows: Activit
   return (
     <ul className="flex flex-col gap-3">
       {rows.map((a) => (
-        <li key={a.id} className={`flex flex-col gap-1 rounded-2xl border border-sand-200 bg-white p-4 ${a.cancelled_at ? "opacity-60" : ""}`}>
+        <li key={a.id} className={`flex flex-col gap-1 rounded-2xl gl-surface p-4 ${a.cancelled_at ? "opacity-60" : ""}`}>
           <p className="font-medium">
             {a.title} {a.cancelled_at && <span className="text-sm text-dawn-700">({t("cancelled")})</span>}
           </p>

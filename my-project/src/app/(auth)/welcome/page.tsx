@@ -23,7 +23,7 @@ export default async function WelcomePage() {
       <h1 className="text-2xl font-semibold">{t("title")}</h1>
       <p className="leading-loose text-ink-700">{t("body")}</p>
       {data?.groups?.name && <p className="rounded-2xl bg-sage-50 p-4 text-sage-700">{t("group", { group: data.groups.name })}</p>}
-      <Link href="/" className={buttonClass("primary")}>
+      <Link href={user.uiChosenAt ? "/" : "/setup/look"} className={buttonClass("primary")}>
         {t("start")}
       </Link>
     </main>

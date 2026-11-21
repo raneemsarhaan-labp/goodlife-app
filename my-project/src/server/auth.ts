@@ -13,6 +13,11 @@ export type CurrentUser = {
   timeZone: string;
   activeRole: AppRole;
   roles: AppRole[];
+  /** Appearance (spec 002, data-model.md users.ui_*). */
+  uiVersion: Database["public"]["Enums"]["ui_version"];
+  uiRitual: boolean;
+  uiReduceTransparency: boolean;
+  uiChosenAt: string | null;
 };
 
 /**
@@ -28,7 +33,7 @@ export const getCurrentUser = cache(async (): Promise<CurrentUser | null> => {
   const [{ data: profile }, { data: roles }] = await Promise.all([
     supabase
       .from("users")
-      .select("id, full_name, email, time_zone, active_role")
+      .select("id, full_name, email, time_zone, active_role, ui_version, ui_ritual, ui_reduce_transparency, ui_chosen_at")
       .eq("id", userId)
       .maybeSingle(),
     supabase.from("user_roles").select("role").eq("user_id", userId),
@@ -42,6 +47,10 @@ export const getCurrentUser = cache(async (): Promise<CurrentUser | null> => {
     timeZone: profile.time_zone,
     activeRole: profile.active_role,
     roles: (roles ?? []).map((r) => r.role),
+    uiVersion: profile.ui_version,
+    uiRitual: profile.ui_ritual,
+    uiReduceTransparency: profile.ui_reduce_transparency,
+    uiChosenAt: profile.ui_chosen_at,
   };
 });
 

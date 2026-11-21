@@ -19,7 +19,7 @@ function refresh() {
 
 /** Adds a habit to the member's current plan (end of the list), optionally in a focus area. */
 export async function createHabit(_prev: State, formData: FormData): Promise<State> {
-  const parsed = habitSchema.safeParse({ name: formData.get("name"), description: formData.get("description") ?? "" });
+  const parsed = habitSchema.safeParse({ name: formData.get("name"), description: formData.get("description") ?? "", icon: formData.get("icon") ?? "" });
   if (!parsed.success) return fail("invalid_input", firstIssuePath(parsed.error) || "name");
   const focusAreaId = uuidSchema.optional().safeParse(emptyToUndefined(formData.get("focusAreaId")));
   const supabase = await createClient();
@@ -36,6 +36,7 @@ export async function createHabit(_prev: State, formData: FormData): Promise<Sta
     plan_id: planId,
     name: parsed.data.name,
     description: parsed.data.description ?? null,
+    icon: parsed.data.icon ?? null,
     focus_area_id: focusAreaId.success ? (focusAreaId.data ?? null) : null,
     sort_order: (last?.sort_order ?? 0) + 1,
   });
@@ -50,7 +51,7 @@ export async function updateHabit(_prev: State, formData: FormData): Promise<Sta
   const supabase = await createClient();
   const { data, error } = await supabase
     .from("habits")
-    .update({ name: parsed.data.name, description: parsed.data.description ?? null, focus_area_id: parsed.data.focusAreaId ?? null })
+    .update({ name: parsed.data.name, description: parsed.data.description ?? null, focus_area_id: parsed.data.focusAreaId ?? null, ...(parsed.data.icon ? { icon: parsed.data.icon } : {}) })
     .eq("id", parsed.data.id)
     .select("id");
   if (error) return fromDbError(error);

@@ -25,10 +25,10 @@ export async function PhrasesTab() {
       <p className="text-ink-700">{t("phrasesIntro")}</p>
       <ul className="flex flex-col gap-3">
         {(data ?? []).map((p) => (
-          <li key={p.id} className="rounded-2xl border border-sand-200 bg-white p-4">{row(p)}</li>
+          <li key={p.id} className="rounded-2xl gl-surface p-4">{row(p)}</li>
         ))}
       </ul>
-      <div className="rounded-2xl border border-dashed border-sand-200 bg-white p-4">{row()}</div>
+      <div className="rounded-2xl border border-dashed border-sand-200 gl-surface p-4">{row()}</div>
     </div>
   );
 }

@@ -2,13 +2,10 @@ import { pageTitle } from "@/i18n/metadata";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { getTranslations } from "next-intl/server";
-import { ChallengeCards } from "@/components/features/today/ChallengeCards";
 import { EmptyHabits } from "@/components/features/today/EmptyHabits";
 import { Greeting } from "@/components/features/today/Greeting";
-import { HabitList } from "@/components/features/today/HabitList";
 import { JourneyEnded } from "@/components/features/today/JourneyEnded";
 import { ReviewPrompt } from "@/components/features/today/ReviewPrompt";
-import { UpcomingActivities } from "@/components/features/today/UpcomingActivities";
 import { DayRollover } from "@/components/features/today/useDayRollover";
 import { buttonClass } from "@/components/ui/Button";
 import { Card, CardTitle } from "@/components/ui/Card";
@@ -17,6 +14,9 @@ import { InstallHint } from "@/components/features/install/InstallHint";
 import { formatDate } from "@/lib/format";
 import { requireUser } from "@/server/auth";
 import { getToday } from "@/server/queries/today";
+import { createClient } from "@/lib/supabase/server";
+import { ChooseLookCard } from "@/ui/components/ChooseLookCard";
+import { TodayIslandClient } from "@/ui/views/TodayIsland.client";
 
 export const generateMetadata = pageTitle("today");
 
@@ -43,6 +43,9 @@ export default async function TodayPage({ searchParams }: { searchParams: Promis
   }
 
   const habits = data.habits ?? [];
+  const supabase = await createClient();
+  const { data: ritualData } = isToday ? await supabase.rpc("today_ritual") : { data: null };
+  const ritual = (ritualData as { show: boolean; quote: { text: string; source: string | null } | null } | null) ?? { show: false, quote: null };
 
   const closed = Boolean(data.day?.closed_at);
 
@@ -50,6 +53,7 @@ export default async function TodayPage({ searchParams }: { searchParams: Promis
     <main id="main" className="mx-auto flex max-w-lg flex-col gap-5 px-5 pt-6">
       <DayRollover timeZone={data.time_zone} shownDate={isToday ? data.local_date : ""} />
       <RoleSwitcher roles={user.roles} active={user.activeRole} />
+      {!user.uiChosenAt && <ChooseLookCard />}
       <Greeting name={user.fullName} timeZone={data.time_zone} localDate={data.local_date} journeyDay={data.journey_status === "active" ? data.journey_day : undefined} />
 
       {data.journey_status === "ended" && <JourneyEnded />}
@@ -67,7 +71,7 @@ export default async function TodayPage({ searchParams }: { searchParams: Promis
                 key={d}
                 href={d === "today" ? "/" : "/?day=yesterday"}
                 aria-current={which === d ? "page" : undefined}
-                className={`rounded-full px-4 py-2 text-sm ${which === d ? "bg-ink-900 text-white" : "bg-white text-ink-700 ring-1 ring-sand-200"}`}
+                className={`rounded-full px-4 py-2 text-sm ${which === d ? "bg-ink-900 text-white" : "gl-surface text-ink-700 ring-1 ring-sand-200"}`}
               >
                 {t(d === "today" ? "todayTab" : "yesterdayTab")}
               </Link>
@@ -98,23 +102,17 @@ export default async function TodayPage({ searchParams }: { searchParams: Promis
               )
             ))}
 
-          <Card aria-labelledby="habits" className="flex flex-col gap-3">
-            <div className="flex items-center justify-between">
+          {habits.length === 0 && (
+            <Card aria-labelledby="habits" className="flex flex-col gap-3">
               <CardTitle id="habits">{t("habits")}</CardTitle>
-              {habits.length > 0 && isToday && (
-                <Link href="/habits/new" className="text-sm text-sage-700 underline underline-offset-4">
-                  {t("addHabit")}
-                </Link>
-              )}
-            </div>
-            {!isToday && <p className="text-sm text-ink-700">{t("yesterdayNote")}</p>}
-            {habits.length === 0 ? <EmptyHabits /> : <HabitList key={data.local_date} habits={habits} localDate={data.local_date} />}
-          </Card>
+              <EmptyHabits />
+            </Card>
+          )}
+          {!isToday && <p className="text-sm text-ink-700">{t("yesterdayNote")}</p>}
+          <TodayIslandClient data={data} isToday={isToday} ritual={ritual} />
 
           {isToday && (
             <>
-              <ChallengeCards journey={data.journey_challenge ?? null} own={data.own_challenge ?? null} localDate={data.local_date} />
-              <UpcomingActivities activities={data.activities ?? []} timeZone={data.time_zone} />
               <InstallHint />
               {closed ? (
                 <p className="rounded-2xl bg-sage-50 p-4 text-center text-sage-700">{t("dayClosed")}</p>

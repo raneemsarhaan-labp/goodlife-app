@@ -26,7 +26,7 @@ export async function StagesTab() {
       <p className="text-ink-700">{t("stagesIntro")}</p>
       <ul className="flex flex-col gap-3">
         {(data ?? []).map((s) => (
-          <li key={s.id} className="flex flex-col gap-2 rounded-2xl border border-sand-200 bg-white p-4">
+          <li key={s.id} className="flex flex-col gap-2 rounded-2xl gl-surface p-4">
             {row(s)}
             <form action={deleteJourneyStage}>
               <input type="hidden" name="id" value={s.id} />
@@ -35,7 +35,7 @@ export async function StagesTab() {
           </li>
         ))}
       </ul>
-      <div className="rounded-2xl border border-dashed border-sand-200 bg-white p-4">{row()}</div>
+      <div className="rounded-2xl border border-dashed border-sand-200 gl-surface p-4">{row()}</div>
     </div>
   );
 }

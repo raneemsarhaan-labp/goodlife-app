@@ -38,7 +38,7 @@ export function HabitList({ habits, localDate }: { habits: TodayHabit[]; localDa
           <li key={habit.id} data-habit-id={habit.id}>
             <label
               className={`flex min-h-14 cursor-pointer items-center gap-3 rounded-2xl border px-4 transition-colors ${
-                done[habit.id] ? "border-sage-100 bg-sage-50" : "border-sand-200 bg-white"
+                done[habit.id] ? "border-sage-100 bg-sage-50" : "gl-surface"
               }`}
             >
               <input

@@ -6,6 +6,7 @@ import { ChallengesTab } from "@/components/features/admin/content/ChallengesTab
 import { ClosingTab } from "@/components/features/admin/content/ClosingTab";
 import { GuidelinesTab } from "@/components/features/admin/content/GuidelinesTab";
 import { PhrasesTab } from "@/components/features/admin/content/PhrasesTab";
+import { QuotesTab } from "@/components/features/admin/content/QuotesTab";
 import { QuestionsTab } from "@/components/features/admin/content/QuestionsTab";
 import { StagesTab } from "@/components/features/admin/content/StagesTab";
 
@@ -19,6 +20,7 @@ const TABS: Record<string, (params: { page: number }) => ReactNode> = {
   phrases: () => <PhrasesTab />,
   stages: () => <StagesTab />,
   guidelines: () => <GuidelinesTab />,
+  quotes: () => <QuotesTab />,
 };
 
 export default async function ContentPage({ searchParams }: { searchParams: Promise<{ tab?: string; page?: string }> }) {
@@ -36,7 +38,7 @@ export default async function ContentPage({ searchParams }: { searchParams: Prom
               <Link
                 href={`/admin/content?tab=${key}`}
                 aria-current={key === active ? "page" : undefined}
-                className={`inline-flex min-h-11 items-center rounded-full px-4 text-sm ${key === active ? "bg-ink-900 text-white" : "bg-white ring-1 ring-sand-200"}`}
+                className={`inline-flex min-h-11 items-center rounded-full px-4 text-sm ${key === active ? "bg-ink-900 text-white" : "gl-surface ring-1 ring-sand-200"}`}
               >
                 {t(`tabs.${key}`)}
               </Link>

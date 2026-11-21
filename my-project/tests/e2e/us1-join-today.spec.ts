@@ -25,6 +25,10 @@ test("join with a code and live a full day on «يومك»", async ({ page }) =>
   await expect(page).toHaveURL("/welcome");
   await checkA11y(page);
   await page.getByRole("link", { name: "ابدأ رحلتك" }).click();
+  // Spec 002: the look step comes next; skipping keeps «رحلة يومي».
+  await expect(page).toHaveURL("/setup/look");
+  await page.getByRole("button", { name: "تخطَّ الآن" }).click();
+  await expect(page).toHaveURL("/");
 
   // «يومك»: journey day 12 (seed cohort started 11 days ago), no habits yet.
   await expect(page.getByText("اليوم ١٢ من رحلتك")).toBeVisible();
@@ -37,11 +41,11 @@ test("join with a code and live a full day on «يومك»", async ({ page }) =>
   }
 
   // Check two habits → ٢/٣.
-  await page.getByRole("checkbox", { name: "قراءة" }).check();
-  await page.getByRole("checkbox", { name: "مشي" }).check();
-  await expect(page.getByText("أنجزت ٢/٣")).toBeVisible();
+  await page.getByRole("button", { name: "قراءة", exact: true }).click();
+  await page.getByRole("button", { name: "مشي", exact: true }).click();
+  await expect(page.getByText("٢/٣", { exact: true })).toBeVisible();
   await page.reload();
-  await expect(page.getByText("أنجزت ٢/٣")).toBeVisible();
+  await expect(page.getByText("٢/٣", { exact: true })).toBeVisible();
 
   // «ابدأ يومي»: intention.
   await page.getByRole("link", { name: /ابدأ يومي/ }).click();
@@ -65,11 +69,11 @@ test("join with a code and live a full day on «يومك»", async ({ page }) =>
 
   // Yesterday: late logging changes yesterday only.
   await page.getByRole("link", { name: "أمس" }).click();
-  await expect(page.getByText("أنجزت ٠/٣")).toBeVisible();
-  await page.getByRole("checkbox", { name: "قراءة" }).check();
-  await expect(page.getByText("أنجزت ١/٣")).toBeVisible();
+  await expect(page.getByText("٠/٣", { exact: true })).toBeVisible();
+  await page.getByRole("button", { name: "قراءة", exact: true }).click();
+  await expect(page.getByText("١/٣", { exact: true })).toBeVisible();
   await page.getByRole("link", { name: "اليوم", exact: true }).click();
-  await expect(page.getByText("أنجزت ٢/٣")).toBeVisible();
+  await expect(page.getByText("٢/٣", { exact: true })).toBeVisible();
 
   // «ختام اليوم».
   await page.getByRole("link", { name: "ختام اليوم" }).click();

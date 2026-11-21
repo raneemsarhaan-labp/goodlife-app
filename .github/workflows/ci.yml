@@ -36,6 +36,12 @@ jobs:
             --override-name auth.anon_key=NEXT_PUBLIC_SUPABASE_ANON_KEY \
             --override-name auth.service_role_key=SUPABASE_SERVICE_ROLE_KEY \
             | grep -E '^(NEXT_PUBLIC_SUPABASE_URL|NEXT_PUBLIC_SUPABASE_ANON_KEY|SUPABASE_SERVICE_ROLE_KEY)=' >> "$GITHUB_ENV"
+      - name: Build and check the «يومك» JS budget (spec 002)
+        run: |
+          npm run build
+          npm run check:bundle
+        env:
+          NEXT_PUBLIC_SITE_URL: http://localhost:3000
       - run: npx playwright install --with-deps chromium
       - name: End-to-end (mobile RTL + axe)
         run: npm run test:e2e

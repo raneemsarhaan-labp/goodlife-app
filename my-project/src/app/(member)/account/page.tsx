@@ -37,6 +37,9 @@ export default async function AccountPage() {
         )}
         <Link href="/account/archived-habits" className="text-sage-700 underline underline-offset-4">{t("archivedHabits")}</Link>
       </Card>
+      <Link href="/account/appearance" className="gl-surface flex min-h-14 items-center rounded-[var(--radius-card)] px-5 text-lg">
+        {t("appearanceLink")}
+      </Link>
       {user.roles.length > 1 && (
         <Card aria-labelledby="roles">
           <CardTitle id="roles" className="mb-2">{t("rolesTitle")}</CardTitle>
