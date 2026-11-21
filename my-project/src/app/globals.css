@@ -1,4 +1,8 @@
-@import "tailwindcss";
+/* Tailwind split into its documented parts so the base reset can leave Ionic components alone. */
+@layer theme, base, components, utilities;
+@import "tailwindcss/theme.css" layer(theme);
+@import "./tailwind-preflight.css" layer(base);
+@import "tailwindcss/utilities.css" layer(utilities);
 
 /* Calm palette with WCAG 2.1 AA contrast (constitution VI). */
 @theme {
@@ -41,6 +45,17 @@
   --ion-color-secondary-shade: #6e3f0d;
   --ion-color-secondary-tint: #8a5a27;
   --ion-border-color: var(--color-sand-200);
+  --ion-item-background: #ffffff;
+  --ion-item-border-color: var(--color-sand-100);
+}
+
+/* Tailwind's preflight resets margins on every element, which beats Ionic's ::slotted spacing
+   (light-DOM rules win over ::slotted). Restore the spacing Ionic expects inside items. */
+ion-item > [slot="start"] {
+  margin-inline-end: 16px;
+}
+ion-item > [slot="end"] {
+  margin-inline-start: 16px;
 }
 
 html {

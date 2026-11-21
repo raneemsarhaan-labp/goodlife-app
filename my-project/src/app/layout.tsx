@@ -40,7 +40,8 @@ export const viewport: Viewport = {
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
   const t = await getTranslations("common");
   return (
-    <html lang="ar" dir="rtl" className={plexArabic.variable}>
+    // suppressHydrationWarning: Ionic adds its mode/platform classes to <html> in the browser.
+    <html lang="ar" dir="rtl" className={plexArabic.variable} suppressHydrationWarning>
       <body className="min-h-dvh bg-sand-50 text-ink-900 antialiased">
         <a
           href="#main"
