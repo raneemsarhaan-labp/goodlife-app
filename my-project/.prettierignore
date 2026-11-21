@@ -1,0 +1,11 @@
+node_modules/
+.next/
+dist/
+build/
+coverage/
+package-lock.json
+public/sw.js
+public/swe-worker-*.js
+.specify/
+specs/
+src/lib/supabase/database.types.ts

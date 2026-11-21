@@ -1,0 +1,40 @@
+# dependencies
+node_modules/
+
+# build output
+.next/
+out/
+dist/
+build/
+coverage/
+*.tsbuildinfo
+next-env.d.ts
+
+# service worker build output
+public/sw.js
+public/sw.js.map
+public/swe-worker-*.js
+
+# test output
+test-results/
+playwright-report/
+blob-report/
+
+# env and secrets
+.env
+.env*.local
+.env.*
+!.env.example
+
+# supabase local
+supabase/.branches/
+supabase/.temp/
+
+# logs and OS files
+*.log
+.DS_Store
+Thumbs.db
+*.tmp
+*.swp
+.vscode/
+.idea/

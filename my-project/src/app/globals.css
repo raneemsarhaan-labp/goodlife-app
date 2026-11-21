@@ -1,0 +1,49 @@
+@import "tailwindcss";
+
+/* Calm palette with WCAG 2.1 AA contrast (constitution VI). */
+@theme {
+  --color-sand-50: #faf8f4;
+  --color-sand-100: #f2eee5;
+  --color-sand-200: #e4ddcd;
+  --color-ink-900: #1f2a2b;
+  --color-ink-700: #3a4748;
+  --color-ink-500: #5b6869;
+  --color-sage-50: #eef5f1;
+  --color-sage-100: #d7e9df;
+  --color-sage-600: #2f6f57;
+  --color-sage-700: #255a46;
+  --color-dawn-50: #fdf3e7;
+  --color-dawn-600: #9a5a14;
+  --color-dawn-700: #7d480f;
+  --font-sans: var(--font-plex-arabic), system-ui, sans-serif;
+  --radius-card: 1.25rem;
+}
+
+:root {
+  color-scheme: light;
+}
+
+html {
+  background: var(--color-sand-50);
+  color: var(--color-ink-900);
+}
+
+body {
+  font-family: var(--font-sans);
+  line-height: 1.7;
+  -webkit-tap-highlight-color: transparent;
+}
+
+:focus-visible {
+  outline: 3px solid var(--color-sage-600);
+  outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}

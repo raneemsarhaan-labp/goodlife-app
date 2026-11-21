@@ -31,16 +31,16 @@ and confirm they fail.
 
 **Purpose**: Project initialization and tooling
 
-- [ ] T001 Scaffold a Next.js 16 App Router project with TypeScript strict mode and `src/` directory in `my-project/` (`package.json`, `tsconfig.json`, `next.config.ts`), keeping the existing `.specify/`, `.claude/`, and `specs/` folders untouched
-- [ ] T002 Add dependencies from plan.md Technical Context to `package.json`: `@supabase/supabase-js`, `@supabase/ssr`, `next-intl`, `tailwindcss@4`, `@serwist/next`, `serwist`, `idb`, `zod`; dev: `supabase`, `vitest`, `@playwright/test`, `@axe-core/playwright`, `eslint`, `prettier`
-- [ ] T003 [P] Configure ESLint + Prettier in `eslint.config.mjs` and `.prettierrc`, including a rule that forbids physical-direction Tailwind classes (`ml-*`, `mr-*`, `pl-*`, `pr-*`, `left-*`, `right-*`, `text-left`, `text-right`, `rounded-l*`, `rounded-r*`) per constitution I
-- [ ] T004 [P] Set up Tailwind CSS 4 with color, spacing, and type tokens (calm palette, AA contrast) in `src/app/globals.css`
-- [ ] T005 [P] Configure Vitest in `vitest.config.ts` with tests under `tests/unit/`
-- [ ] T006 [P] Configure Playwright in `playwright.config.ts` (mobile project "Pixel 7", locale `ar`, trace off) and an axe helper `checkA11y(page)` asserting WCAG 2.1 AA in `tests/e2e/helpers/axe.ts`
-- [ ] T007 Initialize Supabase in `supabase/config.toml`: email OTP sign-in enabled (6-digit code, no magic link), signups disabled except through invitation redemption, Inbucket enabled, private storage bucket `resources`
-- [ ] T008 [P] Create `.env.example` and a Zod-validated env loader in `src/lib/env.ts` (Supabase URL, anon key, service role key server-only, site URL)
-- [ ] T009 [P] Add npm scripts in `package.json`: `dev`, `build`, `lint`, `typecheck`, `test`, `test:e2e`, `db:reset`, `db:test` (`supabase test db`), `gen:types`
-- [ ] T010 [P] Add CI workflow at the git root `.github/workflows/ci.yml` with `working-directory: my-project`, running lint, typecheck, unit tests, `supabase test db`, and Playwright e2e
+- [X] T001 Scaffold a Next.js 16 App Router project with TypeScript strict mode and `src/` directory in `my-project/` (`package.json`, `tsconfig.json`, `next.config.ts`), keeping the existing `.specify/`, `.claude/`, and `specs/` folders untouched
+- [X] T002 Add dependencies from plan.md Technical Context to `package.json`: `@supabase/supabase-js`, `@supabase/ssr`, `next-intl`, `tailwindcss@4`, `@serwist/next`, `serwist`, `idb`, `zod`; dev: `supabase`, `vitest`, `@playwright/test`, `@axe-core/playwright`, `eslint`, `prettier`
+- [X] T003 [P] Configure ESLint + Prettier in `eslint.config.mjs` and `.prettierrc`, including a rule that forbids physical-direction Tailwind classes (`ml-*`, `mr-*`, `pl-*`, `pr-*`, `left-*`, `right-*`, `text-left`, `text-right`, `rounded-l*`, `rounded-r*`) per constitution I
+- [X] T004 [P] Set up Tailwind CSS 4 with color, spacing, and type tokens (calm palette, AA contrast) in `src/app/globals.css`
+- [X] T005 [P] Configure Vitest in `vitest.config.ts` with tests under `tests/unit/`
+- [X] T006 [P] Configure Playwright in `playwright.config.ts` (mobile project "Pixel 7", locale `ar`, trace off) and an axe helper `checkA11y(page)` asserting WCAG 2.1 AA in `tests/e2e/helpers/axe.ts`
+- [X] T007 Initialize Supabase in `supabase/config.toml`: email OTP sign-in enabled (6-digit code, no magic link), signups disabled except through invitation redemption, Inbucket enabled, private storage bucket `resources`
+- [X] T008 [P] Create `.env.example` and a Zod-validated env loader in `src/lib/env.ts` (Supabase URL, anon key, service role key server-only, site URL)
+- [X] T009 [P] Add npm scripts in `package.json`: `dev`, `build`, `lint`, `typecheck`, `test`, `test:e2e`, `db:reset`, `db:test` (`supabase test db`), `gen:types`
+- [X] T010 [P] Add CI workflow at the git root `.github/workflows/ci.yml` with `working-directory: my-project`, running lint, typecheck, unit tests, `supabase test db`, and Playwright e2e
 - [x] T011 Record the stack and offline decisions from research.md §1–4 and §7–9 in `.specify/memory/constitution.md` (resolves TODO(TECH_STACK) and TODO(OFFLINE_SCOPE); also adopts the forward-fix migration policy; version 1.2.0). Done 2026-11-21 during `/speckit-analyze` remediation
 
 ---
@@ -53,30 +53,30 @@ and confirm they fail.
 
 ### Tests for the foundation
 
-- [ ] T012 [P] pgTAP allow/deny tests for `users`, `user_roles`, `cohorts`, `groups`, `group_memberships`, `journey_stages` for member, facilitator, admin, and anonymous in `supabase/tests/rls_foundation.test.sql`
-- [ ] T013 [P] Unit tests for local date in a time zone, journey day (incl. late joiner and day 365 end), and greeting key boundaries (12:00, 17:00) in `tests/unit/journey.test.ts`
-- [ ] T014 [P] Unit tests for Arabic Gregorian + Hijri (umalqura) date formatting and Arabic-Indic digit formatting in `tests/unit/format.test.ts`
+- [X] T012 [P] pgTAP allow/deny tests for `users`, `user_roles`, `cohorts`, `groups`, `group_memberships`, `journey_stages` for member, facilitator, admin, and anonymous in `supabase/tests/rls_foundation.test.sql`
+- [X] T013 [P] Unit tests for local date in a time zone, journey day (incl. late joiner and day 365 end), and greeting key boundaries (12:00, 17:00) in `tests/unit/journey.test.ts`
+- [X] T014 [P] Unit tests for Arabic Gregorian + Hijri (umalqura) date formatting and Arabic-Indic digit formatting in `tests/unit/format.test.ts`
 
 ### Implementation
 
-- [ ] T015 Create `supabase/migrations/0001_foundation.sql`: enums `app_role` and `membership_role` (data-model.md `user_roles.role`, `group_memberships.role`), `set_updated_at()` trigger function, and helpers `has_role(role)`, `is_group_member(group_id)`, `is_group_facilitator(group_id)`, `user_local_date(user_id)` (uses `users.time_zone`)
-- [ ] T016 Create `supabase/migrations/0002_identity.sql`: tables `users` and `user_roles` with constraints per data-model.md `users.id` (= `auth.users.id`, row created only by `redeem_invitation`), `users.full_name`, `users.email`, `users.phone`, `users.gender`, `users.city`, `users.time_zone`, `users.notification_prefs`, `users.active_role` (must be a role in `user_roles`), `users.deletion_requested_at`, `user_roles.user_id`, `user_roles.role` (unique per user), plus RLS policies from data-model.md
-- [ ] T017 Create `supabase/migrations/0003_structure.sql`: tables `cohorts`, `groups`, `group_memberships`, `journey_stages` with constraints per data-model.md `cohorts.name`, `cohorts.start_date`, `cohorts.end_date` (generated), `groups.cohort_id`, `groups.name` (unique within cohort), `group_memberships.group_id`, `group_memberships.user_id`, `group_memberships.role`, `group_memberships.started_on`, `group_memberships.ended_on` (partial unique index: one active member membership per user), `journey_stages.from_day`, `journey_stages.to_day` (1..365, non-overlapping), plus RLS
-- [ ] T018 Add SQL function `journey_day(user_id, local_date)` to `supabase/migrations/0003_structure.sql` (cohort of the active member membership; `local_date − start_date + 1`, capped 1..365)
-- [ ] T019 [P] Write base seed in `supabase/seed.sql`: cohort «الدفعة التجريبية» starting 11 days before seed date, groups «مجموعة النور» and «مجموعة الأمل», admin, facilitator, and two members as in quickstart.md
-- [ ] T020 [P] Create Supabase clients in `src/lib/supabase/server.ts` (user-scoped, cookies via `@supabase/ssr`), `src/lib/supabase/browser.ts`, and `src/lib/supabase/admin.ts` (service-role client, `import 'server-only'`, used only by `completeJoin` and admin storage uploads); generate `src/lib/supabase/database.types.ts` with `npm run gen:types`
-- [ ] T021 Add session refresh and auth redirect in `src/middleware.ts` (public: `/join`, `/join/profile`, `/sign-in`; everything else → `/sign-in` when signed out)
-- [ ] T022 Implement `getCurrentUser()`, `requireRole(role)`, `requireGroupFacilitator(groupId)` in `src/server/auth.ts`; failures call `notFound()` per contracts/routes.md
-- [ ] T023 [P] Implement the `Result<T>` type and `ErrorCode` union from contracts/server-actions.md in `src/server/actions/result.ts`
-- [ ] T024 [P] Configure next-intl with a single `ar` locale in `src/i18n/request.ts` and create `messages/ar.json` with `common`, `nav`, and `errors` (one entry per `ErrorCode`) namespaces
-- [ ] T025 [P] Implement `src/lib/journey.ts` (`localDate(tz)`, `journeyDay(startDate, localDate)`, `greetingKey(hour)`) to pass T013
-- [ ] T026 [P] Implement `src/lib/format.ts` (`formatDate`, `formatHijri`, `formatNumber`, `formatFraction` with an Arabic-Indic/Latin digits switch defaulting to Arabic-Indic) to pass T014
-- [ ] T027 Create root layout `src/app/layout.tsx`: `<html lang="ar" dir="rtl">`, IBM Plex Sans Arabic via `next/font`, `NextIntlClientProvider`, skip-to-content link
-- [ ] T028 [P] Build accessible RTL UI primitives in `src/components/ui/` (`Button.tsx`, `Card.tsx`, `Sheet.tsx`, `Field.tsx`, `EmptyState.tsx`, `Toast.tsx`), with 44×44 px touch targets and Arabic screen-reader labels
-- [ ] T029 Build `src/components/ui/BottomNav.tsx` and member shell `src/app/(member)/layout.tsx` with the five tabs from contracts/routes.md (يومك، خطتي، الإحصاءات، المجتمع، المزيد), `aria-current` on the active tab
-- [ ] T030 [P] Create Arabic "not available" page in `src/app/not-found.tsx`
-- [ ] T031 [P] Create a logger that drops personal fields (names, emails, free text) in `src/lib/log.ts`
-- [ ] T032 Add PWA base: `src/app/manifest.ts` (fields from contracts/routes.md PWA section), icons in `public/icons/` (192, 512, maskable), Serwist service worker `src/app/sw.ts` precaching the app shell, `withSerwist` in `next.config.ts`
+- [X] T015 Create `supabase/migrations/0001_foundation.sql`: enums `app_role` and `membership_role` (data-model.md `user_roles.role`, `group_memberships.role`), `set_updated_at()` trigger function, and helpers `has_role(role)`, `is_group_member(group_id)`, `is_group_facilitator(group_id)`, `user_local_date(user_id)` (uses `users.time_zone`)
+- [X] T016 Create `supabase/migrations/0002_identity.sql`: tables `users` and `user_roles` with constraints per data-model.md `users.id` (= `auth.users.id`, row created only by `redeem_invitation`), `users.full_name`, `users.email`, `users.phone`, `users.gender`, `users.city`, `users.time_zone`, `users.notification_prefs`, `users.active_role` (must be a role in `user_roles`), `users.deletion_requested_at`, `user_roles.user_id`, `user_roles.role` (unique per user), plus RLS policies from data-model.md
+- [X] T017 Create `supabase/migrations/0003_structure.sql`: tables `cohorts`, `groups`, `group_memberships`, `journey_stages` with constraints per data-model.md `cohorts.name`, `cohorts.start_date`, `cohorts.end_date` (generated), `groups.cohort_id`, `groups.name` (unique within cohort), `group_memberships.group_id`, `group_memberships.user_id`, `group_memberships.role`, `group_memberships.started_on`, `group_memberships.ended_on` (partial unique index: one active member membership per user), `journey_stages.from_day`, `journey_stages.to_day` (1..365, non-overlapping), plus RLS
+- [X] T018 Add SQL function `journey_day(user_id, local_date)` to `supabase/migrations/0003_structure.sql` (cohort of the active member membership; `local_date − start_date + 1`, capped 1..365)
+- [X] T019 [P] Write base seed in `supabase/seed.sql`: cohort «الدفعة التجريبية» starting 11 days before seed date, groups «مجموعة النور» and «مجموعة الأمل», admin, facilitator, and two members as in quickstart.md
+- [X] T020 [P] Create Supabase clients in `src/lib/supabase/server.ts` (user-scoped, cookies via `@supabase/ssr`), `src/lib/supabase/browser.ts`, and `src/lib/supabase/admin.ts` (service-role client, `import 'server-only'`, used only by `completeJoin` and admin storage uploads); generate `src/lib/supabase/database.types.ts` with `npm run gen:types`
+- [X] T021 Add session refresh and auth redirect in `src/proxy.ts` (Next.js 16 renamed Middleware to Proxy) (public: `/join`, `/join/profile`, `/sign-in`; everything else → `/sign-in` when signed out)
+- [X] T022 Implement `getCurrentUser()`, `requireRole(role)`, `requireGroupFacilitator(groupId)` in `src/server/auth.ts`; failures call `notFound()` per contracts/routes.md
+- [X] T023 [P] Implement the `Result<T>` type and `ErrorCode` union from contracts/server-actions.md in `src/server/actions/result.ts`
+- [X] T024 [P] Configure next-intl with a single `ar` locale in `src/i18n/request.ts` and create `messages/ar.json` with `common`, `nav`, and `errors` (one entry per `ErrorCode`) namespaces
+- [X] T025 [P] Implement `src/lib/journey.ts` (`localDate(tz)`, `journeyDay(startDate, localDate)`, `greetingKey(hour)`) to pass T013
+- [X] T026 [P] Implement `src/lib/format.ts` (`formatDate`, `formatHijri`, `formatNumber`, `formatFraction` with an Arabic-Indic/Latin digits switch defaulting to Arabic-Indic) to pass T014
+- [X] T027 Create root layout `src/app/layout.tsx`: `<html lang="ar" dir="rtl">`, IBM Plex Sans Arabic via `next/font`, `NextIntlClientProvider`, skip-to-content link
+- [X] T028 [P] Build accessible RTL UI primitives in `src/components/ui/` (`Button.tsx`, `Card.tsx`, `Sheet.tsx`, `Field.tsx`, `EmptyState.tsx`, `Toast.tsx`), with 44×44 px touch targets and Arabic screen-reader labels
+- [X] T029 Build `src/components/ui/BottomNav.tsx` and member shell `src/app/(member)/layout.tsx` with the five tabs from contracts/routes.md (يومك، خطتي، الإحصاءات، المجتمع، المزيد), `aria-current` on the active tab
+- [X] T030 [P] Create Arabic "not available" page in `src/app/not-found.tsx`
+- [X] T031 [P] Create a logger that drops personal fields (names, emails, free text) in `src/lib/log.ts`
+- [X] T032 Add PWA base: `src/app/manifest.ts` (fields from contracts/routes.md PWA section), icons in `public/icons/` (192, 512, maskable), Serwist service worker `src/app/sw.ts` precaching the app shell, `withSerwist` in `next.config.ts`
 
 **Checkpoint**: Foundation ready; user stories can start.
 

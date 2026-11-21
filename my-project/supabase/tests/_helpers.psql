@@ -1,0 +1,49 @@
+-- Shared pgTAP helpers. Included with \ir from each *.test.sql inside its transaction,
+-- so everything here is rolled back with the test.
+create extension if not exists pgtap with schema extensions;
+set local search_path = public, extensions;
+
+create schema tests;
+
+-- Creates an auth user + profile with the given roles (default: member) and returns its id.
+create function tests.create_user(p_email text, p_roles app_role[] default '{member}', p_tz text default 'Asia/Riyadh')
+returns uuid language plpgsql as $$
+declare v_id uuid := gen_random_uuid(); r app_role;
+begin
+  insert into auth.users (id, email) values (v_id, p_email);
+  insert into public.users (id, full_name, email, time_zone, active_role)
+    values (v_id, 'مستخدم ' || split_part(p_email, '@', 1), p_email, p_tz, p_roles[1]);
+  foreach r in array p_roles loop
+    insert into public.user_roles (user_id, role) values (v_id, r);
+  end loop;
+  return v_id;
+end $$;
+
+-- Adds an active membership (default role member) starting on p_from.
+create function tests.join_group(p_user uuid, p_group uuid, p_role membership_role default 'member', p_from date default current_date - 30)
+returns void language sql as $$
+  insert into public.group_memberships (group_id, user_id, role, started_on) values (p_group, p_user, p_role, p_from);
+$$;
+
+-- Acts as the given user for the rest of the transaction (like a signed-in Supabase request).
+create function tests.authenticate_as(p_user uuid) returns void language plpgsql as $$
+begin
+  perform set_config('request.jwt.claims', json_build_object('sub', p_user, 'role', 'authenticated')::text, true);
+  perform set_config('role', 'authenticated', true);
+end $$;
+
+create function tests.as_anon() returns void language plpgsql as $$
+begin
+  perform set_config('request.jwt.claims', json_build_object('role', 'anon')::text, true);
+  perform set_config('role', 'anon', true);
+end $$;
+
+-- Back to the test superuser (setup/teardown between assertions).
+create function tests.as_superuser() returns void language plpgsql as $$
+begin
+  perform set_config('role', 'none', true);
+  perform set_config('request.jwt.claims', '', true);
+end $$;
+
+grant usage on schema tests to anon, authenticated;
+grant execute on all functions in schema tests to anon, authenticated;
