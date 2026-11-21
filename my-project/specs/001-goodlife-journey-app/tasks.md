@@ -161,23 +161,23 @@ and confirm they fail.
 
 ### Tests for User Story 3 ⚠️
 
-- [ ] T072 [P] [US3] pgTAP tests: `plans` and `focus_areas` self-only (facilitator denied); a habit cannot link to another user's focus area; deleting a focus area unlinks habits, in `supabase/tests/rls_plan.test.sql`
-- [ ] T073 [P] [US3] Playwright e2e for quickstart scenario 4 in `tests/e2e/us3-plan-habits.spec.ts`
+- [X] T072 [P] [US3] pgTAP tests: `plans` and `focus_areas` self-only (facilitator denied); a habit cannot link to another user's focus area; deleting a focus area unlinks habits, in `supabase/tests/rls_plan.test.sql`
+- [X] T073 [P] [US3] Playwright e2e for quickstart scenario 4 in `tests/e2e/us3-plan-habits.spec.ts`
 
 ### Implementation for User Story 3
 
-- [ ] T074 [US3] Create `supabase/migrations/0009_plan.sql`: `focus_areas` per data-model.md `focus_areas.plan_id`, `focus_areas.title`, `focus_areas.description`, `focus_areas.sort_order`; self-only RLS (`plans` already exists from T038)
-- [ ] T075 [P] [US3] Zod schemas in `src/lib/validation/plan.ts` citing data-model.md `plans.current_state`, `focus_areas.title`, `focus_areas.description`, `habits.focus_area_id`, `habits.sort_order`
-- [ ] T076 [US3] In `supabase/migrations/0009_plan.sql` add `habits.focus_area_id` per data-model.md `habits.focus_area_id` (FK `on delete set null`, trigger ensuring the area belongs to the habit's plan)
-- [ ] T077 [US3] Implement `saveCurrentState`, `createFocusArea`, `updateFocusArea`, `deleteFocusArea`, `reorderFocusAreas` in `src/server/actions/plan.ts`
-- [ ] T078 [US3] Add `updateHabit`, `reorderHabits`, `archiveHabit`, `restoreHabit` to `src/server/actions/habits.ts`, scoped to the current plan (data-model.md `habits.plan_id`, `habits.archived_at`, `habits.sort_order`)
-- [ ] T079 [P] [US3] Build plan components in `src/components/features/plan/` (`CurrentState.tsx`, `FocusAreaList.tsx`, `HabitsByArea.tsx`, `LastUpdated.tsx`)
-- [ ] T080 [US3] Build «خطتي» page with guided empty state in `src/app/(member)/plan/page.tsx`
-- [ ] T081 [P] [US3] Build an accessible reorder list (move up/down buttons, not drag-only) in `src/components/features/habits/ReorderList.tsx` used by the plan page and focus areas
-- [ ] T082 [US3] Build habit edit screen (name, description, focus area picker, archive) in `src/app/(member)/habits/[id]/page.tsx`; add the focus area picker to `src/app/(member)/habits/new/page.tsx`
-- [ ] T083 [P] [US3] Build archived habits screen with restore in `src/app/(member)/account/archived-habits/page.tsx`
-- [ ] T084 [US3] Implement `copyHabitsFromPreviousPlan` in `src/server/actions/plan.ts` (copies name, description, and order of the previous plan's active habits into the current plan per data-model.md "Journey scoping and date rules" → New journey) and an offer card «ابدأ بعاداتك من الرحلة السابقة» on the empty «خطتي» page in `src/components/features/plan/CopyPreviousHabits.tsx`
-- [ ] T085 [US3] Add US3 Arabic strings to `messages/ar.json`
+- [X] T074 [US3] Create `supabase/migrations/0009_plan.sql`: `focus_areas` per data-model.md `focus_areas.plan_id`, `focus_areas.title`, `focus_areas.description`, `focus_areas.sort_order`; self-only RLS (`plans` already exists from T038)
+- [X] T075 [P] [US3] Zod schemas in `src/lib/validation/plan.ts` citing data-model.md `plans.current_state`, `focus_areas.title`, `focus_areas.description`, `habits.focus_area_id`, `habits.sort_order`
+- [X] T076 [US3] In `supabase/migrations/0009_plan.sql` add `habits.focus_area_id` per data-model.md `habits.focus_area_id` (FK `on delete set null`, trigger ensuring the area belongs to the habit's plan)
+- [X] T077 [US3] Implement `saveCurrentState`, `createFocusArea`, `updateFocusArea`, `deleteFocusArea`, `reorderFocusAreas` in `src/server/actions/plan.ts`
+- [X] T078 [US3] Add `updateHabit`, `reorderHabits`, `archiveHabit`, `restoreHabit` to `src/server/actions/habits.ts`, scoped to the current plan (data-model.md `habits.plan_id`, `habits.archived_at`, `habits.sort_order`)
+- [X] T079 [P] [US3] Build plan components in `src/components/features/plan/` (`CurrentState.tsx`, `FocusAreaList.tsx`, `HabitsByArea.tsx`, `LastUpdated.tsx`)
+- [X] T080 [US3] Build «خطتي» page with guided empty state in `src/app/(member)/plan/page.tsx`
+- [X] T081 [P] [US3] Build an accessible reorder list (move up/down buttons, not drag-only) in `src/components/features/habits/ReorderList.tsx` used by the plan page and focus areas
+- [X] T082 [US3] Build habit edit screen (name, description, focus area picker, archive) in `src/app/(member)/habits/[id]/page.tsx`; add the focus area picker to `src/app/(member)/habits/new/page.tsx`
+- [X] T083 [P] [US3] Build archived habits screen with restore in `src/app/(member)/account/archived-habits/page.tsx`
+- [X] T084 [US3] Implement `copyHabitsFromPreviousPlan` in `src/server/actions/plan.ts` (copies name, description, and order of the previous plan's active habits into the current plan per data-model.md "Journey scoping and date rules" → New journey) and an offer card «ابدأ بعاداتك من الرحلة السابقة» on the empty «خطتي» page in `src/components/features/plan/CopyPreviousHabits.tsx`
+- [X] T085 [US3] Add US3 Arabic strings to `messages/ar.json`
 
 **Checkpoint**: Habits have direction; US1 Today reflects order and archive state.
 

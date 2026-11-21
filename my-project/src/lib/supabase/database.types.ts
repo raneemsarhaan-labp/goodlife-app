@@ -155,6 +155,26 @@ isOneToOne: false
       referencedColumns: ["id"]
     }
                   ]
+                },"focus_areas": {
+                  Row: {
+                    "created_at": string,"description": string | null,"id": string,"plan_id": string,"sort_order": number,"title": string,"updated_at": string
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "created_at"?: string,"description"?: string | null,"id"?: string,"plan_id": string,"sort_order"?: number,"title": string,"updated_at"?: string
+                  }
+                  Update: {
+                    "created_at"?: string,"description"?: string | null,"id"?: string,"plan_id"?: string,"sort_order"?: number,"title"?: string,"updated_at"?: string
+                  }
+                  Relationships: [
+                    {
+      foreignKeyName: "focus_areas_plan_id_fkey"
+      columns: ["plan_id"]
+isOneToOne: false
+      referencedRelation: "plans"
+      referencedColumns: ["id"]
+    }
+                  ]
                 },"group_memberships": {
                   Row: {
                     "created_at": string,"ended_on": string | null,"group_id": string,"id": string,"role": Database["public"]['Enums']["membership_role"],"started_on": string,"updated_at": string,"user_id": string
@@ -229,17 +249,23 @@ isOneToOne: false
                   ]
                 },"habits": {
                   Row: {
-                    "archived_at": string | null,"created_at": string,"description": string | null,"id": string,"name": string,"plan_id": string,"sort_order": number,"updated_at": string
+                    "archived_at": string | null,"created_at": string,"description": string | null,"focus_area_id": string | null,"id": string,"name": string,"plan_id": string,"sort_order": number,"updated_at": string
                   }
                   ComputedFields: never
                   Insert: {
-                    "archived_at"?: string | null,"created_at"?: string,"description"?: string | null,"id"?: string,"name": string,"plan_id": string,"sort_order"?: number,"updated_at"?: string
+                    "archived_at"?: string | null,"created_at"?: string,"description"?: string | null,"focus_area_id"?: string | null,"id"?: string,"name": string,"plan_id": string,"sort_order"?: number,"updated_at"?: string
                   }
                   Update: {
-                    "archived_at"?: string | null,"created_at"?: string,"description"?: string | null,"id"?: string,"name"?: string,"plan_id"?: string,"sort_order"?: number,"updated_at"?: string
+                    "archived_at"?: string | null,"created_at"?: string,"description"?: string | null,"focus_area_id"?: string | null,"id"?: string,"name"?: string,"plan_id"?: string,"sort_order"?: number,"updated_at"?: string
                   }
                   Relationships: [
                     {
+      foreignKeyName: "habits_focus_area_id_fkey"
+      columns: ["focus_area_id"]
+isOneToOne: false
+      referencedRelation: "focus_areas"
+      referencedColumns: ["id"]
+    },{
       foreignKeyName: "habits_plan_id_fkey"
       columns: ["plan_id"]
 isOneToOne: false
@@ -426,6 +452,9 @@ isOneToOne: false
 "close_day":
 { Args: { "p_reflection"?: string }; Returns: Json
                            },
+"copy_habits_from_previous_plan":
+{ Args: { "p_habit_ids"?: (string)[] }; Returns: number
+                           },
 "current_cohort_id":
 { Args: { "p_user": string }; Returns: string
                            },
@@ -465,11 +494,20 @@ isOneToOne: false
 "normalize_invitation_code":
 { Args: { "p_code": string }; Returns: string
                            },
+"previous_plan_habit_count":
+{ Args: Record<PropertyKey, never>; Returns: number
+                           },
 "redeem_invitation":
 { Args: { "p_auth_user": string,"p_city"?: string,"p_code": string,"p_email": string,"p_full_name": string,"p_gender"?: Database["public"]['Enums']["gender"],"p_phone"?: string,"p_time_zone": string }; Returns: string
                            },
 "remove_facilitator":
 { Args: { "p_group": string,"p_user": string }; Returns: undefined
+                           },
+"reorder_focus_areas":
+{ Args: { "p_ids": (string)[] }; Returns: undefined
+                           },
+"reorder_habits":
+{ Args: { "p_ids": (string)[] }; Returns: undefined
                            },
 "require_admin":
 { Args: Record<PropertyKey, never>; Returns: undefined

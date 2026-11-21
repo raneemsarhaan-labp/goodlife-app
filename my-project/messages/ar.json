@@ -150,7 +150,17 @@
     "name": "اسم العادة",
     "nameHint": "صغيرة وواضحة، مثل: قراءة عشر صفحات",
     "description": "وصف (اختياري)",
-    "create": "أضف العادة"
+    "create": "أضف العادة",
+    "editTitle": "تعديل العادة",
+    "focusArea": "المجال",
+    "noFocusArea": "بلا مجال",
+    "save": "احفظ",
+    "archive": "أرشف العادة",
+    "archiveHint": "تختفي من «يومك» ويبقى سجلّها محفوظًا.",
+    "archivedTitle": "العادات المؤرشفة",
+    "noArchived": "لا عادات مؤرشفة.",
+    "restore": "استعادة",
+    "archivedOn": "أُرشفت في {date}"
   },
   "admin": {
     "title": "لوحة الإدارة",
@@ -278,5 +288,40 @@
       "addMessage": "أضف رسالة",
       "newMessage": "رسالة جديدة"
     }
+  },
+  "plan": {
+    "title": "خطتي",
+    "intro": "خطتك لهذا العام: أين أنت الآن، وأين تريد أن تعمل.",
+    "currentStateTitle": "واقعي الآن",
+    "currentStateHint": "صف حالك اليوم بصدق: ما الذي يسير جيدًا، وما الذي تريد أن يتغيّر؟",
+    "currentStatePlaceholder": "اكتب بحرية…",
+    "saveState": "احفظ",
+    "areasTitle": "مجالات العمل لعامك",
+    "areasHint": "اختر مجالات قليلة تهمّك فعلًا، مثل: الصحة، الأسرة، العمل، الروح.",
+    "noAreas": "لم تحدد مجالات بعد.",
+    "areaTitle": "اسم المجال",
+    "areaDescription": "وصف المجال (اختياري)",
+    "addArea": "أضف مجالًا",
+    "saveArea": "احفظ",
+    "deleteArea": "احذف المجال",
+    "habitsTitle": "عاداتك حسب المجال",
+    "unlinked": "عادات بلا مجال",
+    "noHabitsInArea": "لا عادات في هذا المجال بعد.",
+    "editHabit": "تعديل",
+    "addHabit": "أضف عادة",
+    "orderTitle": "ترتيب العادات في «يومك»",
+    "areasOrderTitle": "ترتيب المجالات",
+    "lastUpdated": "آخر تحديث: {date}",
+    "emptyTitle": "لنبدأ خطتك",
+    "emptyBody": "ابدأ بوصف واقعك الآن، ثم أضف مجالات العمل لعامك.",
+    "copyTitle": "ابدأ بعاداتك من الرحلة السابقة",
+    "copyBody": "لديك {count} عادات من رحلتك السابقة. يمكنك نسخها إلى هذه الرحلة.",
+    "copy": "انسخ العادات",
+    "copied": "نُسخت {count} عادات."
+  },
+  "reorder": {
+    "moveUp": "تحريك «{label}» للأعلى",
+    "moveDown": "تحريك «{label}» للأسفل",
+    "saved": "حُفظ الترتيب."
   }
 }
