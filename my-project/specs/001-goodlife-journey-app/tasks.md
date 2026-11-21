@@ -191,20 +191,20 @@ and confirm they fail.
 
 ### Tests for User Story 4 ⚠️
 
-- [ ] T086 [P] [US4] pgTAP tests for `month_figures(month)` (per-habit rate, journey/own challenge counts, days closed, archived-habit cut-off) and self-only RLS on `monthly_reviews`, in `supabase/tests/month_figures.test.sql`
-- [ ] T087 [P] [US4] Unit tests for the review window (opens on the 3rd-last day, closes after day 7 of next month; 28/29/30/31-day months) in `tests/unit/review-window.test.ts`
-- [ ] T088 [P] [US4] Playwright e2e for quickstart scenario 5 in `tests/e2e/us4-monthly-review.spec.ts`
+- [X] T086 [P] [US4] pgTAP tests for `month_figures(month)` (per-habit rate, journey/own challenge counts, days closed, archived-habit cut-off) and self-only RLS on `monthly_reviews`, in `supabase/tests/month_figures.test.sql`
+- [X] T087 [P] [US4] Unit tests for the review window (opens on the 3rd-last day, closes after day 7 of next month; 28/29/30/31-day months) in `tests/unit/review-window.test.ts`
+- [X] T088 [P] [US4] Playwright e2e for quickstart scenario 5 in `tests/e2e/us4-monthly-review.spec.ts`
 
 ### Implementation for User Story 4
 
-- [ ] T089 [US4] Create `supabase/migrations/0010_reviews.sql`: `review_questions` per data-model.md `review_questions.text`, `review_questions.sort_order`, `review_questions.active`; `monthly_reviews` per `monthly_reviews.user_id`, `monthly_reviews.cohort_id`, `monthly_reviews.month` (first of month, unique per user and cohort), `monthly_reviews.answers`, `monthly_reviews.figures_snapshot`, `monthly_reviews.status`, `monthly_reviews.completed_at`; self-only RLS; shared view `daily_activity` (per user, cohort, and date: habits done, challenges done by kind, closed) and function `month_figures(month)` for the current cohort
-- [ ] T090 [P] [US4] Implement `isReviewPromptOpen(localDate)` and `reviewMonthFor(localDate)` in `src/lib/review-window.ts` to pass T087
-- [ ] T091 [P] [US4] Zod schemas in `src/lib/validation/review.ts` citing data-model.md `monthly_reviews.month`, `monthly_reviews.answers`, `monthly_reviews.status`, `review_questions.text`
-- [ ] T092 [US4] Implement `saveReviewDraft` and `completeReview` (copies question text, stores `month_figures` snapshot) in `src/server/actions/reviews.ts`
-- [ ] T093 [US4] Add the review prompt to `getToday()` in `src/server/queries/today.ts` and a gentle `ReviewPrompt.tsx` card in `src/components/features/today/`
-- [ ] T094 [US4] Build past reviews list (done / not yet done) and review screen (figures, then questions; read-only when completed) in `src/app/(member)/reviews/page.tsx` and `src/app/(member)/reviews/[month]/page.tsx`
-- [ ] T095 [US4] Add a review questions tab and `upsertReviewQuestion` to `src/app/admin/content/page.tsx` and `src/server/actions/admin/content.ts`; seed default questions in `supabase/seed.sql`
-- [ ] T096 [US4] Add US4 Arabic strings to `messages/ar.json`
+- [X] T089 [US4] Create `supabase/migrations/0010_reviews.sql`: `review_questions` per data-model.md `review_questions.text`, `review_questions.sort_order`, `review_questions.active`; `monthly_reviews` per `monthly_reviews.user_id`, `monthly_reviews.cohort_id`, `monthly_reviews.month` (first of month, unique per user and cohort), `monthly_reviews.answers`, `monthly_reviews.figures_snapshot`, `monthly_reviews.status`, `monthly_reviews.completed_at`; self-only RLS; shared view `daily_activity` (per user, cohort, and date: habits done, challenges done by kind, closed) and function `month_figures(month)` for the current cohort
+- [X] T090 [P] [US4] Implement `isReviewPromptOpen(localDate)` and `reviewMonthFor(localDate)` in `src/lib/review-window.ts` to pass T087
+- [X] T091 [P] [US4] Zod schemas in `src/lib/validation/review.ts` citing data-model.md `monthly_reviews.month`, `monthly_reviews.answers`, `monthly_reviews.status`, `review_questions.text`
+- [X] T092 [US4] Implement `saveReviewDraft` and `completeReview` (copies question text, stores `month_figures` snapshot) in `src/server/actions/reviews.ts`
+- [X] T093 [US4] Add the review prompt to `getToday()` in `src/server/queries/today.ts` and a gentle `ReviewPrompt.tsx` card in `src/components/features/today/`
+- [X] T094 [US4] Build past reviews list (done / not yet done) and review screen (figures, then questions; read-only when completed) in `src/app/(member)/reviews/page.tsx` and `src/app/(member)/reviews/[month]/page.tsx`
+- [X] T095 [US4] Add a review questions tab and `upsertReviewQuestion` to `src/app/admin/content/page.tsx` and `src/server/actions/admin/content.ts`; seed default questions in `supabase/seed.sql`
+- [X] T096 [US4] Add US4 Arabic strings to `messages/ar.json`
 
 **Checkpoint**: The monthly rhythm works on top of the daily data.
 

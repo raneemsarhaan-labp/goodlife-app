@@ -5,6 +5,7 @@ import { EmptyHabits } from "@/components/features/today/EmptyHabits";
 import { Greeting } from "@/components/features/today/Greeting";
 import { HabitList } from "@/components/features/today/HabitList";
 import { JourneyEnded } from "@/components/features/today/JourneyEnded";
+import { ReviewPrompt } from "@/components/features/today/ReviewPrompt";
 import { UpcomingActivities } from "@/components/features/today/UpcomingActivities";
 import { DayRollover } from "@/components/features/today/useDayRollover";
 import { buttonClass } from "@/components/ui/Button";
@@ -75,6 +76,8 @@ export default async function TodayPage({ searchParams }: { searchParams: Promis
               </Link>
             ))}
           </nav>
+
+          {isToday && data.review_prompt && <ReviewPrompt month={data.review_prompt} />}
 
           {isToday &&
             (data.day?.intention ? (

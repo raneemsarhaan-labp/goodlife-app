@@ -274,7 +274,8 @@
       "title": "المحتوى",
       "tabs": {
         "challenges": "تحدّيات الرحلة",
-        "closing": "رسائل الختام"
+        "closing": "رسائل الختام",
+        "questions": "أسئلة المراجعة"
       },
       "challengesIntro": "تحدٍّ واحد لكل يوم من أيام الرحلة، يراه الجميع في يومه. اترك الحقل فارغًا لإزالة التحدّي.",
       "day": "اليوم {day}",
@@ -286,7 +287,12 @@
       "messageText": "نص الرسالة",
       "activeLabel": "مفعّلة",
       "addMessage": "أضف رسالة",
-      "newMessage": "رسالة جديدة"
+      "newMessage": "رسالة جديدة",
+      "questionsIntro": "تظهر الأسئلة المفعّلة في كل مراجعة شهرية بهذا الترتيب.",
+      "questionText": "نص السؤال",
+      "newQuestion": "سؤال جديد",
+      "addQuestion": "أضف السؤال",
+      "order": "الترتيب"
     }
   },
   "plan": {
@@ -323,5 +329,35 @@
     "moveUp": "تحريك «{label}» للأعلى",
     "moveDown": "تحريك «{label}» للأسفل",
     "saved": "حُفظ الترتيب."
+  },
+  "review": {
+    "title": "مراجعة الشهر",
+    "subtitle": "وقفة مع ما مضى",
+    "listTitle": "مراجعاتي",
+    "listIntro": "وقفة شهرية مع ما مضى، لترى أين تقدّمت وأين تحتاج إلى تعديل.",
+    "done": "مكتملة",
+    "notDone": "لم تكتمل بعد",
+    "draft": "مسودة",
+    "open": "افتح",
+    "none": "لا مراجعات بعد. تظهر الدعوة إلى المراجعة في آخر أيام الشهر.",
+    "promptTitle": "وقفة مع {month}",
+    "promptBody": "خذ دقائق لتنظر إلى شهرك: ما الذي مضى جيدًا، وما الذي تريد تعديله؟",
+    "promptAction": "ابدأ المراجعة",
+    "figuresTitle": "شهرك بالأرقام",
+    "habitRate": "{name}: {done} من {possible} يومًا",
+    "overall": "الالتزام بالعادات: {rate}",
+    "journeyDone": "تحدّيات الرحلة: {done} من {total}",
+    "ownDone": "تحدّياتك الذاتية: أنجزت {done} من {written}",
+    "daysClosed": "أيام ختمتها: {count}",
+    "archivedNote": "(مؤرشفة)",
+    "questionsTitle": "أسئلة للتأمل",
+    "saveDraft": "احفظ مسودة",
+    "complete": "أكمل المراجعة",
+    "savedDraft": "حُفظت المسودة.",
+    "completed": "اكتملت مراجعتك. بارك الله في سعيك.",
+    "completedOn": "اكتملت في {date}",
+    "readOnly": "هذه المراجعة مكتملة ولا يمكن تعديلها.",
+    "noAnswer": "—",
+    "snapshotNote": "الأرقام كما كانت عند إكمال المراجعة."
   }
 }

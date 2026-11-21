@@ -333,6 +333,32 @@ isOneToOne: false
                   Relationships: [
                     
                   ]
+                },"monthly_reviews": {
+                  Row: {
+                    "answers": NonNullable<Json>,"cohort_id": string,"completed_at": string | null,"created_at": string,"figures_snapshot": Json | null,"id": string,"month": string,"status": Database["public"]['Enums']["review_status"],"updated_at": string,"user_id": string
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "answers"?: NonNullable<Json>,"cohort_id": string,"completed_at"?: string | null,"created_at"?: string,"figures_snapshot"?: Json | null,"id"?: string,"month": string,"status"?: Database["public"]['Enums']["review_status"],"updated_at"?: string,"user_id": string
+                  }
+                  Update: {
+                    "answers"?: NonNullable<Json>,"cohort_id"?: string,"completed_at"?: string | null,"created_at"?: string,"figures_snapshot"?: Json | null,"id"?: string,"month"?: string,"status"?: Database["public"]['Enums']["review_status"],"updated_at"?: string,"user_id"?: string
+                  }
+                  Relationships: [
+                    {
+      foreignKeyName: "monthly_reviews_cohort_id_fkey"
+      columns: ["cohort_id"]
+isOneToOne: false
+      referencedRelation: "cohorts"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "monthly_reviews_user_id_fkey"
+      columns: ["user_id"]
+isOneToOne: false
+      referencedRelation: "users"
+      referencedColumns: ["id"]
+    }
+                  ]
                 },"own_challenges": {
                   Row: {
                     "cohort_id": string,"created_at": string,"id": string,"local_date": string,"text": string,"updated_at": string,"user_id": string
@@ -385,6 +411,20 @@ isOneToOne: false
       referencedColumns: ["id"]
     }
                   ]
+                },"review_questions": {
+                  Row: {
+                    "active": boolean,"created_at": string,"id": string,"sort_order": number,"text": string,"updated_at": string
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "active"?: boolean,"created_at"?: string,"id"?: string,"sort_order"?: number,"text": string,"updated_at"?: string
+                  }
+                  Update: {
+                    "active"?: boolean,"created_at"?: string,"id"?: string,"sort_order"?: number,"text"?: string,"updated_at"?: string
+                  }
+                  Relationships: [
+                    
+                  ]
                 },"user_roles": {
                   Row: {
                     "created_at": string,"role": Database["public"]['Enums']["app_role"],"user_id": string
@@ -422,7 +462,15 @@ isOneToOne: false
                 }
           }
           Views: {
-            [_ in never]: never
+            "daily_activity": {
+                  Row: {
+                    "closed": boolean | null,"cohort_id": string | null,"habits_done": number | null,"journey_done": number | null,"local_date": string | null,"own_done": number | null,"own_written": boolean | null,"user_id": string | null
+                  }
+                  ComputedFields: never
+                  Relationships: [
+                    
+                  ]
+                }
           }
           Functions: {
             "activity_created_by_me":
@@ -467,6 +515,11 @@ isOneToOne: false
 "grant_admin":
 { Args: { "p_user": string }; Returns: undefined
                            },
+"habit_rates":
+{ Args: { "p_cohort": string,"p_from": string,"p_to": string,"p_user": string }; Returns: {
+              "archived": boolean,"done_days": number,"habit_id": string,"name": string,"possible_days": number
+            }[]
+                           },
 "has_role":
 { Args: { "p_role": Database["public"]['Enums']["app_role"] }; Returns: boolean
                            },
@@ -488,11 +541,17 @@ isOneToOne: false
 "journey_day":
 { Args: { "p_local_date": string,"p_user": string }; Returns: number
                            },
+"month_figures":
+{ Args: { "p_month": string }; Returns: Json
+                           },
 "move_member":
 { Args: { "p_group": string,"p_user": string }; Returns: undefined
                            },
 "normalize_invitation_code":
 { Args: { "p_code": string }; Returns: string
+                           },
+"period_figures":
+{ Args: { "p_from": string,"p_to": string,"p_user": string }; Returns: Json
                            },
 "previous_plan_habit_count":
 { Args: Record<PropertyKey, never>; Returns: number
@@ -518,6 +577,9 @@ isOneToOne: false
 "save_activity":
 { Args: { "p_cohort_id"?: string,"p_description"?: string,"p_ends_at"?: string,"p_group_ids"?: (string)[],"p_id"?: string,"p_location"?: string,"p_starts_at"?: string,"p_title"?: string }; Returns: string
                            },
+"save_review":
+{ Args: { "p_answers": Json,"p_complete": boolean,"p_month": string }; Returns: undefined
+                           },
 "set_challenge_done":
 { Args: { "p_client_mutation_id": string,"p_done": boolean,"p_kind": Database["public"]['Enums']["challenge_kind"],"p_local_date": string,"p_recorded_at"?: string }; Returns: undefined
                            },
@@ -535,7 +597,7 @@ isOneToOne: false
                            }
           }
           Enums: {
-            "app_role": "member"|"facilitator"|"admin","challenge_kind": "journey"|"own","gender": "male"|"female","membership_role": "member"|"facilitator"
+            "app_role": "member"|"facilitator"|"admin","challenge_kind": "journey"|"own","gender": "male"|"female","membership_role": "member"|"facilitator","review_status": "draft"|"completed"
           }
           CompositeTypes: {
             [_ in never]: never
@@ -651,7 +713,7 @@ export type CompositeTypes<
 export const Constants = {
   "public": {
           Enums: {
-            "app_role": ["member", "facilitator", "admin"],"challenge_kind": ["journey", "own"],"gender": ["male", "female"],"membership_role": ["member", "facilitator"]
+            "app_role": ["member", "facilitator", "admin"],"challenge_kind": ["journey", "own"],"gender": ["male", "female"],"membership_role": ["member", "facilitator"],"review_status": ["draft", "completed"]
           }
         }
 } as const

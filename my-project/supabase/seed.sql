@@ -125,4 +125,12 @@ insert into public.activities (id, title, description, starts_at, location, crea
 insert into public.activity_audiences (activity_id, cohort_id) values
   ('00000000-0000-4000-8000-0000000000e1', '00000000-0000-4000-8000-0000000000c1');
 
+-- ── US4: monthly review questions ───────────────────────────────────────────
+insert into public.review_questions (text, sort_order) values
+  ('ما الذي تقدّمت فيه هذا الشهر، ولو قليلًا؟', 1),
+  ('ما الذي أعانك على الالتزام؟', 2),
+  ('ما الذي أعاقك، وكيف تتعامل معه الشهر القادم؟', 3),
+  ('هل تريد تعديل شيء في خطتك أو عاداتك؟', 4),
+  ('كلمة تقولها لنفسك وأنت تبدأ الشهر القادم.', 5);
+
 commit;

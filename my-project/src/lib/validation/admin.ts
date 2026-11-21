@@ -58,3 +58,11 @@ export const closingMessageSchema = z.object({
   text: z.string().trim().min(2).max(200),
   active: z.preprocess((v) => v === "on" || v === "true" || v === true, z.boolean()),
 });
+
+// data-model.md review_questions.text, review_questions.sort_order, review_questions.active
+export const reviewQuestionSchema = z.object({
+  id: z.preprocess(emptyToUndefined, uuidSchema.optional()),
+  text: z.string().trim().min(2).max(300),
+  sortOrder: z.coerce.number().int().min(0).max(999).default(0),
+  active: z.preprocess((v) => v === "on" || v === "true" || v === true, z.boolean()),
+});
