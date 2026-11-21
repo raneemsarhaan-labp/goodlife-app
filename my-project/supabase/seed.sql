@@ -141,4 +141,28 @@ insert into public.encouragement_phrases (text, sort_order) values
   ('مستمر؟ أنا معك', 4),
   ('أحسنت، واصل بهدوء', 5);
 
+-- ── US7: journey stages, the ten guidelines (editable placeholders), sample resources ─
+insert into public.journey_stages (title, description, from_day, to_day, sort_order) values
+  ('البداية والنيّة', 'تعرّف على نفسك ورحلتك، واكتب واقعك ونيّتك للعام.', 1, 30, 1),
+  ('بناء العادات', 'عادات صغيرة ثابتة في مجالاتك المختارة.', 31, 120, 2),
+  ('الثبات', 'المحافظة على ما بنيت، والتعامل مع الفتور.', 121, 210, 3),
+  ('التعمّق', 'من العادة إلى المعنى: لماذا تفعل ما تفعل.', 211, 300, 4),
+  ('الحصاد والانطلاق', 'مراجعة العام، وما تحمله معك بعده.', 301, 365, 5);
+
+insert into public.guidelines (number, text) values
+  (1, 'النيّة أولًا: نبدأ كل يوم بنيّة واضحة.'),
+  (2, 'القليل الدائم خير من الكثير المنقطع.'),
+  (3, 'الصدق مع النفس في التسجيل والمراجعة.'),
+  (4, 'لا مقارنة: كلٌّ يسير في رحلته بقدره.'),
+  (5, 'نحفظ أسرار المجموعة وما يُقال فيها.'),
+  (6, 'نشجّع ولا نحكم.'),
+  (7, 'نحضر اللقاءات ونحترم أوقاتها.'),
+  (8, 'نعود بهدوء إذا انقطعنا، دون لوم.'),
+  (9, 'نطلب العون حين نحتاجه.'),
+  (10, 'نشكر الله على كل خطوة.');
+
+insert into public.resources (type, title, description, category, url, audience, sort_order) values
+  ('reference', 'كتاب مقترح: العادات الذرية', 'عن بناء العادات الصغيرة.', 'كتب', 'https://example.org/atomic-habits', 'program', 1),
+  ('reference', 'مقالة: كيف نراجع شهرنا', 'أفكار لمراجعة شهرية هادئة.', 'مقالات', 'https://example.org/monthly-review', 'program', 2);
+
 commit;

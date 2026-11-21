@@ -267,6 +267,20 @@ isOneToOne: false
       referencedColumns: ["id"]
     }
                   ]
+                },"guidelines": {
+                  Row: {
+                    "created_at": string,"id": string,"number": number,"text": string,"updated_at": string
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "created_at"?: string,"id"?: string,"number": number,"text": string,"updated_at"?: string
+                  }
+                  Update: {
+                    "created_at"?: string,"id"?: string,"number"?: number,"text"?: string,"updated_at"?: string
+                  }
+                  Relationships: [
+                    
+                  ]
                 },"habit_completions": {
                   Row: {
                     "client_mutation_id": string,"created_at": string,"habit_id": string,"local_date": string,"recorded_at": string | null,"user_id": string
@@ -457,6 +471,58 @@ isOneToOne: false
       referencedColumns: ["id"]
     }
                   ]
+                },"resource_audiences": {
+                  Row: {
+                    "cohort_id": string | null,"group_id": string | null,"id": string,"resource_id": string
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "cohort_id"?: string | null,"group_id"?: string | null,"id"?: string,"resource_id": string
+                  }
+                  Update: {
+                    "cohort_id"?: string | null,"group_id"?: string | null,"id"?: string,"resource_id"?: string
+                  }
+                  Relationships: [
+                    {
+      foreignKeyName: "resource_audiences_cohort_id_fkey"
+      columns: ["cohort_id"]
+isOneToOne: false
+      referencedRelation: "cohorts"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "resource_audiences_group_id_fkey"
+      columns: ["group_id"]
+isOneToOne: false
+      referencedRelation: "groups"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "resource_audiences_resource_id_fkey"
+      columns: ["resource_id"]
+isOneToOne: false
+      referencedRelation: "resources"
+      referencedColumns: ["id"]
+    }
+                  ]
+                },"resources": {
+                  Row: {
+                    "audience": Database["public"]['Enums']["resource_audience"],"category": string | null,"created_at": string,"created_by": string | null,"description": string | null,"id": string,"sort_order": number,"storage_path": string | null,"title": string,"type": Database["public"]['Enums']["resource_type"],"updated_at": string,"url": string | null
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "audience"?: Database["public"]['Enums']["resource_audience"],"category"?: string | null,"created_at"?: string,"created_by"?: string | null,"description"?: string | null,"id"?: string,"sort_order"?: number,"storage_path"?: string | null,"title": string,"type": Database["public"]['Enums']["resource_type"],"updated_at"?: string,"url"?: string | null
+                  }
+                  Update: {
+                    "audience"?: Database["public"]['Enums']["resource_audience"],"category"?: string | null,"created_at"?: string,"created_by"?: string | null,"description"?: string | null,"id"?: string,"sort_order"?: number,"storage_path"?: string | null,"title"?: string,"type"?: Database["public"]['Enums']["resource_type"],"updated_at"?: string,"url"?: string | null
+                  }
+                  Relationships: [
+                    {
+      foreignKeyName: "resources_created_by_fkey"
+      columns: ["created_by"]
+isOneToOne: false
+      referencedRelation: "users"
+      referencedColumns: ["id"]
+    }
+                  ]
                 },"review_questions": {
                   Row: {
                     "active": boolean,"created_at": string,"id": string,"sort_order": number,"text": string,"updated_at": string
@@ -534,8 +600,14 @@ isOneToOne: false
 "assign_facilitator":
 { Args: { "p_group": string,"p_user": string }; Returns: undefined
                            },
+"can_read_resource_object":
+{ Args: { "p_name": string }; Returns: boolean
+                           },
 "can_see_activity":
 { Args: { "p_activity": string }; Returns: boolean
+                           },
+"can_see_resource":
+{ Args: { "p_resource": string }; Returns: boolean
                            },
 "cancel_activity":
 { Args: { "p_id": string }; Returns: undefined
@@ -645,6 +717,9 @@ isOneToOne: false
 "reorder_habits":
 { Args: { "p_ids": (string)[] }; Returns: undefined
                            },
+"reorder_resources":
+{ Args: { "p_ids": (string)[] }; Returns: undefined
+                           },
 "require_admin":
 { Args: Record<PropertyKey, never>; Returns: undefined
                            },
@@ -656,6 +731,9 @@ isOneToOne: false
                            },
 "save_activity":
 { Args: { "p_cohort_id"?: string,"p_description"?: string,"p_ends_at"?: string,"p_group_ids"?: (string)[],"p_id"?: string,"p_location"?: string,"p_starts_at"?: string,"p_title"?: string }; Returns: string
+                           },
+"save_resource":
+{ Args: { "p_audience"?: Database["public"]['Enums']["resource_audience"],"p_category"?: string,"p_cohort_ids"?: (string)[],"p_description"?: string,"p_group_ids"?: (string)[],"p_id"?: string,"p_storage_path"?: string,"p_title"?: string,"p_type"?: Database["public"]['Enums']["resource_type"],"p_url"?: string }; Returns: string
                            },
 "save_review":
 { Args: { "p_answers": Json,"p_complete": boolean,"p_month": string }; Returns: undefined
@@ -683,7 +761,7 @@ isOneToOne: false
                            }
           }
           Enums: {
-            "app_role": "member"|"facilitator"|"admin","challenge_kind": "journey"|"own","gender": "male"|"female","membership_role": "member"|"facilitator","review_status": "draft"|"completed"
+            "app_role": "member"|"facilitator"|"admin","challenge_kind": "journey"|"own","gender": "male"|"female","membership_role": "member"|"facilitator","resource_audience": "program"|"cohorts"|"groups","resource_type": "recording"|"file"|"reference","review_status": "draft"|"completed"
           }
           CompositeTypes: {
             [_ in never]: never
@@ -799,7 +877,7 @@ export type CompositeTypes<
 export const Constants = {
   "public": {
           Enums: {
-            "app_role": ["member", "facilitator", "admin"],"challenge_kind": ["journey", "own"],"gender": ["male", "female"],"membership_role": ["member", "facilitator"],"review_status": ["draft", "completed"]
+            "app_role": ["member", "facilitator", "admin"],"challenge_kind": ["journey", "own"],"gender": ["male", "female"],"membership_role": ["member", "facilitator"],"resource_audience": ["program", "cohorts", "groups"],"resource_type": ["recording", "file", "reference"],"review_status": ["draft", "completed"]
           }
         }
 } as const

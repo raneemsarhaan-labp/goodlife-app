@@ -7,6 +7,7 @@ const SECTIONS = [
   { href: "/admin/cohorts", key: "cohorts" },
   { href: "/admin/invitations", key: "invitations" },
   { href: "/admin/activities", key: "activities" },
+  { href: "/admin/resources", key: "resources" },
   { href: "/admin/content", key: "content" },
 ] as const;
 

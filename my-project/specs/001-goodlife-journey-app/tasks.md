@@ -269,19 +269,19 @@ and confirm they fail.
 
 ### Tests for User Story 7 ⚠️
 
-- [ ] T116 [P] [US7] pgTAP tests: resources visible only to their audience (program, cohorts, groups) and storage object reads denied outside it; admin-only writes for resources, stages, guidelines, in `supabase/tests/rls_resources.test.sql`
-- [ ] T117 [P] [US7] Playwright e2e for quickstart scenario 9 in `tests/e2e/us7-resources.spec.ts`
+- [X] T116 [P] [US7] pgTAP tests: resources visible only to their audience (program, cohorts, groups) and storage object reads denied outside it; admin-only writes for resources, stages, guidelines, in `supabase/tests/rls_resources.test.sql`
+- [X] T117 [P] [US7] Playwright e2e for quickstart scenario 9 in `tests/e2e/us7-resources.spec.ts`
 
 ### Implementation for User Story 7
 
-- [ ] T118 [US7] Create `supabase/migrations/0013_resources.sql`: `resources` per data-model.md `resources.type`, `resources.title`, `resources.description`, `resources.category`, `resources.sort_order`, `resources.storage_path`, `resources.url` (one of storage_path/url required for recording/file), `resources.audience`; `resource_audiences` (cohort_id or group_id); `guidelines` per `guidelines.number` (1..10, unique), `guidelines.text`; storage policies on bucket `resources`
-- [ ] T119 [P] [US7] Zod schemas in `src/lib/validation/resources.ts` citing data-model.md `resources.type`, `resources.title`, `resources.url`, `resources.storage_path`, `resources.audience`, `guidelines.number`, `guidelines.text`, `journey_stages.from_day`, `journey_stages.to_day`
-- [ ] T120 [US7] Implement `getResourceUrl` (audience check, 10-minute signed URL, `not_found` otherwise) in `src/server/actions/resources.ts`
-- [ ] T121 [US7] Implement `upsertResource` (signed upload URL), `deleteResource`, `reorderResources`, `upsertJourneyStage`, `upsertGuideline` in `src/server/actions/admin/resources.ts`
-- [ ] T122 [US7] Build «الموارد» hub and screens: `src/app/(member)/resources/page.tsx`, `src/app/(member)/resources/map/page.tsx` (current stage highlighted), `src/app/(member)/resources/guidelines/page.tsx` (intro «عشرة أعراف تحكم الرحلة…»), `src/app/(member)/resources/[type]/page.tsx` (accessible audio/video player, downloads)
-- [ ] T123 [US7] Build admin resource library in `src/app/admin/resources/page.tsx` and add stages and guidelines tabs to `src/app/admin/content/page.tsx`
-- [ ] T124 [P] [US7] Seed journey stages and the ten guidelines (editable placeholders) in `supabase/seed.sql`
-- [ ] T125 [US7] Add US7 Arabic strings to `messages/ar.json`
+- [X] T118 [US7] Create `supabase/migrations/0013_resources.sql`: `resources` per data-model.md `resources.type`, `resources.title`, `resources.description`, `resources.category`, `resources.sort_order`, `resources.storage_path`, `resources.url` (one of storage_path/url required for recording/file), `resources.audience`; `resource_audiences` (cohort_id or group_id); `guidelines` per `guidelines.number` (1..10, unique), `guidelines.text`; storage policies on bucket `resources`
+- [X] T119 [P] [US7] Zod schemas in `src/lib/validation/resources.ts` citing data-model.md `resources.type`, `resources.title`, `resources.url`, `resources.storage_path`, `resources.audience`, `guidelines.number`, `guidelines.text`, `journey_stages.from_day`, `journey_stages.to_day`
+- [X] T120 [US7] Implement `getResourceUrl` (audience check, 10-minute signed URL, `not_found` otherwise) in `src/server/actions/resources.ts`
+- [X] T121 [US7] Implement `upsertResource` (signed upload URL), `deleteResource`, `reorderResources`, `upsertJourneyStage`, `upsertGuideline` in `src/server/actions/admin/resources.ts`
+- [X] T122 [US7] Build «الموارد» hub and screens: `src/app/(member)/resources/page.tsx`, `src/app/(member)/resources/map/page.tsx` (current stage highlighted), `src/app/(member)/resources/guidelines/page.tsx` (intro «عشرة أعراف تحكم الرحلة…»), `src/app/(member)/resources/[type]/page.tsx` (accessible audio/video player, downloads)
+- [X] T123 [US7] Build admin resource library in `src/app/admin/resources/page.tsx` and add stages and guidelines tabs to `src/app/admin/content/page.tsx`
+- [X] T124 [P] [US7] Seed journey stages and the ten guidelines (editable placeholders) in `supabase/seed.sql`
+- [X] T125 [US7] Add US7 Arabic strings to `messages/ar.json`
 
 **Checkpoint**: Supporting content is available to the right audiences only.
 

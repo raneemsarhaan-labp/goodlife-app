@@ -5,6 +5,7 @@ select plan(26);
 
 -- Setup (as superuser)
 create temp table ids (k text primary key, v uuid) on commit drop;
+delete from journey_stages; -- start from an empty map (seed adds stages)
 grant select on ids to anon, authenticated;
 insert into cohorts (id, name, start_date) values (gen_random_uuid(), 'الدفعة أ', current_date - 11);
 insert into ids select 'c1', id from cohorts where name = 'الدفعة أ';

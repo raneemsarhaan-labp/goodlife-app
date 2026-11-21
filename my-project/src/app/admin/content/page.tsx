@@ -3,8 +3,10 @@ import { getTranslations } from "next-intl/server";
 import type { ReactNode } from "react";
 import { ChallengesTab } from "@/components/features/admin/content/ChallengesTab";
 import { ClosingTab } from "@/components/features/admin/content/ClosingTab";
+import { GuidelinesTab } from "@/components/features/admin/content/GuidelinesTab";
 import { PhrasesTab } from "@/components/features/admin/content/PhrasesTab";
 import { QuestionsTab } from "@/components/features/admin/content/QuestionsTab";
+import { StagesTab } from "@/components/features/admin/content/StagesTab";
 
 export const metadata = { title: "المحتوى" };
 
@@ -14,6 +16,8 @@ const TABS: Record<string, (params: { page: number }) => ReactNode> = {
   closing: () => <ClosingTab />,
   questions: () => <QuestionsTab />,
   phrases: () => <PhrasesTab />,
+  stages: () => <StagesTab />,
+  guidelines: () => <GuidelinesTab />,
 };
 
 export default async function ContentPage({ searchParams }: { searchParams: Promise<{ tab?: string; page?: string }> }) {
