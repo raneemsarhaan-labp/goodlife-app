@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from "next";
 import localFont from "next/font/local";
 import { NextIntlClientProvider } from "next-intl";
 import { getTranslations } from "next-intl/server";
+import { LOCALE } from "@/i18n/request";
 import "./globals.css";
 
 // Self-hosted IBM Plex Sans Arabic (SIL OFL 1.1, see fonts/OFL-LICENSE.txt).
@@ -15,13 +16,16 @@ const plexArabic = localFont({
   display: "swap",
 });
 
-export const metadata: Metadata = {
-  title: { default: "الحياة الطيبة", template: "%s · الحياة الطيبة" },
-  description: "رفيقك في رحلة سنوية منظَّمة نحو حياة أكثر اتزانًا.",
-  applicationName: "الحياة الطيبة",
-  appleWebApp: { capable: true, title: "الحياة الطيبة", statusBarStyle: "default" },
-  icons: { icon: "/icons/icon-192.png", apple: "/icons/apple-touch-icon.png" },
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const t = await getTranslations({ locale: LOCALE, namespace: "meta" });
+  return {
+    title: { default: t("appName"), template: t("titleTemplate") },
+    description: t("description"),
+    applicationName: t("appName"),
+    appleWebApp: { capable: true, title: t("appName"), statusBarStyle: "default" },
+    icons: { icon: "/icons/icon-192.png", apple: "/icons/apple-touch-icon.png" },
+  };
+}
 
 export const viewport: Viewport = {
   themeColor: "#faf8f4",

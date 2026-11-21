@@ -1,3 +1,4 @@
+import { pageTitle } from "@/i18n/metadata";
 import { nowMs } from "@/lib/clock";
 import { getTranslations } from "next-intl/server";
 import { ActivityForm } from "@/components/features/admin/ActivityForm";
@@ -7,7 +8,7 @@ import { createClient } from "@/lib/supabase/server";
 import { requireRole } from "@/server/auth";
 import { listActivities, toDraft } from "@/server/queries/activities";
 
-export const metadata = { title: "الأنشطة" };
+export const generateMetadata = pageTitle("adminActivities");
 
 export default async function AdminActivitiesPage({ searchParams }: { searchParams: Promise<{ edit?: string }> }) {
   const user = await requireRole("admin");

@@ -1,3 +1,4 @@
+import { pageTitle } from "@/i18n/metadata";
 import { getTranslations } from "next-intl/server";
 import { notFound } from "next/navigation";
 import { ActivityForm } from "@/components/features/admin/ActivityForm";
@@ -12,7 +13,7 @@ import { requireGroupFacilitator } from "@/server/auth";
 import { listActivities, toDraft } from "@/server/queries/activities";
 import { getGroupMemberSignals, getGroupStats } from "@/server/queries/stats";
 
-export const metadata = { title: "المجموعة" };
+export const generateMetadata = pageTitle("group");
 
 const pct = (r: number) => formatNumber(r, undefined, { style: "percent" });
 

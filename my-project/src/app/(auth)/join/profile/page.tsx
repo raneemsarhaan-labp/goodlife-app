@@ -1,10 +1,11 @@
+import { pageTitle } from "@/i18n/metadata";
 import { getTranslations } from "next-intl/server";
 import { redirect } from "next/navigation";
 import { ProfileForm } from "@/components/features/auth/ProfileForm";
 import { createClient } from "@/lib/supabase/server";
 import { pendingJoinCode } from "@/server/actions/onboarding";
 
-export const metadata = { title: "بياناتك" };
+export const generateMetadata = pageTitle("joinProfile");
 
 export default async function JoinProfilePage() {
   const code = await pendingJoinCode();

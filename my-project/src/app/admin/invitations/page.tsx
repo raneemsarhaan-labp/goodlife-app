@@ -1,3 +1,4 @@
+import { pageTitle } from "@/i18n/metadata";
 import { nowMs } from "@/lib/clock";
 import { getTranslations } from "next-intl/server";
 import { CopyButton } from "@/components/features/admin/CopyButton";
@@ -11,7 +12,7 @@ import { createClient } from "@/lib/supabase/server";
 import { revokeInvitation } from "@/server/actions/admin/invitations";
 import { requireRole } from "@/server/auth";
 
-export const metadata = { title: "رموز الدعوة" };
+export const generateMetadata = pageTitle("adminInvitations");
 
 export default async function InvitationsPage() {
   const user = await requireRole("admin");

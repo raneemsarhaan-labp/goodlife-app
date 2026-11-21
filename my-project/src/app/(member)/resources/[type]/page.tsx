@@ -1,3 +1,4 @@
+import { pageTitle } from "@/i18n/metadata";
 import { getTranslations } from "next-intl/server";
 import { notFound } from "next/navigation";
 import { OpenResource } from "@/components/features/resources/OpenResource";
@@ -5,7 +6,7 @@ import { EmptyState } from "@/components/ui/EmptyState";
 import { createClient } from "@/lib/supabase/server";
 import { RESOURCE_TYPES } from "@/lib/validation/resources";
 
-export const metadata = { title: "الموارد" };
+export const generateMetadata = pageTitle("resources");
 
 /** Recordings, files, or references visible to the member, grouped by category. */
 export default async function ResourceListPage({ params }: { params: Promise<{ type: string }> }) {

@@ -1,3 +1,4 @@
+import { pageTitle } from "@/i18n/metadata";
 import { getTranslations } from "next-intl/server";
 import { ActionForm } from "@/components/ui/ActionForm";
 import { Button } from "@/components/ui/Button";
@@ -11,7 +12,7 @@ import { formatDate as fmtDate } from "@/lib/format";
 import { localDate } from "@/lib/journey";
 import { requireRole } from "@/server/auth";
 
-export const metadata = { title: "لوحة الإدارة" };
+export const generateMetadata = pageTitle("admin");
 
 export default async function AdminHome() {
   const t = await getTranslations("admin");

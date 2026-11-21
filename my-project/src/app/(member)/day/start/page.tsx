@@ -1,9 +1,10 @@
+import { pageTitle } from "@/i18n/metadata";
 import { getTranslations } from "next-intl/server";
 import { IntentionForm } from "@/components/features/today/IntentionForm";
 import { Sheet } from "@/components/ui/Sheet";
 import { getToday } from "@/server/queries/today";
 
-export const metadata = { title: "ابدأ يومك" };
+export const generateMetadata = pageTitle("startDay");
 
 export default async function StartDayPage() {
   const [t, data] = await Promise.all([getTranslations("startDay"), getToday()]);

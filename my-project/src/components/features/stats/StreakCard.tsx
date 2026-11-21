@@ -10,7 +10,7 @@ export async function StreakCard({ stats }: { stats: MemberStats }) {
     <Card aria-labelledby="best-streak">
       <CardTitle id="best-streak">{t("bestStreakTitle")}</CardTitle>
       <p className="mt-1 text-ink-700">
-        {best && best.current_streak > 0 ? t("bestStreak", { days: formatNumber(best.current_streak), name: best.name }) : t("noStreak")}
+        {best && best.current_streak > 0 ? t("bestStreak", { count: best.current_streak, n: formatNumber(best.current_streak), name: best.name }) : t("noStreak")}
       </p>
     </Card>
   );

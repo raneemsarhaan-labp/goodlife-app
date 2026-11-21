@@ -1,3 +1,4 @@
+import { pageTitle } from "@/i18n/metadata";
 import { getTranslations } from "next-intl/server";
 import { ChallengeSummary } from "@/components/features/stats/ChallengeSummary";
 import { HabitRateList } from "@/components/features/stats/HabitRateList";
@@ -10,7 +11,7 @@ import { PERIODS, periodRange, type Period } from "@/lib/period";
 import { getMemberStats } from "@/server/queries/stats";
 import { getToday } from "@/server/queries/today";
 
-export const metadata = { title: "الإحصاءات" };
+export const generateMetadata = pageTitle("stats");
 
 /** «الإحصاءات» (US5, FR-035/036). */
 export default async function StatsPage({ searchParams }: { searchParams: Promise<{ period?: string }> }) {

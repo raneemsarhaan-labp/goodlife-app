@@ -1,10 +1,11 @@
+import { pageTitle } from "@/i18n/metadata";
 import { getTranslations } from "next-intl/server";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { formatNumber } from "@/lib/format";
 import { createClient } from "@/lib/supabase/server";
 import { getToday } from "@/server/queries/today";
 
-export const metadata = { title: "خريطة الرحلة" };
+export const generateMetadata = pageTitle("journeyMap");
 
 /** Journey map: all stages with the current one highlighted (FR-007). */
 export default async function JourneyMapPage() {

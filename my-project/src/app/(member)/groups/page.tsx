@@ -1,3 +1,4 @@
+import { pageTitle } from "@/i18n/metadata";
 import Link from "next/link";
 import { getTranslations } from "next-intl/server";
 import { Card } from "@/components/ui/Card";
@@ -5,7 +6,7 @@ import { EmptyState } from "@/components/ui/EmptyState";
 import { requireUser } from "@/server/auth";
 import { getMyGroups } from "@/server/queries/community";
 
-export const metadata = { title: "مجموعاتي" };
+export const generateMetadata = pageTitle("groups");
 
 /** «مجموعاتي»: groups led and the group belonged to, labelled by role (FR-042). */
 export default async function MyGroupsPage() {

@@ -18,7 +18,7 @@ export function CloseDayForm() {
     return (
       <div className="flex flex-col items-center gap-5 py-6 text-center">
         <p role="status" className="text-xl leading-loose text-sage-700">
-          {state.data.closingMessage ?? "ما نويته اليوم تمّ. وغدًا يبدأ من حيث توقفت."}
+          {state.data.closingMessage ?? t("fallbackMessage")}
         </p>
         <Link href="/" className={buttonClass("primary")}>
           {t("backToToday")}

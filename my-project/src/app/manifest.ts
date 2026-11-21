@@ -1,11 +1,14 @@
 import type { MetadataRoute } from "next";
+import { getTranslations } from "next-intl/server";
+import { LOCALE } from "@/i18n/request";
 
 /** Installable app manifest (FR-081, contracts/routes.md › PWA). */
-export default function manifest(): MetadataRoute.Manifest {
+export default async function manifest(): Promise<MetadataRoute.Manifest> {
+  const t = await getTranslations({ locale: LOCALE, namespace: "meta" });
   return {
-    name: "الحياة الطيبة",
-    short_name: "الحياة الطيبة",
-    description: "رفيقك في رحلة سنوية منظَّمة نحو حياة أكثر اتزانًا.",
+    name: t("appName"),
+    short_name: t("appName"),
+    description: t("description"),
     lang: "ar",
     dir: "rtl",
     start_url: "/",

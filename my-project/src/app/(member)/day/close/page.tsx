@@ -1,3 +1,4 @@
+import { pageTitle } from "@/i18n/metadata";
 import { getTranslations } from "next-intl/server";
 import { CloseDayForm } from "@/components/features/today/CloseDayForm";
 import { Card } from "@/components/ui/Card";
@@ -5,7 +6,7 @@ import { Sheet } from "@/components/ui/Sheet";
 import { formatFraction } from "@/lib/format";
 import { getToday } from "@/server/queries/today";
 
-export const metadata = { title: "ختام اليوم" };
+export const generateMetadata = pageTitle("closeDay");
 
 /** «ختام اليوم»: summary of the day, optional reflection, closing message (FR-014). */
 export default async function CloseDayPage() {

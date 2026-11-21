@@ -1,8 +1,9 @@
+import { pageTitle } from "@/i18n/metadata";
 import Link from "next/link";
 import { getTranslations } from "next-intl/server";
 import { JoinCodeForm } from "@/components/features/auth/JoinCodeForm";
 
-export const metadata = { title: "انضم إلى الرحلة" };
+export const generateMetadata = pageTitle("join");
 
 export default async function JoinPage() {
   const t = await getTranslations("join");

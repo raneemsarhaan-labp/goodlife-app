@@ -1,10 +1,11 @@
+import { pageTitle } from "@/i18n/metadata";
 import Link from "next/link";
 import { getTranslations } from "next-intl/server";
 import { buttonClass } from "@/components/ui/Button";
 import { createClient } from "@/lib/supabase/server";
 import { requireUser } from "@/server/auth";
 
-export const metadata = { title: "أهلًا بك" };
+export const generateMetadata = pageTitle("welcome");
 
 export default async function WelcomePage() {
   const user = await requireUser();

@@ -1,3 +1,4 @@
+import { pageTitle } from "@/i18n/metadata";
 import { getTranslations } from "next-intl/server";
 import { GroupHeader } from "@/components/features/community/GroupHeader";
 import { MemberList } from "@/components/features/community/MemberList";
@@ -6,7 +7,7 @@ import { Card } from "@/components/ui/Card";
 import { requireUser } from "@/server/auth";
 import { getMyGroup, getReceivedEncouragements } from "@/server/queries/community";
 
-export const metadata = { title: "المجتمع" };
+export const generateMetadata = pageTitle("community");
 
 /** «المجتمع» (US6, FR-040/041). */
 export default async function CommunityPage() {

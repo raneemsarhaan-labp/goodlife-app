@@ -1,3 +1,4 @@
+import { pageTitle } from "@/i18n/metadata";
 import { getTranslations } from "next-intl/server";
 import { notFound } from "next/navigation";
 import { MonthFiguresView } from "@/components/features/review/MonthFiguresView";
@@ -9,7 +10,7 @@ import { monthKeySchema } from "@/lib/validation/review";
 import { requireUser } from "@/server/auth";
 import { getReview } from "@/server/queries/reviews";
 
-export const metadata = { title: "مراجعة الشهر" };
+export const generateMetadata = pageTitle("review");
 
 /** One month's review: figures first, then reflection questions; read-only once completed. */
 export default async function ReviewPage({ params }: { params: Promise<{ month: string }> }) {

@@ -1,3 +1,4 @@
+import { pageTitle } from "@/i18n/metadata";
 import { getTranslations } from "next-intl/server";
 import { CopyPreviousHabits } from "@/components/features/plan/CopyPreviousHabits";
 import { CurrentState } from "@/components/features/plan/CurrentState";
@@ -9,7 +10,7 @@ import { EmptyState } from "@/components/ui/EmptyState";
 import { requireUser } from "@/server/auth";
 import { getPlan } from "@/server/queries/plan";
 
-export const metadata = { title: "خطتي" };
+export const generateMetadata = pageTitle("plan");
 
 /** «خطتي» (US3, FR-020–FR-024). */
 export default async function PlanPage() {

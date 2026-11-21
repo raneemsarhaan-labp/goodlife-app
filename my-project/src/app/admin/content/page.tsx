@@ -1,3 +1,4 @@
+import { pageTitle } from "@/i18n/metadata";
 import Link from "next/link";
 import { getTranslations } from "next-intl/server";
 import type { ReactNode } from "react";
@@ -8,7 +9,7 @@ import { PhrasesTab } from "@/components/features/admin/content/PhrasesTab";
 import { QuestionsTab } from "@/components/features/admin/content/QuestionsTab";
 import { StagesTab } from "@/components/features/admin/content/StagesTab";
 
-export const metadata = { title: "المحتوى" };
+export const generateMetadata = pageTitle("adminContent");
 
 /** Program content managed by admins (FR-063). Tabs are added by later stories. */
 const TABS: Record<string, (params: { page: number }) => ReactNode> = {

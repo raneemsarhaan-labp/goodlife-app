@@ -1,10 +1,11 @@
+import { pageTitle } from "@/i18n/metadata";
 import Link from "next/link";
 import { getTranslations } from "next-intl/server";
 import { InstallHint } from "@/components/features/install/InstallHint";
 import { Card } from "@/components/ui/Card";
 import { requireUser } from "@/server/auth";
 
-export const metadata = { title: "المزيد" };
+export const generateMetadata = pageTitle("more");
 
 /** «المزيد» (FR-082). */
 export default async function MorePage() {

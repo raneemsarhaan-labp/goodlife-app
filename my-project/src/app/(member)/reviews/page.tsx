@@ -1,3 +1,4 @@
+import { pageTitle } from "@/i18n/metadata";
 import Link from "next/link";
 import { getTranslations } from "next-intl/server";
 import { Card } from "@/components/ui/Card";
@@ -6,7 +7,7 @@ import { monthKey, monthsBetween } from "@/lib/review-window";
 import { getToday } from "@/server/queries/today";
 import { getReviewStatuses } from "@/server/queries/reviews";
 
-export const metadata = { title: "مراجعاتي" };
+export const generateMetadata = pageTitle("reviews");
 
 /** Past monthly reviews, done or not yet done (FR-032). */
 export default async function ReviewsPage() {

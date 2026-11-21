@@ -1,8 +1,9 @@
+import { pageTitle } from "@/i18n/metadata";
 import Link from "next/link";
 import { getTranslations } from "next-intl/server";
 import { SignInForm } from "@/components/features/auth/SignInForm";
 
-export const metadata = { title: "تسجيل الدخول" };
+export const generateMetadata = pageTitle("signIn");
 
 export default async function SignInPage() {
   const t = await getTranslations("signIn");

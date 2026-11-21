@@ -1,10 +1,11 @@
+import { pageTitle } from "@/i18n/metadata";
 import Link from "next/link";
 import { getTranslations } from "next-intl/server";
 import { Card } from "@/components/ui/Card";
 import { formatNumber } from "@/lib/format";
 import { createClient } from "@/lib/supabase/server";
 
-export const metadata = { title: "الموارد" };
+export const generateMetadata = pageTitle("resources");
 
 /** «الموارد» hub (US7, FR-050). Counts reflect only what the member may see (RLS). */
 export default async function ResourcesPage() {
@@ -31,7 +32,7 @@ export default async function ResourcesPage() {
             <Link href={s.href} className="block">
               <Card className="flex min-h-16 items-center justify-between hover:bg-sage-50">
                 <span className="text-lg font-medium">{t(`sections.${s.key}`)}</span>
-                {s.n !== undefined && <span className="text-sm text-ink-500">{t("count", { count: formatNumber(s.n) })}</span>}
+                {s.n !== undefined && <span className="text-sm text-ink-500">{t("count", { count: s.n, n: formatNumber(s.n) })}</span>}
               </Card>
             </Link>
           </li>

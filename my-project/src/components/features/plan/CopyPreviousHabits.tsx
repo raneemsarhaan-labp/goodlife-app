@@ -11,11 +11,11 @@ export function CopyPreviousHabits({ count }: { count: number }) {
   return (
     <section aria-labelledby="copy-previous" className="flex flex-col gap-3 rounded-[var(--radius-card)] border border-sage-100 bg-sage-50 p-5">
       <h2 id="copy-previous" className="text-lg font-semibold text-sage-700">{t("copyTitle")}</h2>
-      <p>{t("copyBody", { count: formatNumber(count) })}</p>
+      <p>{t("copyBody", { count, n: formatNumber(count) })}</p>
       <ActionForm
         action={copyHabitsFromPreviousPlan}
         submitLabel={t("copy")}
-        renderSuccess={({ count: copied }) => <p role="status" className="text-sage-700">{t("copied", { count: formatNumber(copied) })}</p>}
+        renderSuccess={({ count: copied }) => <p role="status" className="text-sage-700">{t("copied", { count: copied, n: formatNumber(copied) })}</p>}
       >
         {null}
       </ActionForm>

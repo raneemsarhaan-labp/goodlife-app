@@ -1,3 +1,4 @@
+import { pageTitle } from "@/i18n/metadata";
 import Link from "next/link";
 import { getTranslations } from "next-intl/server";
 import { ActionForm } from "@/components/ui/ActionForm";
@@ -8,7 +9,7 @@ import { formatDate, formatNumber } from "@/lib/format";
 import { createClient } from "@/lib/supabase/server";
 import { upsertCohort } from "@/server/actions/admin/structure";
 
-export const metadata = { title: "الدفعات والمجموعات" };
+export const generateMetadata = pageTitle("adminCohorts");
 
 export default async function CohortsPage() {
   const t = await getTranslations("admin");
@@ -36,7 +37,7 @@ export default async function CohortsPage() {
                       {t("cohorts.dates", { start: formatDate(c.start_date, { withYear: true, withWeekday: false }), end: formatDate(c.end_date ?? c.start_date, { withYear: true, withWeekday: false }) })}
                     </p>
                     <p className="text-sm text-ink-500">
-                      {t("cohorts.groupsCount", { count: formatNumber(c.groups.length) })} · {t("cohorts.membersCount", { count: formatNumber(members) })}
+                      {t("cohorts.groupsCount", { count: c.groups.length, n: formatNumber(c.groups.length) })} · {t("cohorts.membersCount", { count: members, n: formatNumber(members) })}
                     </p>
                   </div>
                   <Link href={`/admin/cohorts/${c.id}`} className="text-sage-700 underline underline-offset-4">

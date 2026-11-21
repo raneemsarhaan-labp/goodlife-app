@@ -1,3 +1,4 @@
+import { pageTitle } from "@/i18n/metadata";
 import { getTranslations } from "next-intl/server";
 import { notFound } from "next/navigation";
 import { ActionForm } from "@/components/ui/ActionForm";
@@ -8,7 +9,7 @@ import { Field } from "@/components/ui/Field";
 import { createClient } from "@/lib/supabase/server";
 import { addMember, assignFacilitator, moveMember, removeFacilitator, upsertCohort, upsertGroup } from "@/server/actions/admin/structure";
 
-export const metadata = { title: "إدارة الدفعة" };
+export const generateMetadata = pageTitle("adminCohort");
 
 type Person = { id: string; full_name: string; email: string };
 

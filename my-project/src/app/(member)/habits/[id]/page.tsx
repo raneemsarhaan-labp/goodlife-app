@@ -1,3 +1,4 @@
+import { pageTitle } from "@/i18n/metadata";
 import { getTranslations } from "next-intl/server";
 import { notFound } from "next/navigation";
 import { HabitEditForm } from "@/components/features/habits/HabitEditForm";
@@ -7,7 +8,7 @@ import { createClient } from "@/lib/supabase/server";
 import { archiveHabit } from "@/server/actions/habits";
 import { getFocusAreas } from "@/server/queries/plan";
 
-export const metadata = { title: "تعديل العادة" };
+export const generateMetadata = pageTitle("editHabit");
 
 export default async function EditHabitPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;

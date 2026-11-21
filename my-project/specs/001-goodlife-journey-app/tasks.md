@@ -317,14 +317,14 @@ and confirm they fail.
 
 **Purpose**: Constitution gates across all stories
 
-- [ ] T136 [P] Add a messages test that every key used in `src/` exists in `messages/ar.json` and no value is Latin-only text, in `tests/unit/messages.test.ts`
-- [ ] T137 [P] Add an axe sweep over every route for each role in `tests/e2e/a11y-all-routes.spec.ts`
-- [ ] T138 [P] Add a performance check that «يومك» is interactive within 3 s on a throttled mid-range mobile profile in `tests/e2e/perf-today.spec.ts` (SC-003)
-- [ ] T139 Add security headers (CSP, Referrer-Policy, Permissions-Policy) in `next.config.ts` and confirm no personal data reaches logs via `src/lib/log.ts`
-- [ ] T140 Arabic language and tone review of `messages/ar.json` (calm, warm, no gamified wording) with fixes applied
-- [ ] T141 Capture RTL screenshots of every member screen on a phone viewport for the PR review gate in `tests/e2e/screenshots.spec.ts`
-- [ ] T142 Add a release checklist in `docs/release-checklist.md`: take a database backup before any release that includes new migrations, never edit a merged migration, fix mistakes with a new migration (constitution v1.2.0, Constraints › البيانات)
-- [ ] T143 Run all of quickstart.md (automated checks and the 10 manual scenarios) and record results in `specs/001-goodlife-journey-app/checklists/quickstart-run.md`
+- [X] T136 [P] Add a messages test that every key used in `src/` exists in `messages/ar.json` and no value is Latin-only text, in `tests/unit/messages.test.ts`
+- [X] T137 [P] Add an axe sweep over every route for each role in `tests/e2e/a11y-all-routes.spec.ts`
+- [X] T138 [P] Add a performance check that «يومك» is interactive within 3 s on a throttled mid-range mobile profile in `tests/e2e/perf-today.spec.ts` (SC-003)
+- [X] T139 Add security headers (CSP, Referrer-Policy, Permissions-Policy) in `next.config.ts` and confirm no personal data reaches logs via `src/lib/log.ts`
+- [X] T140 Arabic language and tone review of `messages/ar.json` (calm, warm, no gamified wording) with fixes applied
+- [X] T141 Capture RTL screenshots of every member screen on a phone viewport for the PR review gate in `tests/e2e/screenshots.spec.ts`
+- [X] T142 Add a release checklist in `docs/release-checklist.md`: take a database backup before any release that includes new migrations, never edit a merged migration, fix mistakes with a new migration (constitution v1.2.0, Constraints › البيانات)
+- [X] T143 Run all of quickstart.md (automated checks and the 10 manual scenarios) and record results in `specs/001-goodlife-journey-app/checklists/quickstart-run.md`
 
 ---
 

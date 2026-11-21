@@ -1,3 +1,4 @@
+import { pageTitle } from "@/i18n/metadata";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { getTranslations } from "next-intl/server";
@@ -17,7 +18,7 @@ import { formatDate } from "@/lib/format";
 import { requireUser } from "@/server/auth";
 import { getToday } from "@/server/queries/today";
 
-export const metadata = { title: "يومك" };
+export const generateMetadata = pageTitle("today");
 
 /** «يومك»: the member's home screen (US1, FR-010–FR-014). */
 export default async function TodayPage({ searchParams }: { searchParams: Promise<{ day?: string }> }) {

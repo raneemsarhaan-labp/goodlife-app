@@ -1,8 +1,9 @@
+import { pageTitle } from "@/i18n/metadata";
 import { getTranslations } from "next-intl/server";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { createClient } from "@/lib/supabase/server";
 
-export const metadata = { title: "أعراف الرحلة" };
+export const generateMetadata = pageTitle("guidelines");
 
 export default async function GuidelinesPage() {
   const t = await getTranslations("resources");

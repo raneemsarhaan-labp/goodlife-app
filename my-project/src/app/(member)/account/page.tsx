@@ -1,3 +1,4 @@
+import { pageTitle } from "@/i18n/metadata";
 import Link from "next/link";
 import { getTranslations } from "next-intl/server";
 import { DeleteRequest } from "@/components/features/account/DeleteRequest";
@@ -10,7 +11,7 @@ import { createClient } from "@/lib/supabase/server";
 import { signOut } from "@/server/actions/onboarding";
 import { requireUser } from "@/server/auth";
 
-export const metadata = { title: "حسابي" };
+export const generateMetadata = pageTitle("account");
 
 /** «حسابي» (FR-070, FR-071). */
 export default async function AccountPage() {

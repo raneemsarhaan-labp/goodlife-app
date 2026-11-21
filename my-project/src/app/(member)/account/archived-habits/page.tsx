@@ -1,3 +1,4 @@
+import { pageTitle } from "@/i18n/metadata";
 import { getTranslations } from "next-intl/server";
 import { Button } from "@/components/ui/Button";
 import { EmptyState } from "@/components/ui/EmptyState";
@@ -8,7 +9,7 @@ import { createClient } from "@/lib/supabase/server";
 import { restoreHabit } from "@/server/actions/habits";
 import { requireUser } from "@/server/auth";
 
-export const metadata = { title: "العادات المؤرشفة" };
+export const generateMetadata = pageTitle("archivedHabits");
 
 /** Archived habits of the current journey, with restore (FR-022). */
 export default async function ArchivedHabitsPage() {

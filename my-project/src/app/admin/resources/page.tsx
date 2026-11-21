@@ -1,3 +1,4 @@
+import { pageTitle } from "@/i18n/metadata";
 import Link from "next/link";
 import { getTranslations } from "next-intl/server";
 import { ResourceForm } from "@/components/features/admin/ResourceForm";
@@ -8,7 +9,7 @@ import { EmptyState } from "@/components/ui/EmptyState";
 import { createClient } from "@/lib/supabase/server";
 import { deleteResource, reorderResources } from "@/server/actions/admin/resources";
 
-export const metadata = { title: "مكتبة الموارد" };
+export const generateMetadata = pageTitle("adminResources");
 
 export default async function AdminResourcesPage({ searchParams }: { searchParams: Promise<{ edit?: string }> }) {
   const { edit } = await searchParams;
