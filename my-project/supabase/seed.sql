@@ -55,7 +55,7 @@ insert into public.group_memberships (group_id, user_id, role, started_on) value
   ('00000000-0000-4000-8000-0000000000a1', '00000000-0000-4000-8000-000000000004', 'member', current_date - 11);
 
 -- ── US1: invitations, plans, habits, challenges, closing messages, activity ─
-select set_config('goodlife.seeding', 'on', true); -- allow back-dated history in seed only
+set local goodlife.seeding = 'on'; -- allow back-dated history in seed only
 
 -- Join with this code (quickstart.md). Alphabet excludes 0/O/1/I/L.
 insert into public.invitation_codes (code, cohort_id, group_id, expires_at, max_uses, created_by) values

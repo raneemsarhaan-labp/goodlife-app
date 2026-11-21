@@ -129,25 +129,25 @@ and confirm they fail.
 
 ### Tests for User Story 2 ⚠️
 
-- [ ] T056 [P] [US2] pgTAP tests: admin writes on cohorts, groups, memberships, invitations, journey challenges, closing messages, and roles are denied for member and facilitator; a facilitator removed from a group immediately loses read access to it; `move_member` keeps the member's personal rows unchanged, in `supabase/tests/rls_admin.test.sql`
-- [ ] T057 [P] [US2] pgTAP tests for activity permissions (constitution III): a facilitator can create, edit, and cancel an activity whose audience is only groups they lead; is refused for another group, for a cohort-wide audience, and for editing an activity they did not create; a member is refused all writes; admin can do all, in `supabase/tests/rls_activities.test.sql`
-- [ ] T058 [P] [US2] Playwright e2e for quickstart scenario 3 with `checkA11y` in `tests/e2e/us2-admin-setup.spec.ts`
+- [X] T056 [P] [US2] pgTAP tests: admin writes on cohorts, groups, memberships, invitations, journey challenges, closing messages, and roles are denied for member and facilitator; a facilitator removed from a group immediately loses read access to it; `move_member` keeps the member's personal rows unchanged, in `supabase/tests/rls_admin.test.sql`
+- [X] T057 [P] [US2] pgTAP tests for activity permissions (constitution III): a facilitator can create, edit, and cancel an activity whose audience is only groups they lead; is refused for another group, for a cohort-wide audience, and for editing an activity they did not create; a member is refused all writes; admin can do all, in `supabase/tests/rls_activities.test.sql`
+- [X] T058 [P] [US2] Playwright e2e for quickstart scenario 3 with `checkA11y` in `tests/e2e/us2-admin-setup.spec.ts`
 
 ### Implementation for User Story 2
 
-- [ ] T059 [US2] Create `supabase/migrations/0008_admin.sql`: admin write policies on structure, invitation, and content tables; for `activities` and `activity_audiences`: admin may write any row, a facilitator may insert/update/cancel only rows they created whose every audience row is a group they lead (cohort-wide audiences are admin-only); `move_member(user_id, group_id)` (sets `group_memberships.ended_on`, inserts a new row with `group_memberships.started_on`, same cohort only); `assign_facilitator` / `remove_facilitator` maintaining `user_roles.role` = `facilitator`; guard against revoking the last admin
-- [ ] T060 [P] [US2] Zod schemas in `src/lib/validation/admin.ts` citing data-model.md `cohorts.name`, `cohorts.start_date`, `groups.name`, `invitation_codes.max_uses`, `invitation_codes.expires_at`, `activities.title`, `activities.description`, `activities.starts_at`, `activities.ends_at`, `activities.location`, `activity_audiences.cohort_id`, `activity_audiences.group_id`, `journey_challenges.journey_day`, `journey_challenges.text`, `closing_messages.text`
-- [ ] T061 [P] [US2] Implement an unambiguous-alphabet 8-character code generator in `src/lib/codes.ts` (data-model.md `invitation_codes.code`) with a unit test in `tests/unit/codes.test.ts`
-- [ ] T062 [US2] Implement `upsertCohort`, `upsertGroup`, `assignFacilitator`, `removeFacilitator`, `addMember`, `moveMember`, `grantAdmin`, `revokeAdmin` in `src/server/actions/admin/structure.ts`
-- [ ] T063 [US2] Implement `createInvitations` and `revokeInvitation` in `src/server/actions/admin/invitations.ts`
-- [ ] T064 [US2] Implement `createActivity`, `updateActivity`, `cancelActivity` in `src/server/actions/activities.ts` (admin: any audience; facilitator: own groups only, used by US6)
-- [ ] T065 [US2] Implement `upsertJourneyChallenge` and `upsertClosingMessage` in `src/server/actions/admin/content.ts`
-- [ ] T066 [US2] Build admin layout and home (`requireRole('admin')`, counts of cohorts, groups, members) in `src/app/admin/layout.tsx` and `src/app/admin/page.tsx`
-- [ ] T067 [US2] Build cohorts list and cohort detail (groups, facilitators, members, add/move member) in `src/app/admin/cohorts/page.tsx` and `src/app/admin/cohorts/[id]/page.tsx`
-- [ ] T068 [P] [US2] Build invitations screen (generate, copy, revoke, uses) in `src/app/admin/invitations/page.tsx`
-- [ ] T069 [P] [US2] Build activities screen (schedule for groups or cohort, edit, cancel) in `src/app/admin/activities/page.tsx`
-- [ ] T070 [US2] Build content screen with tabs for journey challenges (by day 1–365) and closing messages in `src/app/admin/content/page.tsx`
-- [ ] T071 [US2] Add US2 Arabic strings to `messages/ar.json`
+- [X] T059 [US2] Create `supabase/migrations/0008_admin.sql`: admin write policies on structure, invitation, and content tables; for `activities` and `activity_audiences`: admin may write any row, a facilitator may insert/update/cancel only rows they created whose every audience row is a group they lead (cohort-wide audiences are admin-only); `move_member(user_id, group_id)` (sets `group_memberships.ended_on`, inserts a new row with `group_memberships.started_on`, same cohort only); `assign_facilitator` / `remove_facilitator` maintaining `user_roles.role` = `facilitator`; guard against revoking the last admin
+- [X] T060 [P] [US2] Zod schemas in `src/lib/validation/admin.ts` citing data-model.md `cohorts.name`, `cohorts.start_date`, `groups.name`, `invitation_codes.max_uses`, `invitation_codes.expires_at`, `activities.title`, `activities.description`, `activities.starts_at`, `activities.ends_at`, `activities.location`, `activity_audiences.cohort_id`, `activity_audiences.group_id`, `journey_challenges.journey_day`, `journey_challenges.text`, `closing_messages.text`
+- [X] T061 [P] [US2] Implement an unambiguous-alphabet 8-character code generator in `src/lib/codes.ts` (data-model.md `invitation_codes.code`) with a unit test in `tests/unit/codes.test.ts`
+- [X] T062 [US2] Implement `upsertCohort`, `upsertGroup`, `assignFacilitator`, `removeFacilitator`, `addMember`, `moveMember`, `grantAdmin`, `revokeAdmin` in `src/server/actions/admin/structure.ts`
+- [X] T063 [US2] Implement `createInvitations` and `revokeInvitation` in `src/server/actions/admin/invitations.ts`
+- [X] T064 [US2] Implement `createActivity`, `updateActivity`, `cancelActivity` in `src/server/actions/activities.ts` (admin: any audience; facilitator: own groups only, used by US6)
+- [X] T065 [US2] Implement `upsertJourneyChallenge` and `upsertClosingMessage` in `src/server/actions/admin/content.ts`
+- [X] T066 [US2] Build admin layout and home (`requireRole('admin')`, counts of cohorts, groups, members) in `src/app/admin/layout.tsx` and `src/app/admin/page.tsx`
+- [X] T067 [US2] Build cohorts list and cohort detail (groups, facilitators, members, add/move member) in `src/app/admin/cohorts/page.tsx` and `src/app/admin/cohorts/[id]/page.tsx`
+- [X] T068 [P] [US2] Build invitations screen (generate, copy, revoke, uses) in `src/app/admin/invitations/page.tsx`
+- [X] T069 [P] [US2] Build activities screen (schedule for groups or cohort, edit, cancel) in `src/app/admin/activities/page.tsx`
+- [X] T070 [US2] Build content screen with tabs for journey challenges (by day 1–365) and closing messages in `src/app/admin/content/page.tsx`
+- [X] T071 [US2] Add US2 Arabic strings to `messages/ar.json`
 
 **Checkpoint**: The program can be set up and run without manual tracking; US1 works on real data.
 

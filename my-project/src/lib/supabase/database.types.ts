@@ -399,11 +399,26 @@ isOneToOne: false
             [_ in never]: never
           }
           Functions: {
-            "assert_day_editable":
+            "activity_created_by_me":
+{ Args: { "p_activity": string }; Returns: boolean
+                           },
+"activity_led_by_me":
+{ Args: { "p_activity": string }; Returns: boolean
+                           },
+"add_member":
+{ Args: { "p_group": string,"p_user": string }; Returns: undefined
+                           },
+"assert_day_editable":
 { Args: { "p_cohort": string,"p_date": string,"p_recorded_at": string,"p_user": string }; Returns: undefined
+                           },
+"assign_facilitator":
+{ Args: { "p_group": string,"p_user": string }; Returns: undefined
                            },
 "can_see_activity":
 { Args: { "p_activity": string }; Returns: boolean
+                           },
+"cancel_activity":
+{ Args: { "p_id": string }; Returns: undefined
                            },
 "check_invitation":
 { Args: { "p_code": string }; Returns: Record<string, unknown>
@@ -419,6 +434,9 @@ isOneToOne: false
                            },
 "get_today":
 { Args: { "p_which"?: string }; Returns: Json
+                           },
+"grant_admin":
+{ Args: { "p_user": string }; Returns: undefined
                            },
 "has_role":
 { Args: { "p_role": Database["public"]['Enums']["app_role"] }; Returns: boolean
@@ -441,11 +459,26 @@ isOneToOne: false
 "journey_day":
 { Args: { "p_local_date": string,"p_user": string }; Returns: number
                            },
+"move_member":
+{ Args: { "p_group": string,"p_user": string }; Returns: undefined
+                           },
 "normalize_invitation_code":
 { Args: { "p_code": string }; Returns: string
                            },
 "redeem_invitation":
 { Args: { "p_auth_user": string,"p_city"?: string,"p_code": string,"p_email": string,"p_full_name": string,"p_gender"?: Database["public"]['Enums']["gender"],"p_phone"?: string,"p_time_zone": string }; Returns: string
+                           },
+"remove_facilitator":
+{ Args: { "p_group": string,"p_user": string }; Returns: undefined
+                           },
+"require_admin":
+{ Args: Record<PropertyKey, never>; Returns: undefined
+                           },
+"revoke_admin":
+{ Args: { "p_user": string }; Returns: undefined
+                           },
+"save_activity":
+{ Args: { "p_cohort_id"?: string,"p_description"?: string,"p_ends_at"?: string,"p_group_ids"?: (string)[],"p_id"?: string,"p_location"?: string,"p_starts_at"?: string,"p_title"?: string }; Returns: string
                            },
 "set_challenge_done":
 { Args: { "p_client_mutation_id": string,"p_done": boolean,"p_kind": Database["public"]['Enums']["challenge_kind"],"p_local_date": string,"p_recorded_at"?: string }; Returns: undefined

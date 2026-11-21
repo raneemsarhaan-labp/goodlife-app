@@ -21,6 +21,7 @@ export default async function TodayPage({ searchParams }: { searchParams: Promis
   const which = (await searchParams).day === "yesterday" ? "yesterday" : "today";
   const data = await getToday(which);
   const t = await getTranslations("today");
+  const tn = await getTranslations("nav");
   const isToday = which === "today";
 
   if (!data || data.journey_status === "none") {
@@ -30,16 +31,27 @@ export default async function TodayPage({ searchParams }: { searchParams: Promis
         <Card>
           <p>{t("noJourney")}</p>
         </Card>
+        {user.roles.includes("admin") && (
+          <Link href="/admin" className="self-start text-sage-700 underline underline-offset-4">
+            {tn("admin")}
+          </Link>
+        )}
       </main>
     );
   }
 
   const habits = data.habits ?? [];
+  const adminLink = user.roles.includes("admin") && (
+    <Link href="/admin" className="self-start text-sm text-sage-700 underline underline-offset-4">
+      {tn("admin")}
+    </Link>
+  );
   const closed = Boolean(data.day?.closed_at);
 
   return (
     <main id="main" className="mx-auto flex max-w-lg flex-col gap-5 px-5 pt-6">
       <DayRollover timeZone={data.time_zone} shownDate={isToday ? data.local_date : ""} />
+      {adminLink}
       <Greeting name={user.fullName} timeZone={data.time_zone} localDate={data.local_date} journeyDay={data.journey_status === "active" ? data.journey_day : undefined} />
 
       {data.journey_status === "ended" && <JourneyEnded />}
