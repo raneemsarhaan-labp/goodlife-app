@@ -1,20 +1,17 @@
 <!--
 Sync Impact Report
-- Version change: 1.0.0 → 1.1.0 (MINOR: principle IV gains a concrete facilitator-visibility rule)
-- Modified principles: none (first adoption)
-- Added principles:
-  I. العربية أولًا واتجاه من اليمين إلى اليسار
-  II. الرحلة السنوية هي المحور
-  III. الأدوار والصلاحيات تُفرض في الخادم
-  IV. خصوصية التأمل الشخصي
-  V. تطبيق ويب قابل للتثبيت، للجوال أولًا
-  VI. البساطة والهدوء وإتاحة الوصول
-- Added sections: القيود التقنية والتشغيلية، سير العمل وبوابات الجودة، الحوكمة
+- Version change: 1.1.0 → 1.2.0 (MINOR: tech stack recorded; offline scope defined; data-change
+  rule redefined from "reversible migrations" to forward-fix + backup)
+- Modified sections:
+  V. تطبيق ويب قابل للتثبيت: offline scope made concrete (was TODO(OFFLINE_SCOPE))
+  القيود التقنية والتشغيلية: التقنيات (was TODO(TECH_STACK)); البيانات (forward-fix policy)
+- Added sections: none
 - Removed sections: none
-- Deferred TODOs:
-  TODO(TECH_STACK): لم تُحدَّد التقنيات بعد؛ تُقرَّر في أول /speckit-plan وتُضاف هنا بتعديل MINOR.
-  RESOLVED(FACILITATOR_VISIBILITY) 2026-11-21: إشارات النشاط فقط (spec 001, FR-043).
-  TODO(OFFLINE_SCOPE): مدى العمل دون اتصال؛ يُحسم في مواصفة «يومك».
+- Resolved TODOs:
+  RESOLVED(FACILITATOR_VISIBILITY) 2026-11-21 (v1.1.0): activity signals only (spec 001, FR-043).
+  RESOLVED(TECH_STACK) 2026-11-21: spec 001 research.md §1–3, §7–9.
+  RESOLVED(OFFLINE_SCOPE) 2026-11-21: spec 001 research.md §4.
+- Dependent artifacts: specs/001-goodlife-journey-app/plan.md Constitution Check updated.
 -->
 
 # دستور «الحياة الطيبة» (GoodLife Constitution)
@@ -78,8 +75,8 @@ Sync Impact Report
 - يجب أن يعمل التطبيق في المتصفحات الحديثة على الجوال والحاسوب دون تثبيت، وأن يكون قابلًا للتثبيت
   على الشاشة الرئيسية كتطبيق ويب تقدّمي (PWA): ملف manifest، وأيقونات، و service worker.
 - يجب أن تُصمَّم الشاشات للجوال أولًا ثم تتسع للشاشات الكبيرة.
-- ينبغي أن تبقى شاشة «يومك» قابلة للفتح وتسجيل العادات حتى مع ضعف الاتصال، مع مزامنة لاحقة
-  (يُحدَّد النطاق في TODO(OFFLINE_SCOPE)).
+- يجب أن تبقى شاشة «يومك» قابلة للفتح، وتسجيل العادات والتحديات ممكنًا، دون اتصال، مع مزامنة
+  لاحقة لا تكرّر ولا تُضيّع ما سُجّل خلال 7 أيام. باقي الشاشات تتطلب اتصالًا وتقول ذلك بهدوء.
 - يجب أن يبقى تحميل شاشة «يومك» الأول سريعًا على جوال متوسط واتصال 4G (الهدف: تفاعلية خلال 3 ثوانٍ).
 
 **المبرر**: الاستخدام اليومي يحدث على الجوال في لحظات قصيرة؛ أي احتكاك يقطع العادة.
@@ -97,12 +94,15 @@ Sync Impact Report
 
 ## القيود التقنية والتشغيلية
 
-- **التقنيات**: TODO(TECH_STACK). أي اختيار يجب أن يدعم RTL والعربية جيدًا، وPWA، والتحقق من
-  الصلاحيات في الخادم.
+- **التقنيات**: Next.js وTypeScript لتطبيق واحد متكامل، وSupabase (PostgreSQL مع Row Level
+  Security، وتسجيل دخول برمز لمرة واحدة، وتخزين خاص بروابط موقّتة). أي تقنية تُضاف يجب أن تدعم
+  RTL والعربية جيدًا، وPWA، والتحقق من الصلاحيات في الخادم، وأن تُبرَّر في الخطة.
 - **الأسرار**: يجب ألا تُحفظ مفاتيح أو كلمات مرور في المستودع؛ تُقرأ من متغيرات البيئة أو مخزن أسرار.
 - **الموارد**: الملفات والتسجيلات في «الموارد» يجب أن تُقدَّم عبر روابط تحترم الصلاحيات، لا روابط
   عامة دائمة لمحتوى مخصص لمجموعة.
-- **البيانات**: كل تغيير في بنية قاعدة البيانات يجب أن يكون عبر migration مُراجَع وقابل للتراجع.
+- **البيانات**: كل تغيير في بنية قاعدة البيانات يجب أن يكون عبر migration مُراجَع. لا تُعدَّل
+  migration بعد دمجها؛ يُصلَح أي خطأ بـ migration جديدة، ويجب أخذ نسخة احتياطية قبل كل نشر يغيّر
+  البنية.
 
 ## سير العمل وبوابات الجودة
 
@@ -125,4 +125,4 @@ Sync Impact Report
 - **المراجعة**: كل خطة ومراجعة كود يجب أن تتحقق من الالتزام؛ أي مخالفة مقصودة تُوثَّق ويُبرَّر سببها
   في الخطة. يُراجَع الدستور نفسه مع بداية كل رحلة سنوية جديدة.
 
-**Version**: 1.1.0 | **Ratified**: 2026-11-21 | **Last Amended**: 2026-11-21
+**Version**: 1.2.0 | **Ratified**: 2026-11-21 | **Last Amended**: 2026-11-21

@@ -91,6 +91,27 @@ checks validity atomically and creates the membership + `member` role. RLS: A on
 `title`, `description`, `from_day int`, `to_day int` (1..365, non-overlapping), `sort_order`.
 RLS: all signed-in read; A write.
 
+## Journey scoping and date rules
+
+These rules apply to every day-level table below (constitution II: data tied to one journey).
+
+- **Current cohort**: the cohort of the user's active `member` membership.
+- **Scoping**: `habits` belong to a `plan` (one per user per cohort); `day_entries`,
+  `own_challenges`, `challenge_completions`, and `monthly_reviews` carry `cohort_id`.
+  `habit_completions` inherit the cohort through their habit. Writes are accepted only for the
+  current cohort.
+- **Journey window**: `local_date` must be within the cohort's `start_date..end_date`. After
+  `end_date` the member keeps read access; new daily writes are refused.
+- **Online writes**: `local_date` is today or yesterday in the user's time zone.
+- **Offline replay**: an entry carrying `recorded_at` (device time of the tap) is accepted when
+  `local_date` is that day or the day before in the user's time zone, `recorded_at ≤ now()`, and
+  `now() − recorded_at ≤ 7 days`. Otherwise it is refused with `date_not_editable` (research §4).
+- **Reads**: «يومك», stats, and reviews read the current cohort. Past cohorts are read-only
+  history.
+- **New journey**: when a member joins a new cohort, `redeem_invitation` creates an empty plan for
+  it; the member may copy habits (name, description, order) from their previous plan. Completions,
+  focus areas, and reflections are not copied.
+
 ## Daily practice
 
 ### plans (خطتي)
@@ -101,7 +122,8 @@ RLS: all signed-in read; A write.
 | cohort_id | uuid → cohorts | unique (user_id, cohort_id) |
 | current_state | text | ≤ 5,000 chars |
 
-`updated_at` drives "last updated" (FR-024). RLS: Self only. No facilitator access.
+`updated_at` drives "last updated" (FR-024). Created empty by `redeem_invitation` for the joining
+cohort. RLS: Self only. No facilitator access.
 
 ### focus_areas (مجال)
 
@@ -111,14 +133,14 @@ RLS: all signed-in read; A write.
 
 | Field | Type | Rules |
 |-------|------|-------|
-| user_id | uuid → users | |
-| focus_area_id | uuid? → focus_areas | must belong to the same user's plan |
+| plan_id | uuid → plans | required; gives the owner and the cohort |
+| focus_area_id | uuid? → focus_areas | must belong to the same plan |
 | name | text | required, ≤ 80 |
 | description | text? | ≤ 500 |
 | sort_order | int | |
 | archived_at | timestamptz? | null = active |
 
-State: `active ⇄ archived` (archive/restore, FR-022). RLS: Self only.
+State: `active ⇄ archived` (archive/restore, FR-022). RLS: Self only (owner of the plan).
 
 ### habit_completions
 
@@ -126,7 +148,8 @@ State: `active ⇄ archived` (archive/restore, FR-022). RLS: Self only.
 |-------|------|-------|
 | habit_id | uuid → habits | |
 | user_id | uuid | denormalized for RLS/indexing |
-| local_date | date | must be today or yesterday in user's zone at write time |
+| local_date | date | per "Journey scoping and date rules" |
+| recorded_at | timestamptz | device time of the tap; offline replay rule |
 | client_mutation_id | uuid | unique; makes offline replay idempotent |
 
 Unique (habit_id, local_date). "Unchecked" = row deleted. No `id`/`updated_at` needed beyond PK.
@@ -142,7 +165,8 @@ RLS: Self only. Facilitators reach aggregates only through functions (below).
 | Field | Type | Rules |
 |-------|------|-------|
 | user_id | uuid → users | |
-| local_date | date | unique (user_id, local_date): at most one per day |
+| cohort_id | uuid → cohorts | current cohort |
+| local_date | date | within journey window; unique (user_id, cohort_id, local_date): at most one per day |
 | text | text | required, ≤ 300 |
 
 Editable/removable only while `local_date` is today. RLS: Self only.
@@ -152,20 +176,23 @@ Editable/removable only while `local_date` is today. RLS: Self only.
 | Field | Type | Rules |
 |-------|------|-------|
 | user_id | uuid | |
-| local_date | date | today or yesterday |
+| cohort_id | uuid → cohorts | current cohort |
+| local_date | date | per "Journey scoping and date rules" |
+| recorded_at | timestamptz | device time of the tap; offline replay rule |
 | kind | enum(`journey`,`own`) | |
 | journey_challenge_id | uuid? | required when kind = journey |
 | own_challenge_id | uuid? | required when kind = own |
 | client_mutation_id | uuid | unique |
 
-Unique (user_id, local_date, kind). RLS: Self only.
+Unique (user_id, cohort_id, local_date, kind). RLS: Self only.
 
 ### day_entries
 
 | Field | Type | Rules |
 |-------|------|-------|
 | user_id | uuid | |
-| local_date | date | unique (user_id, local_date) |
+| cohort_id | uuid → cohorts | current cohort |
+| local_date | date | within journey window; unique (user_id, cohort_id, local_date) |
 | intention | text? | ≤ 300; editable on that day |
 | reflection | text? | ≤ 1,000 |
 | closed_at | timestamptz? | set by «ختام اليوم» |
@@ -189,7 +216,8 @@ RLS: Self only.
 | Field | Type | Rules |
 |-------|------|-------|
 | user_id | uuid | |
-| month | date | first day of the month; unique (user_id, month) |
+| cohort_id | uuid → cohorts | cohort of the reviewed month |
+| month | date | first day of the month; unique (user_id, cohort_id, month) |
 | answers | jsonb | `[{question_id, question_text, answer}]` (question text copied) |
 | figures_snapshot | jsonb | per-habit rate, journey/own challenge counts, days closed |
 | status | enum(`draft`,`completed`) | |
@@ -260,8 +288,8 @@ Server Action that checks access and returns a signed URL valid 10 minutes (FR-0
 | Function | Returns | Caller |
 |----------|---------|--------|
 | `journey_day(user_id, local_date)` | int | any (self) |
-| `member_stats(from, to)` | per-habit rate, streaks, challenge counts | Self |
-| `group_stats(group_id, from, to)` | avg completion, journey-challenge completion, active members | F of group, A |
+| `member_stats(from, to)` | per-habit rate, streaks, challenge counts (current cohort; dates clamped to the member's join date and the journey window) | Self |
+| `group_stats(group_id, from, to)` | avg completion, journey-challenge completion, active members (each member counted only for dates inside their membership in this group) | F of group, A |
 | `group_member_signals(group_id, from, to)` | per member: last_active, days_closed, completion_rate | F of group, A |
 | `month_figures(month)` | snapshot used by monthly review | Self |
 
@@ -272,8 +300,9 @@ their `archived_at` date and not after.
 
 ```text
 cohorts 1─* groups 1─* group_memberships *─1 users 1─* user_roles
-users 1─* plans (per cohort) 1─* focus_areas 1─* habits 1─* habit_completions
-users 1─* day_entries, own_challenges, challenge_completions, monthly_reviews
+users 1─* plans (one per cohort) 1─* habits 1─* habit_completions
+plans 1─* focus_areas 0..1─* habits
+users 1─* day_entries, own_challenges, challenge_completions, monthly_reviews (each with cohort_id)
 journey_challenges 1─* challenge_completions
 users (sender/recipient) *─* encouragements *─1 encouragement_phrases
 activities 1─* activity_audiences → cohorts | groups

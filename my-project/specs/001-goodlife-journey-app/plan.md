@@ -51,25 +51,26 @@ screens; ≈ 25 tables
 
 *GATE: Must pass before Phase 0 research. Re-check after Phase 1 design.*
 
-Constitution v1.1.0 — evaluated before research and re-evaluated after Phase 1 design.
+Constitution v1.2.0 — evaluated before research, re-evaluated after Phase 1 design, and re-checked
+after `/speckit-analyze` remediation (2026-11-21).
 
 | Principle | Gate | Pre-research | Post-design | Evidence |
 |-----------|------|--------------|-------------|----------|
 | I. Arabic first, RTL | Arabic-only UI, RTL by construction, strings in translation files, one date/number formatter | PASS | PASS | research §3; `messages/ar.json`; `src/lib/format.ts`; Tailwind logical utilities only (lint rule) |
-| II. Annual journey is the centre | Every feature maps to day → month → year; «يومك» is home; stats derived from records | PASS | PASS | spec US1–US8 all tied to the journey; route `/` = «يومك»; research §6, data-model derived functions |
+| II. Annual journey is the centre | Every feature maps to day → month → year; «يومك» is home; stats derived from records; data tied to one journey/cohort | PASS | PASS | spec US1–US8 all tied to the journey; route `/` = «يومك»; research §6; data-model "Journey scoping and date rules" (`habits.plan_id`, `cohort_id` on day-level tables, journey window) |
 | III. Roles enforced on server | Server checks per request; least privilege; automated test per permission rule | PASS | PASS | contracts/server-actions.md (check → validate → RLS); pgTAP allow/deny suite; 404 for forbidden routes |
 | IV. Privacy of personal reflection | Reflective content private; facilitator sees activity signals only; export + deletion; no PII in logs | PASS | PASS | data-model RLS "Self only" for plans, habits, day entries, own challenges, reviews; `group_member_signals()` returns 3 signals only; `requestDataExport`, `requestAccountDeletion` |
 | V. Installable, mobile-first PWA | Manifest + service worker; mobile-first; offline «يومك»; ≤ 3 s | PASS | PASS | contracts/routes.md PWA section; research §4; SC-003 performance goal |
 | VI. Simplicity, calm, accessibility | WCAG 2.1 AA; simplest solution; calm tone, optional reminders | PASS | PASS | one deployable; no custom backend; axe in e2e; preset-encouragement community; no gamification |
-| Constraints: tech stack | TODO(TECH_STACK) resolved | RESOLVED | — | research §1–3, §7–9 → constitution amendment follows (see below) |
-| Constraints: secrets, resources, migrations | Env-only secrets; signed URLs; reviewed reversible migrations | PASS | PASS | research §8; `getResourceUrl`; `supabase/migrations/` |
+| Constraints: tech stack | Stack recorded in constitution | PASS | PASS | research §1–3, §7–9; constitution v1.2.0 |
+| Constraints: secrets, resources, migrations | Env-only secrets; signed URLs; reviewed forward-only migrations + backup before schema-changing releases | PASS | PASS | research §8; `getResourceUrl`; `supabase/migrations/` (never edited after merge); release checklist task in tasks.md Polish |
 | Workflow gates | Constitution Check in plan; roles named in spec; tests before merge; PR review | PASS | PASS | this section; quickstart automated checks |
 
 **Result**: no violations; Complexity Tracking not needed.
 
-**Follow-up (governance)**: research resolves constitution `TODO(TECH_STACK)` and
-`TODO(OFFLINE_SCOPE)`. Record them in the constitution with `/speckit-constitution` (MINOR bump to
-1.2.0) before implementation starts.
+**Governance**: research resolved constitution `TODO(TECH_STACK)` and `TODO(OFFLINE_SCOPE)`; both
+are recorded in constitution v1.2.0, which also replaces "reversible migrations" with a
+forward-fix + backup policy (analysis finding D2).
 
 ## Project Structure
 

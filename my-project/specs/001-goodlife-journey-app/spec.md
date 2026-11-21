@@ -294,7 +294,12 @@ facilitator view and back, opens archived habits, and installs the app from a ph
 - **Archived habit**: does not count in today's total or in overall completion rate going forward;
   its past completions remain in history.
 - **Connectivity loss**: if the member checks a habit while offline, the app shows it as pending
-  and saves it once the connection returns, without losing or duplicating it.
+  and saves it once the connection returns, without losing or duplicating it. It counts for the
+  day it was tapped, provided it reaches the app within 7 days; older entries are not saved and
+  the member is told so calmly.
+- **New journey**: a member who joins a new cohort starts with a fresh plan and habit list and
+  may copy habits from their previous journey; earlier journeys remain readable but are not mixed
+  into the new journey's Today, stats, or reviews.
 - **Same person, two devices**: checking a habit on one device shows on the other on next open.
 
 ## Requirements *(mandatory)*

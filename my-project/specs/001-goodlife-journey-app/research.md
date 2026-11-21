@@ -61,6 +61,11 @@ current releases as of 2026-11-21.
     idempotent (no duplicates, spec edge case).
   - Everything else (plan editing, reviews, admin, community) requires a connection and says so
     calmly.
+  - **Late replay rule**: each queued check-off carries `recorded_at` (device time of the tap).
+    The server accepts it when its `local_date` is the tap day or the day before in the user's
+    time zone, `recorded_at` is not in the future, and it arrives within 7 days of the tap. Older
+    entries are refused; the outbox drops them and shows «لم نتمكن من حفظ هذا التسجيل».
+    (Decided 2026-11-21, /speckit-analyze finding A1.)
 - **Rationale**: Covers the daily-use moment the constitution cares about (V) with the smallest
   offline surface. Idempotent "set state" mutations (`done = true/false` for a date) make
   conflict handling trivial: last write wins per habit per date.

@@ -22,6 +22,11 @@ anything other than today/yesterday with `date_not_editable` where noted.
 |--------|-------|--------|-----|--------|
 | `checkInvitation` | `{ code }` | `{ cohortName, groupName }` | public | code_invalid, code_expired, code_used_up |
 | `completeJoin` | `{ code, fullName, email, phone?, gender?, city?, timeZone }` | `{ userId }` → sends OTP | public | as above, invalid_input, conflict (email exists) |
+
+`completeJoin` steps: (1) re-check the code; (2) create the auth user with the server-only
+admin client (email unconfirmed); (3) call `redeem_invitation(code, auth_user_id, profile)`, which
+creates the profile, `member` role, membership, and an empty plan; (4) if (3) fails, delete the
+auth user from (2); (5) send the one-time code.
 | `requestSignInCode` | `{ email }` | `{}` (always ok; no account enumeration) | public | — |
 | `verifySignInCode` | `{ email, token }` | `{}` sets session | public | invalid_input |
 | `updateProfile` | `{ fullName?, phone?, gender?, city?, timeZone? }` | profile | self | invalid_input |
@@ -33,14 +38,16 @@ anything other than today/yesterday with `date_not_editable` where noted.
 
 | Action | Input | Output | Who | Errors |
 |--------|-------|--------|-----|--------|
-| `setHabitDone` | `{ habitId, localDate, done, clientMutationId }` | `{ doneCount, total }` | habit owner | not_found, date_not_editable |
+| `setHabitDone` | `{ habitId, localDate, done, clientMutationId, recordedAt? }` | `{ doneCount, total }` | habit owner | not_found, date_not_editable |
 | `setIntention` | `{ text }` (today) | day entry | self | invalid_input |
 | `setOwnChallenge` | `{ text }` (today) / `{ remove: true }` | own challenge | self | invalid_input |
-| `setChallengeDone` | `{ kind: 'journey'\|'own', localDate, done, clientMutationId }` | `{}` | self | not_found, date_not_editable |
+| `setChallengeDone` | `{ kind: 'journey'\|'own', localDate, done, clientMutationId, recordedAt? }` | `{}` | self | not_found, date_not_editable |
 | `closeDay` | `{ reflection? }` (today) | `{ summary, closingMessage }` | self | invalid_input |
 
 `setHabitDone` and `setChallengeDone` are idempotent: replaying the same `clientMutationId`
-returns the current state without a second write (offline outbox, research §4).
+returns the current state without a second write (offline outbox, research §4). `recordedAt` is
+sent by the offline outbox; date rules are in data-model.md "Journey scoping and date rules".
+All Today actions write to the current cohort and are refused after the cohort's end date.
 
 ## Plan and habits
 
@@ -52,6 +59,7 @@ returns the current state without a second write (offline outbox, research §4).
 | `createHabit` / `updateHabit` | `{ id?, name, description?, focusAreaId? }` | owner |
 | `reorderHabits` | `{ ids: uuid[] }` | owner |
 | `archiveHabit` / `restoreHabit` | `{ id }` | owner |
+| `copyHabitsFromPreviousPlan` | `{ habitIds?: uuid[] }` (default: all active habits of the previous plan) | self, first weeks of a new journey |
 
 Deleting a focus area unlinks its habits (habits are kept).
 
