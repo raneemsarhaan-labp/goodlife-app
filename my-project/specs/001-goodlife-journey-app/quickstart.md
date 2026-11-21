@@ -21,9 +21,9 @@ npm run dev                   # http://localhost:3000
 
 Seed data: cohort «الدفعة التجريبية» starting 11 days ago, groups «مجموعة النور» and
 «مجموعة الأمل», one admin (`admin@example.test`), one facilitator (`facilitator@example.test`),
-two members, invitation code `TEST2026`, journey challenges for days 1–30, ten guidelines, review
+two members, invitation code `TAYBAH26`, journey challenges for days 1–30, ten guidelines, review
 questions, closing messages, encouragement phrases. One-time codes arrive in the local mail
-viewer (Inbucket) at the URL `supabase start` prints.
+viewer (Mailpit) at the URL `supabase start` prints. Codes use an unambiguous alphabet (no 0/O/1/I/L).
 
 ## Automated checks (all must pass before merge)
 
@@ -31,6 +31,7 @@ viewer (Inbucket) at the URL `supabase start` prints.
 npm run lint && npm run typecheck
 npm run test             # Vitest: journey day, streaks, formatters, validation
 npx supabase test db     # pgTAP: RLS allow/deny per role and table, SQL stats functions
+npm run db:test:local    # same pgTAP suite on a plain local PostgreSQL + pgTAP (no Docker)
 npm run test:e2e         # Playwright (mobile RTL viewport) + axe WCAG 2.1 AA
 ```
 
@@ -38,7 +39,7 @@ npm run test:e2e         # Playwright (mobile RTL viewport) + axe WCAG 2.1 AA
 
 Use a phone-sized viewport (or a real phone on the LAN).
 
-1. **Join and Today (US1)**: `/join` → `TEST2026` → personal data → welcome → «يومك» shows a
+1. **Join and Today (US1)**: `/join` → `TAYBAH26` → personal data → welcome → «يومك» shows a
    greeting, today's date, "اليوم ١٢", habits empty-state invitation. Create 3 habits, check 2
    → progress ٢/٣. Tap «ابدأ يومي», write an intention. Journey challenge shows labelled
    «تحدّي الرحلة»; add an own challenge, shown as «تحدّي ذاتي» with a distinct style. Mark both
