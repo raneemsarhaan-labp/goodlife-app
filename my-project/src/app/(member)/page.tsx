@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { redirect } from "next/navigation";
 import { getTranslations } from "next-intl/server";
 import { ChallengeCards } from "@/components/features/today/ChallengeCards";
 import { EmptyHabits } from "@/components/features/today/EmptyHabits";
@@ -10,6 +11,8 @@ import { UpcomingActivities } from "@/components/features/today/UpcomingActiviti
 import { DayRollover } from "@/components/features/today/useDayRollover";
 import { buttonClass } from "@/components/ui/Button";
 import { Card, CardTitle } from "@/components/ui/Card";
+import { RoleSwitcher } from "@/components/ui/RoleSwitcher";
+import { InstallHint } from "@/components/features/install/InstallHint";
 import { formatDate } from "@/lib/format";
 import { requireUser } from "@/server/auth";
 import { getToday } from "@/server/queries/today";
@@ -19,10 +22,11 @@ export const metadata = { title: "يومك" };
 /** «يومك»: the member's home screen (US1, FR-010–FR-014). */
 export default async function TodayPage({ searchParams }: { searchParams: Promise<{ day?: string }> }) {
   const user = await requireUser();
+  if (user.activeRole === "admin" && user.roles.includes("admin")) redirect("/admin");
+  if (user.activeRole === "facilitator" && user.roles.includes("facilitator")) redirect("/groups");
   const which = (await searchParams).day === "yesterday" ? "yesterday" : "today";
   const data = await getToday(which);
   const t = await getTranslations("today");
-  const tn = await getTranslations("nav");
   const isToday = which === "today";
 
   if (!data || data.journey_status === "none") {
@@ -32,27 +36,19 @@ export default async function TodayPage({ searchParams }: { searchParams: Promis
         <Card>
           <p>{t("noJourney")}</p>
         </Card>
-        {user.roles.includes("admin") && (
-          <Link href="/admin" className="self-start text-sage-700 underline underline-offset-4">
-            {tn("admin")}
-          </Link>
-        )}
+        <RoleSwitcher roles={user.roles} active={user.activeRole} />
       </main>
     );
   }
 
   const habits = data.habits ?? [];
-  const adminLink = user.roles.includes("admin") && (
-    <Link href="/admin" className="self-start text-sm text-sage-700 underline underline-offset-4">
-      {tn("admin")}
-    </Link>
-  );
+
   const closed = Boolean(data.day?.closed_at);
 
   return (
     <main id="main" className="mx-auto flex max-w-lg flex-col gap-5 px-5 pt-6">
       <DayRollover timeZone={data.time_zone} shownDate={isToday ? data.local_date : ""} />
-      {adminLink}
+      <RoleSwitcher roles={user.roles} active={user.activeRole} />
       <Greeting name={user.fullName} timeZone={data.time_zone} localDate={data.local_date} journeyDay={data.journey_status === "active" ? data.journey_day : undefined} />
 
       {data.journey_status === "ended" && <JourneyEnded />}
@@ -118,6 +114,7 @@ export default async function TodayPage({ searchParams }: { searchParams: Promis
             <>
               <ChallengeCards journey={data.journey_challenge ?? null} own={data.own_challenge ?? null} localDate={data.local_date} />
               <UpcomingActivities activities={data.activities ?? []} timeZone={data.time_zone} />
+              <InstallHint />
               {closed ? (
                 <p className="rounded-2xl bg-sage-50 p-4 text-center text-sage-700">{t("dayClosed")}</p>
               ) : (

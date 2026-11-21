@@ -30,5 +30,6 @@ export async function signIn(page: Page, email: string) {
   const code = await latestSignInCode(email, since);
   await page.getByLabel("رمز الدخول").fill(code);
   await page.getByRole("button", { name: "دخول" }).click();
-  await expect(page).toHaveURL("/");
+  // Each role lands on its own home: «يومك», «مجموعاتي», or the admin panel.
+  await expect(page).not.toHaveURL(/\/sign-in/);
 }

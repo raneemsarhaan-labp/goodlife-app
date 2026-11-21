@@ -184,7 +184,11 @@
       "admins": "المديرون",
       "grantAdmin": "أضف مديرًا بالبريد الإلكتروني",
       "grant": "أضف",
-      "revoke": "إزالة"
+      "revoke": "إزالة",
+      "deletionTitle": "طلبات حذف الحسابات",
+      "noDeletion": "لا طلبات حذف.",
+      "requestedOn": "طُلب في {date}",
+      "processDeletion": "احذف الحساب نهائيًا"
     },
     "cohorts": {
       "title": "الدفعات والمجموعات",
@@ -510,5 +514,49 @@
     "loading": "جارٍ التحضير…",
     "linkExpires": "الرابط صالح لعشر دقائق.",
     "uncategorized": "عام"
+  },
+  "account": {
+    "title": "حسابي",
+    "profileTitle": "بياناتي",
+    "save": "احفظ",
+    "saved": "تمّ الحفظ.",
+    "timeZone": "المنطقة الزمنية",
+    "timeZoneHint": "يبدأ يومك وينتهي بحسبها.",
+    "journeyTitle": "رحلتي",
+    "cohort": "الدفعة: {name}",
+    "group": "المجموعة: {name}",
+    "noJourney": "لست ضمن رحلة حالية.",
+    "archivedHabits": "العادات المؤرشفة",
+    "rolesTitle": "الدور الحالي",
+    "roleNow": "أنت الآن: {role}",
+    "switchTo": "انتقل إلى دور {role}",
+    "roles": {
+      "member": "مشارك",
+      "facilitator": "ميسّر",
+      "admin": "مدير"
+    },
+    "privacyTitle": "بياناتك",
+    "exportHint": "نزّل نسخة من كل ما سجّلته في التطبيق.",
+    "export": "نزّل بياناتي",
+    "deleteHint": "تُرسل طلبًا إلى إدارة البرنامج لحذف حسابك وكل بياناتك نهائيًا.",
+    "delete": "اطلب حذف حسابي",
+    "deleteConfirm": "نعم، أطلب حذف حسابي",
+    "deleteRequested": "وصل طلب الحذف إلى إدارة البرنامج.",
+    "signOut": "تسجيل الخروج"
+  },
+  "more": {
+    "title": "المزيد",
+    "resources": "الموارد",
+    "groups": "مجموعاتي",
+    "reviews": "مراجعاتي",
+    "account": "حسابي",
+    "admin": "لوحة الإدارة"
+  },
+  "install": {
+    "title": "ثبّت التطبيق على شاشتك",
+    "android": "أضفه إلى الشاشة الرئيسية ليفتح كتطبيق مستقل.",
+    "install": "ثبّت التطبيق",
+    "ios": "في Safari: اضغط زر المشاركة ثم «إضافة إلى الشاشة الرئيسية».",
+    "dismiss": "لاحقًا"
   }
 }

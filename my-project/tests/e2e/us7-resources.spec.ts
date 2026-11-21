@@ -11,7 +11,7 @@ test("admin uploads a cohort-only recording; members of that cohort play it, oth
   await page.goto("/admin/resources");
   await page.getByLabel("النوع").selectOption({ label: "تسجيل" });
   await page.getByLabel("العنوان").fill(title);
-  await page.getByLabel("الملف").setInputFiles(path.join(__dirname, "fixtures/silence.wav"));
+  await page.getByLabel("الملف").setInputFiles(path.join(process.cwd(), "tests/e2e/fixtures/silence.wav"));
   await page.getByLabel("دفعات محددة").check();
   await page.getByLabel("الدفعة التجريبية").check();
   await page.getByRole("button", { name: "احفظ المورد" }).click();

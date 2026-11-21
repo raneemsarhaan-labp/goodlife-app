@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { getTranslations } from "next-intl/server";
+import { RoleSwitcher } from "@/components/ui/RoleSwitcher";
 import { requireRole } from "@/server/auth";
 
 const SECTIONS = [
@@ -13,16 +14,14 @@ const SECTIONS = [
 
 /** «لوحة الإدارة» shell; admin only (404 for everyone else). */
 export default async function AdminLayout({ children }: { children: React.ReactNode }) {
-  await requireRole("admin");
+  const user = await requireRole("admin");
   const t = await getTranslations("admin");
   return (
     <div className="mx-auto flex min-h-dvh max-w-4xl flex-col gap-6 px-5 pb-16 pt-6">
       <header className="flex flex-col gap-3">
         <div className="flex items-center justify-between">
           <p className="text-lg font-semibold text-sage-700">{t("title")}</p>
-          <Link href="/" className="text-sm text-sage-700 underline underline-offset-4">
-            {t("nav.backToApp")}
-          </Link>
+          <RoleSwitcher roles={user.roles} active={user.activeRole} />
         </div>
         <nav aria-label={t("navLabel")}>
           <ul className="flex flex-wrap gap-2">

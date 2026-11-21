@@ -5,7 +5,11 @@ import { Card, CardTitle } from "@/components/ui/Card";
 import { Field } from "@/components/ui/Field";
 import { formatNumber } from "@/lib/format";
 import { createClient } from "@/lib/supabase/server";
+import { processAccountDeletion } from "@/server/actions/account";
 import { grantAdmin, revokeAdmin } from "@/server/actions/admin/structure";
+import { formatDate as fmtDate } from "@/lib/format";
+import { localDate } from "@/lib/journey";
+import { requireRole } from "@/server/auth";
 
 export const metadata = { title: "لوحة الإدارة" };
 
@@ -20,6 +24,8 @@ export default async function AdminHome() {
     count(supabase.from("group_memberships").select("*", { count: "exact", head: true }).eq("role", "facilitator").is("ended_on", null)),
   ]);
   const { data: admins } = await supabase.from("user_roles").select("user_id, users(full_name, email)").eq("role", "admin");
+  const me = await requireRole("admin");
+  const { data: deletions } = await supabase.from("users").select("id, full_name, email, deletion_requested_at").not("deletion_requested_at", "is", null).order("deletion_requested_at");
 
   return (
     <>
@@ -56,6 +62,26 @@ export default async function AdminHome() {
         <ActionForm action={grantAdmin} submitLabel={t("home.grant")} resetOnSuccess successText={t("saved")}>
           <Field name="email" type="email" dir="ltr" label={t("home.grantAdmin")} required />
         </ActionForm>
+      </Card>
+      <Card aria-labelledby="deletions" className="flex flex-col gap-3">
+        <CardTitle id="deletions">{t("home.deletionTitle")}</CardTitle>
+        {(deletions ?? []).length === 0 && <p className="text-ink-500">{t("home.noDeletion")}</p>}
+        <ul className="flex flex-col gap-2">
+          {(deletions ?? []).map((d) => (
+            <li key={d.id} className="flex flex-wrap items-center justify-between gap-2">
+              <span>
+                {d.full_name} <span dir="ltr" className="text-sm text-ink-500">{d.email}</span>
+                <span className="block text-sm text-ink-500">
+                  {t("home.requestedOn", { date: fmtDate(localDate(me.timeZone, new Date(d.deletion_requested_at!)), { withYear: true }) })}
+                </span>
+              </span>
+              <form action={processAccountDeletion}>
+                <input type="hidden" name="userId" value={d.id} />
+                <Button type="submit" variant="secondary">{t("home.processDeletion")}</Button>
+              </form>
+            </li>
+          ))}
+        </ul>
       </Card>
     </>
   );

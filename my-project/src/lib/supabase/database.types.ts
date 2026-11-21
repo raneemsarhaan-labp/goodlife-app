@@ -627,6 +627,9 @@ isOneToOne: false
 "current_plan_id":
 { Args: Record<PropertyKey, never>; Returns: string
                            },
+"export_my_data":
+{ Args: Record<PropertyKey, never>; Returns: Json
+                           },
 "get_today":
 { Args: { "p_which"?: string }; Returns: Json
                            },
@@ -719,6 +722,9 @@ isOneToOne: false
                            },
 "reorder_resources":
 { Args: { "p_ids": (string)[] }; Returns: undefined
+                           },
+"request_account_deletion":
+{ Args: Record<PropertyKey, never>; Returns: undefined
                            },
 "require_admin":
 { Args: Record<PropertyKey, never>; Returns: undefined

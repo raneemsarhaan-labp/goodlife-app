@@ -295,19 +295,19 @@ and confirm they fail.
 
 ### Tests for User Story 8 ⚠️
 
-- [ ] T126 [P] [US8] pgTAP tests: `users.active_role` can only be set to a held role; export function returns only the caller's rows, in `supabase/tests/account.test.sql`
-- [ ] T127 [P] [US8] Playwright e2e for quickstart scenario 10 (profile edit, role switch without sign-out, manifest standalone check) in `tests/e2e/us8-account.spec.ts`
+- [X] T126 [P] [US8] pgTAP tests: `users.active_role` can only be set to a held role; export function returns only the caller's rows, in `supabase/tests/account.test.sql`
+- [X] T127 [P] [US8] Playwright e2e for quickstart scenario 10 (profile edit, role switch without sign-out, manifest standalone check) in `tests/e2e/us8-account.spec.ts`
 
 ### Implementation for User Story 8
 
-- [ ] T128 [US8] Create `supabase/migrations/0014_account.sql`: `export_my_data()` (JSON of all own rows) and `request_account_deletion()` setting data-model.md `users.deletion_requested_at`
-- [ ] T129 [US8] Implement `updateProfile` (data-model.md `users.full_name`, `users.phone`, `users.gender`, `users.city`, `users.time_zone`), `switchRole` (`users.active_role`), `requestDataExport`, `requestAccountDeletion` in `src/server/actions/account.ts`
-- [ ] T130 [US8] Build «حسابي» page (profile form, cohort and group, archived habits link, role switch, sign out, export, delete request) in `src/app/(member)/account/page.tsx`
-- [ ] T131 [P] [US8] Build «المزيد» menu (الموارد، مجموعاتي، مراجعاتي، حسابي; لوحة الإدارة only for admins) in `src/app/(member)/more/page.tsx`
-- [ ] T132 [US8] Route `/` by `users.active_role` (member → «يومك», facilitator → group overview, admin → `/admin`) in `src/app/(member)/page.tsx`, and add `src/components/ui/RoleSwitcher.tsx` to the header for multi-role users
-- [ ] T133 [P] [US8] Build the install hint (Android `beforeinstallprompt`, iOS "Add to Home Screen" instructions, hidden when standalone) in `src/components/features/install/InstallHint.tsx`
-- [ ] T134 [US8] Add a deletion-requests list for admins in `src/app/admin/page.tsx`
-- [ ] T135 [US8] Add US8 Arabic strings to `messages/ar.json`
+- [X] T128 [US8] Create `supabase/migrations/0014_account.sql`: `export_my_data()` (JSON of all own rows) and `request_account_deletion()` setting data-model.md `users.deletion_requested_at`
+- [X] T129 [US8] Implement `updateProfile` (data-model.md `users.full_name`, `users.phone`, `users.gender`, `users.city`, `users.time_zone`), `switchRole` (`users.active_role`), `requestDataExport`, `requestAccountDeletion` in `src/server/actions/account.ts`
+- [X] T130 [US8] Build «حسابي» page (profile form, cohort and group, archived habits link, role switch, sign out, export, delete request) in `src/app/(member)/account/page.tsx`
+- [X] T131 [P] [US8] Build «المزيد» menu (الموارد، مجموعاتي، مراجعاتي، حسابي; لوحة الإدارة only for admins) in `src/app/(member)/more/page.tsx`
+- [X] T132 [US8] Route `/` by `users.active_role` (member → «يومك», facilitator → group overview, admin → `/admin`) in `src/app/(member)/page.tsx`, and add `src/components/ui/RoleSwitcher.tsx` to the header for multi-role users
+- [X] T133 [P] [US8] Build the install hint (Android `beforeinstallprompt`, iOS "Add to Home Screen" instructions, hidden when standalone) in `src/components/features/install/InstallHint.tsx`
+- [X] T134 [US8] Add a deletion-requests list for admins in `src/app/admin/page.tsx`
+- [X] T135 [US8] Add US8 Arabic strings to `messages/ar.json`
 
 **Checkpoint**: All user stories are independently functional.
 
