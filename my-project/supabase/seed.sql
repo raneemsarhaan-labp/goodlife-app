@@ -133,4 +133,12 @@ insert into public.review_questions (text, sort_order) values
   ('هل تريد تعديل شيء في خطتك أو عاداتك؟', 4),
   ('كلمة تقولها لنفسك وأنت تبدأ الشهر القادم.', 5);
 
+-- ── US6: encouragement phrases ──────────────────────────────────────────────
+insert into public.encouragement_phrases (text, sort_order) values
+  ('بارك الله في سعيك', 1),
+  ('ثبّتك الله', 2),
+  ('خطوتك اليوم تُلهمني', 3),
+  ('مستمر؟ أنا معك', 4),
+  ('أحسنت، واصل بهدوء', 5);
+
 commit;

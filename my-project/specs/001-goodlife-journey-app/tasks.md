@@ -241,21 +241,21 @@ and confirm they fail.
 
 ### Tests for User Story 6 ⚠️
 
-- [ ] T104 [P] [US6] pgTAP tests: `group_peers` shows only current group peers (id, full_name); encouragements readable by sender and recipient only; cross-group send denied; second send to the same person the same day denied; inactive phrase denied, in `supabase/tests/rls_community.test.sql`
-- [ ] T105 [P] [US6] Playwright e2e for quickstart scenario 8 and the facilitator part of scenario 7 in `tests/e2e/us6-community.spec.ts`
+- [X] T104 [P] [US6] pgTAP tests: `group_peers` shows only current group peers (id, full_name); encouragements readable by sender and recipient only; cross-group send denied; second send to the same person the same day denied; inactive phrase denied, in `supabase/tests/rls_community.test.sql`
+- [X] T105 [P] [US6] Playwright e2e for quickstart scenario 8 and the facilitator part of scenario 7 in `tests/e2e/us6-community.spec.ts`
 
 ### Implementation for User Story 6
 
-- [ ] T106 [US6] Create `supabase/migrations/0012_community.sql`: `encouragement_phrases` per data-model.md `encouragement_phrases.text`, `encouragement_phrases.active`, `encouragement_phrases.sort_order`; `encouragements` per `encouragements.sender_id`, `encouragements.recipient_id` (≠ sender, same active group), `encouragements.phrase_id` (active only), `encouragements.local_date`, unique (sender, recipient, local_date); view `group_peers`; function `send_encouragement(recipient_id, phrase_id)`
-- [ ] T107 [P] [US6] Zod schema in `src/lib/validation/community.ts` citing data-model.md `encouragements.recipient_id`, `encouragements.phrase_id`, `encouragement_phrases.text`
-- [ ] T108 [US6] Implement `sendEncouragement` (maps the unique violation to `limit_reached`) in `src/server/actions/community.ts`
-- [ ] T109 [US6] Implement `getMyGroup`, `getReceivedEncouragements`, `getMyGroups` (led groups + own group with role labels) in `src/server/queries/community.ts`
-- [ ] T110 [P] [US6] Build community components in `src/components/features/community/` (`GroupHeader.tsx`, `MemberList.tsx`, `EncouragePicker.tsx` preset phrases only with no text input, `ReceivedList.tsx`)
-- [ ] T111 [US6] Build «المجتمع» page in `src/app/(member)/community/page.tsx`
-- [ ] T112 [P] [US6] Build «مجموعاتي» page in `src/app/(facilitator)/groups/page.tsx`
-- [ ] T113 [US6] Build facilitator group page (members with the three signals only, group stats from US5 queries, activities with create/cancel via `src/server/actions/activities.ts`) in `src/app/(facilitator)/groups/[id]/page.tsx`
-- [ ] T114 [US6] Add an encouragement phrases tab and `upsertEncouragementPhrase` to `src/app/admin/content/page.tsx` and `src/server/actions/admin/content.ts`; seed default phrases (e.g. «بارك الله في سعيك»، «ثبّتك الله») in `supabase/seed.sql`
-- [ ] T115 [US6] Add US6 Arabic strings to `messages/ar.json`
+- [X] T106 [US6] Create `supabase/migrations/0012_community.sql`: `encouragement_phrases` per data-model.md `encouragement_phrases.text`, `encouragement_phrases.active`, `encouragement_phrases.sort_order`; `encouragements` per `encouragements.sender_id`, `encouragements.recipient_id` (≠ sender, same active group), `encouragements.phrase_id` (active only), `encouragements.local_date`, unique (sender, recipient, local_date); view `group_peers`; function `send_encouragement(recipient_id, phrase_id)`
+- [X] T107 [P] [US6] Zod schema in `src/lib/validation/community.ts` citing data-model.md `encouragements.recipient_id`, `encouragements.phrase_id`, `encouragement_phrases.text`
+- [X] T108 [US6] Implement `sendEncouragement` (maps the unique violation to `limit_reached`) in `src/server/actions/community.ts`
+- [X] T109 [US6] Implement `getMyGroup`, `getReceivedEncouragements`, `getMyGroups` (led groups + own group with role labels) in `src/server/queries/community.ts`
+- [X] T110 [P] [US6] Build community components in `src/components/features/community/` (`GroupHeader.tsx`, `MemberList.tsx`, `EncouragePicker.tsx` preset phrases only with no text input, `ReceivedList.tsx`)
+- [X] T111 [US6] Build «المجتمع» page in `src/app/(member)/community/page.tsx`
+- [X] T112 [P] [US6] Build «مجموعاتي» page in `src/app/(member)/groups/page.tsx` (member section, so members can open it too; analysis finding I1)
+- [X] T113 [US6] Build facilitator group page (members with the three signals only, group stats from US5 queries, activities with create/cancel via `src/server/actions/activities.ts`) in `src/app/(member)/groups/[id]/page.tsx` (guarded by `requireGroupFacilitator`)
+- [X] T114 [US6] Add an encouragement phrases tab and `upsertEncouragementPhrase` to `src/app/admin/content/page.tsx` and `src/server/actions/admin/content.ts`; seed default phrases (e.g. «بارك الله في سعيك»، «ثبّتك الله») in `supabase/seed.sql`
+- [X] T115 [US6] Add US6 Arabic strings to `messages/ar.json`
 
 **Checkpoint**: The group journey works with privacy limits enforced.
 

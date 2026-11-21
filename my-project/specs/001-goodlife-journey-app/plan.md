@@ -97,8 +97,7 @@ src/
 ├── app/
 │   ├── (auth)/              # join, join/profile, welcome, sign-in
 │   ├── (member)/            # «يومك» (/), day/start, day/close, plan, habits, reviews, stats,
-│   │                        # community, resources, more, account
-│   ├── (facilitator)/       # groups, groups/[id]
+│   │                        # community, groups, groups/[id], resources, more, account
 │   ├── admin/               # cohorts, invitations, activities, resources, content
 │   ├── layout.tsx           # <html lang="ar" dir="rtl">, font, providers
 │   ├── manifest.ts          # PWA manifest

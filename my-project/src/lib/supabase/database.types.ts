@@ -155,6 +155,52 @@ isOneToOne: false
       referencedColumns: ["id"]
     }
                   ]
+                },"encouragement_phrases": {
+                  Row: {
+                    "active": boolean,"created_at": string,"id": string,"sort_order": number,"text": string,"updated_at": string
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "active"?: boolean,"created_at"?: string,"id"?: string,"sort_order"?: number,"text": string,"updated_at"?: string
+                  }
+                  Update: {
+                    "active"?: boolean,"created_at"?: string,"id"?: string,"sort_order"?: number,"text"?: string,"updated_at"?: string
+                  }
+                  Relationships: [
+                    
+                  ]
+                },"encouragements": {
+                  Row: {
+                    "created_at": string,"id": string,"local_date": string,"phrase_id": string,"recipient_id": string,"sender_id": string
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "created_at"?: string,"id"?: string,"local_date": string,"phrase_id": string,"recipient_id": string,"sender_id": string
+                  }
+                  Update: {
+                    "created_at"?: string,"id"?: string,"local_date"?: string,"phrase_id"?: string,"recipient_id"?: string,"sender_id"?: string
+                  }
+                  Relationships: [
+                    {
+      foreignKeyName: "encouragements_phrase_id_fkey"
+      columns: ["phrase_id"]
+isOneToOne: false
+      referencedRelation: "encouragement_phrases"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "encouragements_recipient_id_fkey"
+      columns: ["recipient_id"]
+isOneToOne: false
+      referencedRelation: "users"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "encouragements_sender_id_fkey"
+      columns: ["sender_id"]
+isOneToOne: false
+      referencedRelation: "users"
+      referencedColumns: ["id"]
+    }
+                  ]
                 },"focus_areas": {
                   Row: {
                     "created_at": string,"description": string | null,"id": string,"plan_id": string,"sort_order": number,"title": string,"updated_at": string
@@ -520,6 +566,11 @@ isOneToOne: false
               "completion_rate": number,"days_closed": number,"full_name": string,"last_active": string,"user_id": string
             }[]
                            },
+"group_peers":
+{ Args: Record<PropertyKey, never>; Returns: {
+              "full_name": string,"group_id": string,"role": Database["public"]['Enums']["membership_role"],"user_id": string
+            }[]
+                           },
 "group_stats":
 { Args: { "p_from": string,"p_group": string,"p_to": string }; Returns: Json
                            },
@@ -577,6 +628,11 @@ isOneToOne: false
 "previous_plan_habit_count":
 { Args: Record<PropertyKey, never>; Returns: number
                            },
+"received_encouragements":
+{ Args: { "p_limit"?: number }; Returns: {
+              "created_at": string,"id": string,"local_date": string,"phrase": string,"sender_name": string
+            }[]
+                           },
 "redeem_invitation":
 { Args: { "p_auth_user": string,"p_city"?: string,"p_code": string,"p_email": string,"p_full_name": string,"p_gender"?: Database["public"]['Enums']["gender"],"p_phone"?: string,"p_time_zone": string }; Returns: string
                            },
@@ -604,6 +660,9 @@ isOneToOne: false
 "save_review":
 { Args: { "p_answers": Json,"p_complete": boolean,"p_month": string }; Returns: undefined
                            },
+"send_encouragement":
+{ Args: { "p_phrase": string,"p_recipient": string }; Returns: undefined
+                           },
 "set_challenge_done":
 { Args: { "p_client_mutation_id": string,"p_done": boolean,"p_kind": Database["public"]['Enums']["challenge_kind"],"p_local_date": string,"p_recorded_at"?: string }; Returns: undefined
                            },
@@ -615,6 +674,9 @@ isOneToOne: false
                            },
 "set_own_challenge":
 { Args: { "p_text": string }; Returns: string
+                           },
+"shares_active_group":
+{ Args: { "p_a": string,"p_b": string }; Returns: boolean
                            },
 "user_local_date":
 { Args: { "p_user": string }; Returns: string

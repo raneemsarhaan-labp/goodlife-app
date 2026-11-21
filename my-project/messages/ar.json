@@ -275,7 +275,8 @@
       "tabs": {
         "challenges": "تحدّيات الرحلة",
         "closing": "رسائل الختام",
-        "questions": "أسئلة المراجعة"
+        "questions": "أسئلة المراجعة",
+        "phrases": "كلمات التشجيع"
       },
       "challengesIntro": "تحدٍّ واحد لكل يوم من أيام الرحلة، يراه الجميع في يومه. اترك الحقل فارغًا لإزالة التحدّي.",
       "day": "اليوم {day}",
@@ -292,7 +293,11 @@
       "questionText": "نص السؤال",
       "newQuestion": "سؤال جديد",
       "addQuestion": "أضف السؤال",
-      "order": "الترتيب"
+      "order": "الترتيب",
+      "phrasesIntro": "عبارات قصيرة يختار منها المشاركون لتشجيع بعضهم. لا يمكن كتابة نص حر.",
+      "phraseText": "العبارة",
+      "newPhrase": "عبارة جديدة",
+      "addPhrase": "أضف العبارة"
     }
   },
   "plan": {
@@ -385,5 +390,46 @@
     "daysClosed": "أيام ختمتها: {count} من {days}",
     "archived": "مؤرشفة",
     "noHabits": "لا عادات في هذه الفترة بعد."
+  },
+  "community": {
+    "title": "المجتمع",
+    "intro": "تسير مع دفعتك ومجموعتك. شجّع من يسير معك بكلمة طيبة.",
+    "noGroup": "لست ضمن مجموعة الآن.",
+    "group": "مجموعتك: {group}",
+    "cohort": "دفعتك: {cohort}",
+    "facilitators": "الميسّر",
+    "noFacilitator": "لا ميسّر للمجموعة بعد.",
+    "members": "رفقاء الرحلة",
+    "noMembers": "لا مشاركين آخرين في المجموعة بعد.",
+    "encourage": "شجّع {name}",
+    "choosePhrase": "اختر كلمة تشجيع",
+    "send": "أرسل",
+    "sent": "وصلته كلمتك.",
+    "alreadyToday": "شجّعته اليوم",
+    "receivedTitle": "كلمات وصلتك",
+    "noneReceived": "لم تصلك كلمات بعد.",
+    "receivedItem": "«{phrase}» — {name}"
+  },
+  "groups": {
+    "title": "مجموعاتي",
+    "intro": "المجموعات التي تيسّرها، والمجموعة التي تنتمي إليها.",
+    "none": "لست ضمن أي مجموعة الآن.",
+    "roleFacilitator": "ميسّر",
+    "roleMember": "مشارك",
+    "open": "افتح",
+    "openCommunity": "افتح المجتمع",
+    "statsTitle": "المجموعة بالأرقام",
+    "members": "المشاركون: {count}",
+    "avgCompletion": "متوسط الالتزام بالعادات: {rate}",
+    "journeyCompletion": "تحدّيات الرحلة المنجزة: {rate}",
+    "active7d": "نشطون في آخر ٧ أيام: {count}",
+    "signalsTitle": "المشاركون",
+    "signalsHint": "ترى إشارات النشاط فقط؛ ما يكتبه المشاركون يبقى خاصًا بهم.",
+    "lastActive": "آخر نشاط: {date}",
+    "neverActive": "لا نشاط بعد",
+    "daysClosed": "أيام مختومة: {count}",
+    "completion": "الالتزام: {rate}",
+    "activitiesTitle": "أنشطة المجموعة",
+    "newActivity": "نشاط جديد للمجموعة"
   }
 }

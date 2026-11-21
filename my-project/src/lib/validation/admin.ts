@@ -66,3 +66,11 @@ export const reviewQuestionSchema = z.object({
   sortOrder: z.coerce.number().int().min(0).max(999).default(0),
   active: z.preprocess((v) => v === "on" || v === "true" || v === true, z.boolean()),
 });
+
+// data-model.md encouragement_phrases.text, encouragement_phrases.sort_order, encouragement_phrases.active
+export const encouragementPhraseSchema = z.object({
+  id: z.preprocess(emptyToUndefined, uuidSchema.optional()),
+  text: z.string().trim().min(2).max(80),
+  sortOrder: z.coerce.number().int().min(0).max(999).default(0),
+  active: z.preprocess((v) => v === "on" || v === "true" || v === true, z.boolean()),
+});
