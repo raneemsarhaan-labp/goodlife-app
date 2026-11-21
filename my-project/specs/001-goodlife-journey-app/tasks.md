@@ -1,0 +1,415 @@
+---
+
+description: "Task list for the الحياة الطيبة (The Good Life) journey app"
+---
+
+# Tasks: الحياة الطيبة (The Good Life) Journey App
+
+**Input**: Design documents from `/specs/001-goodlife-journey-app/`
+
+**Prerequisites**: [plan.md](./plan.md), [spec.md](./spec.md), [research.md](./research.md),
+[data-model.md](./data-model.md), [contracts/](./contracts/), [quickstart.md](./quickstart.md)
+
+**Tests**: Included. The constitution (v1.1.0, principle III and "Workflow and quality gates")
+requires an automated test for every permission rule, tests of the core journey logic, automated
+accessibility checks, and e2e validation before merge. Within each story, write the tests first
+and confirm they fail.
+
+**Organization**: Tasks are grouped by user story so each story can be built and tested on its own.
+
+## Format: `[ID] [P?] [Story] Description`
+
+- **[P]**: Can run in parallel (different files, no dependency on an unfinished task)
+- **[Story]**: US1–US8 from spec.md
+- All paths are relative to `my-project/` (the Next.js project root, per plan.md), except the CI
+  workflow, which lives at the git root.
+- Field constraints are canonical in `data-model.md`; tasks cite them as `Entity.field`.
+
+---
+
+## Phase 1: Setup (Shared Infrastructure)
+
+**Purpose**: Project initialization and tooling
+
+- [ ] T001 Scaffold a Next.js 16 App Router project with TypeScript strict mode and `src/` directory in `my-project/` (`package.json`, `tsconfig.json`, `next.config.ts`), keeping the existing `.specify/`, `.claude/`, and `specs/` folders untouched
+- [ ] T002 Add dependencies from plan.md Technical Context to `package.json`: `@supabase/supabase-js`, `@supabase/ssr`, `next-intl`, `tailwindcss@4`, `@serwist/next`, `serwist`, `idb`, `zod`; dev: `supabase`, `vitest`, `@playwright/test`, `@axe-core/playwright`, `eslint`, `prettier`
+- [ ] T003 [P] Configure ESLint + Prettier in `eslint.config.mjs` and `.prettierrc`, including a rule that forbids physical-direction Tailwind classes (`ml-*`, `mr-*`, `pl-*`, `pr-*`, `left-*`, `right-*`, `text-left`, `text-right`, `rounded-l*`, `rounded-r*`) per constitution I
+- [ ] T004 [P] Set up Tailwind CSS 4 with color, spacing, and type tokens (calm palette, AA contrast) in `src/app/globals.css`
+- [ ] T005 [P] Configure Vitest in `vitest.config.ts` with tests under `tests/unit/`
+- [ ] T006 [P] Configure Playwright in `playwright.config.ts` (mobile project "Pixel 7", locale `ar`, trace off) and an axe helper `checkA11y(page)` asserting WCAG 2.1 AA in `tests/e2e/helpers/axe.ts`
+- [ ] T007 Initialize Supabase in `supabase/config.toml`: email OTP sign-in enabled (6-digit code, no magic link), signups disabled except through invitation redemption, Inbucket enabled, private storage bucket `resources`
+- [ ] T008 [P] Create `.env.example` and a Zod-validated env loader in `src/lib/env.ts` (Supabase URL, anon key, service role key server-only, site URL)
+- [ ] T009 [P] Add npm scripts in `package.json`: `dev`, `build`, `lint`, `typecheck`, `test`, `test:e2e`, `db:reset`, `db:test` (`supabase test db`), `gen:types`
+- [ ] T010 [P] Add CI workflow at the git root `.github/workflows/ci.yml` with `working-directory: my-project`, running lint, typecheck, unit tests, `supabase test db`, and Playwright e2e
+- [ ] T011 Record the stack and offline decisions from research.md §1–4 and §7–9 in `.specify/memory/constitution.md` via `/speckit-constitution` (resolves TODO(TECH_STACK) and TODO(OFFLINE_SCOPE), version 1.2.0)
+
+---
+
+## Phase 2: Foundational (Blocking Prerequisites)
+
+**Purpose**: Identity, program structure, auth, i18n, shell, and PWA base that every story needs
+
+**⚠️ CRITICAL**: No user story work can begin until this phase is complete
+
+### Tests for the foundation
+
+- [ ] T012 [P] pgTAP allow/deny tests for `users`, `user_roles`, `cohorts`, `groups`, `group_memberships`, `journey_stages` for member, facilitator, admin, and anonymous in `supabase/tests/rls_foundation.test.sql`
+- [ ] T013 [P] Unit tests for local date in a time zone, journey day (incl. late joiner and day 365 end), and greeting key boundaries (12:00, 17:00) in `tests/unit/journey.test.ts`
+- [ ] T014 [P] Unit tests for Arabic Gregorian + Hijri (umalqura) date formatting and Arabic-Indic digit formatting in `tests/unit/format.test.ts`
+
+### Implementation
+
+- [ ] T015 Create `supabase/migrations/0001_foundation.sql`: enums `app_role` and `membership_role` (data-model.md `user_roles.role`, `group_memberships.role`), `set_updated_at()` trigger function, and helpers `has_role(role)`, `is_group_member(group_id)`, `is_group_facilitator(group_id)`, `user_local_date(user_id)` (uses `users.time_zone`)
+- [ ] T016 Create `supabase/migrations/0002_identity.sql`: tables `users` and `user_roles` with constraints per data-model.md `users.full_name`, `users.email`, `users.phone`, `users.gender`, `users.city`, `users.time_zone`, `users.notification_prefs`, `users.active_role` (must be a role in `user_roles`), `users.deletion_requested_at`, `user_roles.user_id`, `user_roles.role` (unique per user), plus RLS policies from data-model.md
+- [ ] T017 Create `supabase/migrations/0003_structure.sql`: tables `cohorts`, `groups`, `group_memberships`, `journey_stages` with constraints per data-model.md `cohorts.name`, `cohorts.start_date`, `cohorts.end_date` (generated), `groups.cohort_id`, `groups.name` (unique within cohort), `group_memberships.group_id`, `group_memberships.user_id`, `group_memberships.role`, `group_memberships.started_on`, `group_memberships.ended_on` (partial unique index: one active member membership per user), `journey_stages.from_day`, `journey_stages.to_day` (1..365, non-overlapping), plus RLS
+- [ ] T018 Add SQL function `journey_day(user_id, local_date)` to `supabase/migrations/0003_structure.sql` (cohort of the active member membership; `local_date − start_date + 1`, capped 1..365)
+- [ ] T019 [P] Write base seed in `supabase/seed.sql`: cohort «الدفعة التجريبية» starting 11 days before seed date, groups «مجموعة النور» and «مجموعة الأمل», admin, facilitator, and two members as in quickstart.md
+- [ ] T020 [P] Create Supabase clients in `src/lib/supabase/server.ts` (user-scoped, cookies via `@supabase/ssr`) and `src/lib/supabase/browser.ts`; generate `src/lib/supabase/database.types.ts` with `npm run gen:types`
+- [ ] T021 Add session refresh and auth redirect in `src/middleware.ts` (public: `/join`, `/join/profile`, `/sign-in`; everything else → `/sign-in` when signed out)
+- [ ] T022 Implement `getCurrentUser()`, `requireRole(role)`, `requireGroupFacilitator(groupId)` in `src/server/auth.ts`; failures call `notFound()` per contracts/routes.md
+- [ ] T023 [P] Implement the `Result<T>` type and `ErrorCode` union from contracts/server-actions.md in `src/server/actions/result.ts`
+- [ ] T024 [P] Configure next-intl with a single `ar` locale in `src/i18n/request.ts` and create `messages/ar.json` with `common`, `nav`, and `errors` (one entry per `ErrorCode`) namespaces
+- [ ] T025 [P] Implement `src/lib/journey.ts` (`localDate(tz)`, `journeyDay(startDate, localDate)`, `greetingKey(hour)`) to pass T013
+- [ ] T026 [P] Implement `src/lib/format.ts` (`formatDate`, `formatHijri`, `formatNumber`, `formatFraction` with an Arabic-Indic/Latin digits switch defaulting to Arabic-Indic) to pass T014
+- [ ] T027 Create root layout `src/app/layout.tsx`: `<html lang="ar" dir="rtl">`, IBM Plex Sans Arabic via `next/font`, `NextIntlClientProvider`, skip-to-content link
+- [ ] T028 [P] Build accessible RTL UI primitives in `src/components/ui/` (`Button.tsx`, `Card.tsx`, `Sheet.tsx`, `Field.tsx`, `EmptyState.tsx`, `Toast.tsx`), with 44×44 px touch targets and Arabic screen-reader labels
+- [ ] T029 Build `src/components/ui/BottomNav.tsx` and member shell `src/app/(member)/layout.tsx` with the five tabs from contracts/routes.md (يومك، خطتي، الإحصاءات، المجتمع، المزيد), `aria-current` on the active tab
+- [ ] T030 [P] Create Arabic "not available" page in `src/app/not-found.tsx`
+- [ ] T031 [P] Create a logger that drops personal fields (names, emails, free text) in `src/lib/log.ts`
+- [ ] T032 Add PWA base: `src/app/manifest.ts` (fields from contracts/routes.md PWA section), icons in `public/icons/` (192, 512, maskable), Serwist service worker `src/app/sw.ts` precaching the app shell, `withSerwist` in `next.config.ts`
+
+**Checkpoint**: Foundation ready; user stories can start.
+
+---
+
+## Phase 3: User Story 1 - Join the journey and live the day on «يومك» (Priority: P1) 🎯 MVP
+
+**Goal**: A person joins with a code and lives a full day: intention, habits, journey and own challenges, upcoming activities, close-out; check-offs work offline.
+
+**Independent Test**: With the seed cohort, group, code `TEST2026`, and journey challenges for days 1–30, run quickstart.md scenarios 1 and 2.
+
+### Tests for User Story 1 ⚠️
+
+- [ ] T033 [P] [US1] pgTAP tests: `habits`, `habit_completions`, `day_entries`, `own_challenges`, `challenge_completions` are self-only (facilitator, other members, and admin-as-member denied); `journey_challenges` readable only up to the caller's journey day; writes for dates other than today/yesterday rejected, in `supabase/tests/rls_daily.test.sql`
+- [ ] T034 [P] [US1] pgTAP tests for `redeem_invitation(code)`: valid, expired, revoked, used up, and two concurrent redemptions of a 1-use code, in `supabase/tests/redeem_invitation.test.sql`
+- [ ] T035 [P] [US1] Playwright e2e for quickstart scenario 1 (join → welcome → «يومك» "اليوم ١٢" → habits ٢/٣ → intention → journey + own challenge with distinct labels → close day) with `checkA11y` on each screen, in `tests/e2e/us1-join-today.spec.ts`
+- [ ] T036 [P] [US1] Playwright e2e for quickstart scenario 2 (offline check-off saved once on reconnect) in `tests/e2e/us1-offline.spec.ts`
+
+### Implementation for User Story 1
+
+- [ ] T037 [P] [US1] Create `supabase/migrations/0004_invitations.sql`: `invitation_codes` per data-model.md `invitation_codes.code`, `invitation_codes.cohort_id`, `invitation_codes.group_id` (must belong to cohort), `invitation_codes.expires_at`, `invitation_codes.max_uses`, `invitation_codes.uses`, `invitation_codes.revoked_at`, `invitation_codes.created_by`; admin-only RLS; security-definer `redeem_invitation(code)` that locks the row, validates, increments `uses`, creates the `users` row, `member` role, and active membership
+- [ ] T038 [P] [US1] Create `supabase/migrations/0005_daily.sql`: `habits` per data-model.md `habits.user_id`, `habits.name`, `habits.description`, `habits.sort_order`, `habits.archived_at` (`habits.focus_area_id` is added in T075); `habit_completions` per `habit_completions.habit_id`, `habit_completions.user_id`, `habit_completions.local_date`, `habit_completions.client_mutation_id` (unique), unique (habit_id, local_date); `day_entries` per `day_entries.user_id`, `day_entries.local_date` (unique per user), `day_entries.intention`, `day_entries.reflection`, `day_entries.closed_at`, `day_entries.closing_message_id`; `closing_messages` per `closing_messages.text`, `closing_messages.active`; self-only RLS and a trigger enforcing the today/yesterday rule with `user_local_date()`
+- [ ] T039 [P] [US1] Create `supabase/migrations/0006_challenges.sql`: `journey_challenges` per data-model.md `journey_challenges.journey_day` (1..365, unique), `journey_challenges.text`; `own_challenges` per `own_challenges.user_id`, `own_challenges.local_date` (unique per user), `own_challenges.text` (editable only when `local_date` is today); `challenge_completions` per `challenge_completions.user_id`, `challenge_completions.local_date`, `challenge_completions.kind`, `challenge_completions.journey_challenge_id`, `challenge_completions.own_challenge_id` (check: matches `kind`), `challenge_completions.client_mutation_id` (unique), unique (user_id, local_date, kind); RLS per data-model.md
+- [ ] T040 [P] [US1] Create `supabase/migrations/0007_activities.sql`: `activities` per data-model.md `activities.title`, `activities.description`, `activities.starts_at`, `activities.ends_at` (> starts_at), `activities.location`, `activities.created_by`, `activities.cancelled_at`; `activity_audiences` per `activity_audiences.cohort_id` / `activity_audiences.group_id` (exactly one set); read RLS for members/facilitators of the audience, admin all
+- [ ] T041 [US1] Extend `supabase/seed.sql`: invitation code `TEST2026`, journey challenges for days 1–30, 6 closing messages including «ما نويته اليوم تمّ. وغدًا يبدأ من حيث توقفت.», one cohort-wide activity in 3 days; then regenerate types (`npm run gen:types`)
+- [ ] T042 [P] [US1] Zod schemas in `src/lib/validation/onboarding.ts` (data-model.md `users.full_name`, `users.email`, `users.phone`, `users.gender`, `users.city`, `users.time_zone`, `invitation_codes.code`) and `src/lib/validation/today.ts` (`day_entries.intention`, `day_entries.reflection`, `own_challenges.text`, `habits.name`, `habits.description`, `habit_completions.local_date`, `habit_completions.client_mutation_id`, `challenge_completions.kind`)
+- [ ] T043 [US1] Implement `checkInvitation`, `completeJoin`, `requestSignInCode` (no account enumeration), `verifySignInCode` per contracts/server-actions.md in `src/server/actions/onboarding.ts`
+- [ ] T044 [US1] Build join flow screens `src/app/(auth)/join/page.tsx` (code), `src/app/(auth)/join/profile/page.tsx` (personal data, time zone auto-detected), `src/app/(auth)/welcome/page.tsx`
+- [ ] T045 [US1] Build sign-in screen (email → 6-digit code) in `src/app/(auth)/sign-in/page.tsx`
+- [ ] T046 [US1] Implement `getToday()` read model (greeting key, Gregorian + Hijri date, journey day, active habits with today's state, journey challenge, own challenge, upcoming 7-day non-cancelled activities, day entry state) in `src/server/queries/today.ts`
+- [ ] T047 [US1] Implement `setHabitDone`, `setIntention`, `setOwnChallenge`, `setChallengeDone`, `closeDay` in `src/server/actions/today.ts`: idempotent on `client_mutation_id`, `date_not_editable` outside today/yesterday, closing message picked from active `closing_messages`
+- [ ] T048 [US1] Implement `createHabit` in `src/server/actions/habits.ts` and the create-habit screen `src/app/(member)/habits/new/page.tsx` (name, description)
+- [ ] T049 [P] [US1] Build Today components in `src/components/features/today/`: `Greeting.tsx`, `HabitList.tsx` (optimistic check/uncheck, progress like ٢/٦), `ChallengeCards.tsx` (journey «تحدّي الرحلة» and own «تحدّي ذاتي» with distinct label, icon, and style; journey card hidden when none; add/edit/remove own challenge), `UpcomingActivities.tsx`, `EmptyHabits.tsx`
+- [ ] T050 [US1] Build «يومك» page `src/app/(member)/page.tsx` composing T049 components from `getToday()`
+- [ ] T051 [P] [US1] Build «ابدأ يومي» sheet in `src/app/(member)/day/start/page.tsx`
+- [ ] T052 [P] [US1] Build «ختام اليوم» screen (intention, habits done/total, status of each challenge, optional reflection, closing message) in `src/app/(member)/day/close/page.tsx`
+- [ ] T053 [US1] Add midnight rollover in the user's time zone with `src/components/features/today/useDayRollover.ts` used by the Today page
+- [ ] T054 [US1] Implement the IndexedDB outbox (`enqueue`, ordered `replay` on `online`, pending state per item) in `src/lib/offline/outbox.ts`; use it in `HabitList.tsx` and `ChallengeCards.tsx`; add runtime caching of `/` and its data in `src/app/sw.ts`
+- [ ] T055 [US1] Add all US1 Arabic strings (join, sign-in, welcome, today, start day, close day, offline pending) to `messages/ar.json`
+
+**Checkpoint**: MVP: a member can join and live the daily loop end to end.
+
+---
+
+## Phase 4: User Story 2 - Admin sets up the program (Priority: P1)
+
+**Goal**: Admins create cohorts and groups, assign facilitators, issue and revoke codes, move members, schedule activities, and write journey challenges and closing messages.
+
+**Independent Test**: quickstart.md scenario 3.
+
+### Tests for User Story 2 ⚠️
+
+- [ ] T056 [P] [US2] pgTAP tests: every admin write (cohorts, groups, memberships, invitations, activities, journey challenges, closing messages, roles) denied for member and facilitator; `move_member` keeps the member's personal rows unchanged, in `supabase/tests/rls_admin.test.sql`
+- [ ] T057 [P] [US2] Playwright e2e for quickstart scenario 3 with `checkA11y` in `tests/e2e/us2-admin-setup.spec.ts`
+
+### Implementation for User Story 2
+
+- [ ] T058 [US2] Create `supabase/migrations/0008_admin.sql`: admin write policies on structure, invitation, activity, and content tables; `move_member(user_id, group_id)` (sets `group_memberships.ended_on`, inserts a new row with `group_memberships.started_on`, same cohort only); `assign_facilitator` / `remove_facilitator` maintaining `user_roles.role` = `facilitator`; guard against revoking the last admin
+- [ ] T059 [P] [US2] Zod schemas in `src/lib/validation/admin.ts` citing data-model.md `cohorts.name`, `cohorts.start_date`, `groups.name`, `invitation_codes.max_uses`, `invitation_codes.expires_at`, `activities.title`, `activities.description`, `activities.starts_at`, `activities.ends_at`, `activities.location`, `activity_audiences.cohort_id`, `activity_audiences.group_id`, `journey_challenges.journey_day`, `journey_challenges.text`, `closing_messages.text`
+- [ ] T060 [P] [US2] Implement an unambiguous-alphabet 8-character code generator in `src/lib/codes.ts` (data-model.md `invitation_codes.code`) with a unit test in `tests/unit/codes.test.ts`
+- [ ] T061 [US2] Implement `upsertCohort`, `upsertGroup`, `assignFacilitator`, `removeFacilitator`, `addMember`, `moveMember`, `grantAdmin`, `revokeAdmin` in `src/server/actions/admin/structure.ts`
+- [ ] T062 [US2] Implement `createInvitations` and `revokeInvitation` in `src/server/actions/admin/invitations.ts`
+- [ ] T063 [US2] Implement `createActivity`, `updateActivity`, `cancelActivity` in `src/server/actions/activities.ts` (admin: any audience; facilitator: own groups only, used by US6)
+- [ ] T064 [US2] Implement `upsertJourneyChallenge` and `upsertClosingMessage` in `src/server/actions/admin/content.ts`
+- [ ] T065 [US2] Build admin layout and home (`requireRole('admin')`, counts of cohorts, groups, members) in `src/app/admin/layout.tsx` and `src/app/admin/page.tsx`
+- [ ] T066 [US2] Build cohorts list and cohort detail (groups, facilitators, members, add/move member) in `src/app/admin/cohorts/page.tsx` and `src/app/admin/cohorts/[id]/page.tsx`
+- [ ] T067 [P] [US2] Build invitations screen (generate, copy, revoke, uses) in `src/app/admin/invitations/page.tsx`
+- [ ] T068 [P] [US2] Build activities screen (schedule for groups or cohort, edit, cancel) in `src/app/admin/activities/page.tsx`
+- [ ] T069 [US2] Build content screen with tabs for journey challenges (by day 1–365) and closing messages in `src/app/admin/content/page.tsx`
+- [ ] T070 [US2] Add US2 Arabic strings to `messages/ar.json`
+
+**Checkpoint**: The program can be set up and run without manual tracking; US1 works on real data.
+
+---
+
+## Phase 5: User Story 3 - Build my plan and shape my habits (Priority: P2)
+
+**Goal**: «خطتي» with current state and focus areas; habits linked to areas, edited, reordered, archived, and restored.
+
+**Independent Test**: quickstart.md scenario 4.
+
+### Tests for User Story 3 ⚠️
+
+- [ ] T071 [P] [US3] pgTAP tests: `plans` and `focus_areas` self-only (facilitator denied); a habit cannot link to another user's focus area; deleting a focus area unlinks habits, in `supabase/tests/rls_plan.test.sql`
+- [ ] T072 [P] [US3] Playwright e2e for quickstart scenario 4 in `tests/e2e/us3-plan-habits.spec.ts`
+
+### Implementation for User Story 3
+
+- [ ] T073 [US3] Create `supabase/migrations/0009_plan.sql`: `plans` per data-model.md `plans.user_id`, `plans.cohort_id` (unique per user), `plans.current_state`; `focus_areas` per `focus_areas.plan_id`, `focus_areas.title`, `focus_areas.description`, `focus_areas.sort_order`; self-only RLS
+- [ ] T074 [P] [US3] Zod schemas in `src/lib/validation/plan.ts` citing data-model.md `plans.current_state`, `focus_areas.title`, `focus_areas.description`, `habits.focus_area_id`, `habits.sort_order`
+- [ ] T075 [US3] In `supabase/migrations/0009_plan.sql` add `habits.focus_area_id` per data-model.md `habits.focus_area_id` (FK `on delete set null`, trigger ensuring the area belongs to the habit owner's plan)
+- [ ] T076 [US3] Implement `saveCurrentState`, `createFocusArea`, `updateFocusArea`, `deleteFocusArea`, `reorderFocusAreas` in `src/server/actions/plan.ts`
+- [ ] T077 [US3] Add `updateHabit`, `reorderHabits`, `archiveHabit`, `restoreHabit` to `src/server/actions/habits.ts` (data-model.md `habits.archived_at`, `habits.sort_order`)
+- [ ] T078 [P] [US3] Build plan components in `src/components/features/plan/` (`CurrentState.tsx`, `FocusAreaList.tsx`, `HabitsByArea.tsx`, `LastUpdated.tsx`)
+- [ ] T079 [US3] Build «خطتي» page with guided empty state in `src/app/(member)/plan/page.tsx`
+- [ ] T080 [P] [US3] Build an accessible reorder list (move up/down buttons, not drag-only) in `src/components/features/habits/ReorderList.tsx` used by the plan page and focus areas
+- [ ] T081 [US3] Build habit edit screen (name, description, focus area picker, archive) in `src/app/(member)/habits/[id]/page.tsx`; add the focus area picker to `src/app/(member)/habits/new/page.tsx`
+- [ ] T082 [P] [US3] Build archived habits screen with restore in `src/app/(member)/account/archived-habits/page.tsx`
+- [ ] T083 [US3] Add US3 Arabic strings to `messages/ar.json`
+
+**Checkpoint**: Habits have direction; US1 Today reflects order and archive state.
+
+---
+
+## Phase 6: User Story 4 - Monthly review «وقفة مع ما مضى» (Priority: P2)
+
+**Goal**: A monthly review prompt, figures for the month, reflection answers, and past reviews.
+
+**Independent Test**: quickstart.md scenario 5.
+
+### Tests for User Story 4 ⚠️
+
+- [ ] T084 [P] [US4] pgTAP tests for `month_figures(month)` (per-habit rate, journey/own challenge counts, days closed, archived-habit cut-off) and self-only RLS on `monthly_reviews`, in `supabase/tests/month_figures.test.sql`
+- [ ] T085 [P] [US4] Unit tests for the review window (opens on the 3rd-last day, closes after day 7 of next month; 28/29/30/31-day months) in `tests/unit/review-window.test.ts`
+- [ ] T086 [P] [US4] Playwright e2e for quickstart scenario 5 in `tests/e2e/us4-monthly-review.spec.ts`
+
+### Implementation for User Story 4
+
+- [ ] T087 [US4] Create `supabase/migrations/0010_reviews.sql`: `review_questions` per data-model.md `review_questions.text`, `review_questions.sort_order`, `review_questions.active`; `monthly_reviews` per `monthly_reviews.user_id`, `monthly_reviews.month` (first of month, unique per user), `monthly_reviews.answers`, `monthly_reviews.figures_snapshot`, `monthly_reviews.status`, `monthly_reviews.completed_at`; self-only RLS; shared view `daily_activity` (per user per date: habits done, challenges done by kind, closed) and function `month_figures(month)`
+- [ ] T088 [P] [US4] Implement `isReviewPromptOpen(localDate)` and `reviewMonthFor(localDate)` in `src/lib/review-window.ts` to pass T085
+- [ ] T089 [P] [US4] Zod schemas in `src/lib/validation/review.ts` citing data-model.md `monthly_reviews.month`, `monthly_reviews.answers`, `monthly_reviews.status`, `review_questions.text`
+- [ ] T090 [US4] Implement `saveReviewDraft` and `completeReview` (copies question text, stores `month_figures` snapshot) in `src/server/actions/reviews.ts`
+- [ ] T091 [US4] Add the review prompt to `getToday()` in `src/server/queries/today.ts` and a gentle `ReviewPrompt.tsx` card in `src/components/features/today/`
+- [ ] T092 [US4] Build past reviews list (done / not yet done) and review screen (figures, then questions; read-only when completed) in `src/app/(member)/reviews/page.tsx` and `src/app/(member)/reviews/[month]/page.tsx`
+- [ ] T093 [US4] Add a review questions tab and `upsertReviewQuestion` to `src/app/admin/content/page.tsx` and `src/server/actions/admin/content.ts`; seed default questions in `supabase/seed.sql`
+- [ ] T094 [US4] Add US4 Arabic strings to `messages/ar.json`
+
+**Checkpoint**: The monthly rhythm works on top of the daily data.
+
+---
+
+## Phase 7: User Story 5 - See my progress in «الإحصاءات» (Priority: P2)
+
+**Goal**: Member stats by period; facilitator group aggregates with no access to private content.
+
+**Independent Test**: quickstart.md scenarios 6 and 7.
+
+### Tests for User Story 5 ⚠️
+
+- [ ] T095 [P] [US5] pgTAP tests for `member_stats`, `group_stats`, `group_member_signals` against fixtures in `supabase/tests/fixtures/stats_expected.json` (20/30 days → 67%, current streak 5, longest streak, archived habits, journey vs own challenge counts), plus denial for non-facilitators and other groups' facilitators, in `supabase/tests/stats.test.sql`
+- [ ] T096 [P] [US5] Playwright e2e for quickstart scenarios 6 and 7 in `tests/e2e/us5-stats.spec.ts`
+
+### Implementation for User Story 5
+
+- [ ] T097 [US5] Create `supabase/migrations/0011_stats.sql`: security-definer functions `member_stats(from, to)` (self), `group_stats(group_id, from, to)` and `group_member_signals(group_id, from, to)` (facilitator of group or admin; signals limited to last_active, days_closed, completion_rate) built on `daily_activity`
+- [ ] T098 [US5] Implement `getMemberStats`, `getGroupStats`, `getGroupMemberSignals` in `src/server/queries/stats.ts`
+- [ ] T099 [P] [US5] Build stats components with text equivalents for every visual in `src/components/features/stats/` (`PeriodTabs.tsx`, `HabitRateList.tsx`, `StreakCard.tsx`, `ChallengeSummary.tsx` with journey/own split)
+- [ ] T100 [US5] Build «الإحصاءات» page (this week, this month, whole journey) in `src/app/(member)/stats/page.tsx`
+- [ ] T101 [US5] Add US5 Arabic strings to `messages/ar.json`
+
+**Checkpoint**: Progress is visible; figures match monthly reviews and Today.
+
+---
+
+## Phase 8: User Story 6 - Walk together: community and groups (Priority: P3)
+
+**Goal**: Group and cohort view, preset encouragements, «مجموعاتي», facilitator group page with signals, stats, and activities.
+
+**Independent Test**: quickstart.md scenarios 7 and 8.
+
+### Tests for User Story 6 ⚠️
+
+- [ ] T102 [P] [US6] pgTAP tests: `group_peers` shows only current group peers (id, full_name); encouragements readable by sender and recipient only; cross-group send denied; second send to the same person the same day denied; inactive phrase denied, in `supabase/tests/rls_community.test.sql`
+- [ ] T103 [P] [US6] Playwright e2e for quickstart scenario 8 and the facilitator part of scenario 7 in `tests/e2e/us6-community.spec.ts`
+
+### Implementation for User Story 6
+
+- [ ] T104 [US6] Create `supabase/migrations/0012_community.sql`: `encouragement_phrases` per data-model.md `encouragement_phrases.text`, `encouragement_phrases.active`, `encouragement_phrases.sort_order`; `encouragements` per `encouragements.sender_id`, `encouragements.recipient_id` (≠ sender, same active group), `encouragements.phrase_id` (active only), `encouragements.local_date`, unique (sender, recipient, local_date); view `group_peers`; function `send_encouragement(recipient_id, phrase_id)`
+- [ ] T105 [P] [US6] Zod schema in `src/lib/validation/community.ts` citing data-model.md `encouragements.recipient_id`, `encouragements.phrase_id`, `encouragement_phrases.text`
+- [ ] T106 [US6] Implement `sendEncouragement` (maps the unique violation to `limit_reached`) in `src/server/actions/community.ts`
+- [ ] T107 [US6] Implement `getMyGroup`, `getReceivedEncouragements`, `getMyGroups` (led groups + own group with role labels) in `src/server/queries/community.ts`
+- [ ] T108 [P] [US6] Build community components in `src/components/features/community/` (`GroupHeader.tsx`, `MemberList.tsx`, `EncouragePicker.tsx` preset phrases only with no text input, `ReceivedList.tsx`)
+- [ ] T109 [US6] Build «المجتمع» page in `src/app/(member)/community/page.tsx`
+- [ ] T110 [P] [US6] Build «مجموعاتي» page in `src/app/(facilitator)/groups/page.tsx`
+- [ ] T111 [US6] Build facilitator group page (members with the three signals only, group stats from US5 queries, activities with create/cancel via `src/server/actions/activities.ts`) in `src/app/(facilitator)/groups/[id]/page.tsx`
+- [ ] T112 [US6] Add an encouragement phrases tab and `upsertEncouragementPhrase` to `src/app/admin/content/page.tsx` and `src/server/actions/admin/content.ts`; seed default phrases (e.g. «بارك الله في سعيك»، «ثبّتك الله») in `supabase/seed.sql`
+- [ ] T113 [US6] Add US6 Arabic strings to `messages/ar.json`
+
+**Checkpoint**: The group journey works with privacy limits enforced.
+
+---
+
+## Phase 9: User Story 7 - Resources (Priority: P3)
+
+**Goal**: Journey map, recordings, files, references, and the ten guidelines, audience-restricted; admins manage them.
+
+**Independent Test**: quickstart.md scenario 9.
+
+### Tests for User Story 7 ⚠️
+
+- [ ] T114 [P] [US7] pgTAP tests: resources visible only to their audience (program, cohorts, groups) and storage object reads denied outside it; admin-only writes for resources, stages, guidelines, in `supabase/tests/rls_resources.test.sql`
+- [ ] T115 [P] [US7] Playwright e2e for quickstart scenario 9 in `tests/e2e/us7-resources.spec.ts`
+
+### Implementation for User Story 7
+
+- [ ] T116 [US7] Create `supabase/migrations/0013_resources.sql`: `resources` per data-model.md `resources.type`, `resources.title`, `resources.description`, `resources.category`, `resources.sort_order`, `resources.storage_path`, `resources.url` (one of storage_path/url required for recording/file), `resources.audience`; `resource_audiences` (cohort_id or group_id); `guidelines` per `guidelines.number` (1..10, unique), `guidelines.text`; storage policies on bucket `resources`
+- [ ] T117 [P] [US7] Zod schemas in `src/lib/validation/resources.ts` citing data-model.md `resources.type`, `resources.title`, `resources.url`, `resources.storage_path`, `resources.audience`, `guidelines.number`, `guidelines.text`, `journey_stages.from_day`, `journey_stages.to_day`
+- [ ] T118 [US7] Implement `getResourceUrl` (audience check, 10-minute signed URL, `not_found` otherwise) in `src/server/actions/resources.ts`
+- [ ] T119 [US7] Implement `upsertResource` (signed upload URL), `deleteResource`, `reorderResources`, `upsertJourneyStage`, `upsertGuideline` in `src/server/actions/admin/resources.ts`
+- [ ] T120 [US7] Build «الموارد» hub and screens: `src/app/(member)/resources/page.tsx`, `src/app/(member)/resources/map/page.tsx` (current stage highlighted), `src/app/(member)/resources/guidelines/page.tsx` (intro «عشرة أعراف تحكم الرحلة…»), `src/app/(member)/resources/[type]/page.tsx` (accessible audio/video player, downloads)
+- [ ] T121 [US7] Build admin resource library in `src/app/admin/resources/page.tsx` and add stages and guidelines tabs to `src/app/admin/content/page.tsx`
+- [ ] T122 [P] [US7] Seed journey stages and the ten guidelines (editable placeholders) in `supabase/seed.sql`
+- [ ] T123 [US7] Add US7 Arabic strings to `messages/ar.json`
+
+**Checkpoint**: Supporting content is available to the right audiences only.
+
+---
+
+## Phase 10: User Story 8 - My account, roles, and installing the app (Priority: P3)
+
+**Goal**: Profile editing, cohort/group view, role switching, data export and deletion request, «المزيد» menu, install prompt.
+
+**Independent Test**: quickstart.md scenario 10.
+
+### Tests for User Story 8 ⚠️
+
+- [ ] T124 [P] [US8] pgTAP tests: `users.active_role` can only be set to a held role; export function returns only the caller's rows, in `supabase/tests/account.test.sql`
+- [ ] T125 [P] [US8] Playwright e2e for quickstart scenario 10 (profile edit, role switch without sign-out, manifest standalone check) in `tests/e2e/us8-account.spec.ts`
+
+### Implementation for User Story 8
+
+- [ ] T126 [US8] Create `supabase/migrations/0014_account.sql`: `export_my_data()` (JSON of all own rows) and `request_account_deletion()` setting data-model.md `users.deletion_requested_at`
+- [ ] T127 [US8] Implement `updateProfile` (data-model.md `users.full_name`, `users.phone`, `users.gender`, `users.city`, `users.time_zone`), `switchRole` (`users.active_role`), `requestDataExport`, `requestAccountDeletion` in `src/server/actions/account.ts`
+- [ ] T128 [US8] Build «حسابي» page (profile form, cohort and group, archived habits link, role switch, sign out, export, delete request) in `src/app/(member)/account/page.tsx`
+- [ ] T129 [P] [US8] Build «المزيد» menu (الموارد، مجموعاتي، مراجعاتي، حسابي; لوحة الإدارة only for admins) in `src/app/(member)/more/page.tsx`
+- [ ] T130 [US8] Route `/` by `users.active_role` (member → «يومك», facilitator → group overview, admin → `/admin`) in `src/app/(member)/page.tsx`, and add `src/components/ui/RoleSwitcher.tsx` to the header for multi-role users
+- [ ] T131 [P] [US8] Build the install hint (Android `beforeinstallprompt`, iOS "Add to Home Screen" instructions, hidden when standalone) in `src/components/features/install/InstallHint.tsx`
+- [ ] T132 [US8] Add a deletion-requests list for admins in `src/app/admin/page.tsx`
+- [ ] T133 [US8] Add US8 Arabic strings to `messages/ar.json`
+
+**Checkpoint**: All user stories are independently functional.
+
+---
+
+## Phase 11: Polish & Cross-Cutting Concerns
+
+**Purpose**: Constitution gates across all stories
+
+- [ ] T134 [P] Add a messages test that every key used in `src/` exists in `messages/ar.json` and no value is Latin-only text, in `tests/unit/messages.test.ts`
+- [ ] T135 [P] Add an axe sweep over every route for each role in `tests/e2e/a11y-all-routes.spec.ts`
+- [ ] T136 [P] Add a performance check that «يومك» is interactive within 3 s on a throttled mid-range mobile profile in `tests/e2e/perf-today.spec.ts` (SC-003)
+- [ ] T137 Add security headers (CSP, Referrer-Policy, Permissions-Policy) in `next.config.ts` and confirm no personal data reaches logs via `src/lib/log.ts`
+- [ ] T138 Arabic language and tone review of `messages/ar.json` (calm, warm, no gamified wording) with fixes applied
+- [ ] T139 Capture RTL screenshots of every member screen on a phone viewport for the PR review gate in `tests/e2e/screenshots.spec.ts`
+- [ ] T140 Run all of quickstart.md (automated checks and the 10 manual scenarios) and record results in `specs/001-goodlife-journey-app/checklists/quickstart-run.md`
+
+---
+
+## Dependencies & Execution Order
+
+### Phase Dependencies
+
+- **Setup (Phase 1)**: none.
+- **Foundational (Phase 2)**: after Setup; blocks all stories.
+- **US1 (Phase 3)**: after Foundational. Creates the daily, challenge, invitation, and activity tables used by later stories.
+- **US2 (Phase 4)**: after Foundational; its migration `0008` adds admin write policies to tables from US1 (`0004`–`0007`), so run US1's migrations first.
+- **US3, US4, US5**: after US1 (they extend `habits` and read daily records). US5 reuses `daily_activity` from US4's migration `0010`.
+- **US6**: after US1; the facilitator group page uses US5 queries (T098) and the activity actions from US2 (T063).
+- **US7**: after Foundational (uses `journey_stages` from `0003`); independent of other stories.
+- **US8**: after US1; the role-based home (T130) links to US2 admin and US6 facilitator pages when present.
+- **Polish (Phase 11)**: after the stories you intend to ship.
+
+### Story completion order
+
+```text
+Setup → Foundational → US1 ─┬─→ US2
+                            ├─→ US3
+                            ├─→ US4 → US5 → US6
+                            └─→ US8
+Foundational → US7 (any time)
+```
+
+### Within each story
+
+- Tests first; confirm they fail.
+- Migration → validation schemas → actions/queries → components → pages → strings.
+- Migrations are numbered; apply them in order (`npm run db:reset`).
+
+### Parallel Opportunities
+
+- Setup: T003–T006, T008–T010 together.
+- Foundational: tests T012–T014 together; T019, T020, T023–T026, T028, T030, T031 together after T015–T018.
+- US1: tests T033–T036 together; migrations T037–T040 together; T042, T049, T051, T052 alongside the actions.
+- After US1, one developer per story: US2, US3, US4, US7, US8 can proceed in parallel.
+
+---
+
+## Parallel Example: User Story 1
+
+```bash
+# Tests first, together:
+Task: "pgTAP daily RLS tests in supabase/tests/rls_daily.test.sql"
+Task: "pgTAP redeem_invitation tests in supabase/tests/redeem_invitation.test.sql"
+Task: "Playwright join + today e2e in tests/e2e/us1-join-today.spec.ts"
+Task: "Playwright offline e2e in tests/e2e/us1-offline.spec.ts"
+
+# Then the four migrations, together:
+Task: "invitation_codes + redeem_invitation in supabase/migrations/0004_invitations.sql"
+Task: "habits, habit_completions, day_entries, closing_messages in supabase/migrations/0005_daily.sql"
+Task: "journey/own challenges + completions in supabase/migrations/0006_challenges.sql"
+Task: "activities + audiences in supabase/migrations/0007_activities.sql"
+```
+
+---
+
+## Implementation Strategy
+
+### MVP First (User Story 1 only)
+
+1. Phase 1 Setup → Phase 2 Foundational.
+2. Phase 3 (US1), with seed data standing in for the admin panel.
+3. **Stop and validate** with quickstart scenarios 1–2; demo to a few members.
+
+### Incremental Delivery
+
+1. Setup + Foundational → foundation ready.
+2. US1 → MVP demo.
+3. US2 → first real cohort can be set up and invited (**pilot-ready**: US1 + US2).
+4. US3 + US4 + US5 → plan, monthly rhythm, progress.
+5. US6 + US7 + US8 → full group experience, resources, account.
+6. Polish → release.
+
+### Parallel Team Strategy
+
+1. Everyone: Setup + Foundational + US1 migrations.
+2. Then: Dev A US2 → US8; Dev B US3 → US4 → US5; Dev C US7 → US6.
+
+---
+
+## Notes
+
+- [P] = different files, no dependency on unfinished tasks.
+- Several tasks extend shared files (`messages/ar.json`, `src/app/admin/content/page.tsx`,
+  `src/server/actions/admin/content.ts`, `supabase/seed.sql`, `src/server/queries/today.ts`);
+  those are not marked [P] across stories.
+- Commit after each task or logical group; stop at any checkpoint to validate the story.
