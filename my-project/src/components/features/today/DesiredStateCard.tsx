@@ -4,7 +4,7 @@ import Link from "next/link";
 import { useTranslations } from "next-intl";
 import { useId, useState, type FormEvent } from "react";
 import { Toast } from "@/components/ui/Toast";
-import { REFLECTION_MAX } from "@/lib/validation/reflections";
+import { REFLECTION_MAX } from "@/lib/limits";
 import { icon } from "@/ui/icons";
 import { useOutbox } from "./useOutbox";
 

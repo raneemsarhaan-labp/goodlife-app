@@ -16,3 +16,13 @@ describe("Arabic plural agreement", () => {
     expect(count(100)).toBe("١٠٠ عنصر");
   });
 });
+
+describe("spec 003 plurals use Arabic digits", () => {
+  const ta = createTranslator({ locale: "ar", messages, namespace: "activityRegistration" });
+  it("sessions and places", () => {
+    expect(ta("sessions", { count: 4, n: formatNumber(4) })).toBe("٤ لقاءات");
+    expect(ta("sessions", { count: 2, n: formatNumber(2) })).toBe("لقاءان");
+    expect(ta("placesLeft", { count: 0, n: formatNumber(0) })).toBe("لا مقاعد متبقية");
+    expect(ta("placesLeft", { count: 12, n: formatNumber(12) })).toBe("١٢ مقعدًا متبقيًا");
+  });
+});

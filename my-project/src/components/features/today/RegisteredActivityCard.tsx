@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useTranslations } from "next-intl";
 import { useState, useTransition } from "react";
-import { formatDateTime } from "@/lib/format";
+import { formatDateTime, formatNumber } from "@/lib/format";
 import type { RegisteredActivity } from "@/server/queries/today";
 import { dismissActivityCard } from "@/server/actions/activities";
 import { icon } from "@/ui/icons";
@@ -37,7 +37,7 @@ export function RegisteredActivityCard({ activity, timeZone }: { activity: Regis
           </span>
           <span id={titleId} className="font-semibold text-ink-900">
             {activity.title}
-            {activity.session_count > 1 && <span className="font-normal text-ink-700"> — {t("sessions", { count: activity.session_count })}</span>}
+            {activity.session_count > 1 && <span className="font-normal text-ink-700"> — {t("sessions", { count: activity.session_count, n: formatNumber(activity.session_count) })}</span>}
           </span>
           <span className={`text-sm ${activity.cancelled ? "font-semibold text-dawn-700" : "text-ink-700"}`}>
             {activity.cancelled ? t("cancelledToday") : t("nextSession", { when: formatDateTime(activity.next_starts_at, timeZone) })}

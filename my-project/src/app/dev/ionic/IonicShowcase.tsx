@@ -29,6 +29,8 @@ import {
   sunnyOutline,
 } from "ionicons/icons";
 import { useState } from "react";
+import { DesiredStateCard } from "@/components/features/today/DesiredStateCard";
+import { RegisteredActivityCard } from "@/components/features/today/RegisteredActivityCard";
 import { ActivitiesCard } from "@/ui/components/ActivitiesCard";
 import { HabitRow, type RowHabit } from "@/ui/components/HabitRow";
 import { ProgressCard } from "@/ui/components/ProgressCard";
@@ -66,6 +68,14 @@ export function IonicShowcase() {
 
       <section aria-labelledby="today-cards" className="flex flex-col gap-4">
         <h2 id="today-cards" className="text-lg font-semibold">بطاقات «يومك» (src/ui/components)</h2>
+        <DesiredStateCard
+          localDate="2026-11-22"
+          text="أستيقظ ولي وقتٌ لنفسي قبل أن يبدأ يومي مع الناس. أمشي بخُطًى ثابتة، وأُنجز ما نويت دون استعجالٍ أو ضغط، وأنام وأنا مطمئن أنّي عشتُ يومي كما أحب."
+        />
+        <RegisteredActivityCard
+          timeZone="Asia/Riyadh"
+          activity={{ id: "00000000-0000-4000-8000-0000000000e2", title: "نشاط قراءة: أمراض القلوب", mode: "online", next_starts_at: "2026-11-24T15:00:00Z", next_ends_at: null, next_local_date: "2026-11-24", session_count: 4, cancelled: false, dismissed_on: null }}
+        />
         <HabitRow habits={SAMPLE_HABITS} localDate="2026-11-21" />
         <ProgressCard done={2} total={4} />
         <ActivitiesCard timeZone="Asia/Riyadh" activities={[{ id: "a1", title: "لقاء المجموعة الأسبوعي", starts_at: "2026-11-23T17:00:00Z", ends_at: null, location: "عن بُعد" }]} />
@@ -84,15 +94,15 @@ export function IonicShowcase() {
         <p className="text-sm text-ink-500">color: primary · secondary · shape: round · مع أيقونة</p>
         <div className="flex flex-wrap gap-2">
           <IonButton color="secondary" shape="round">
-            <IonIcon slot="start" icon={checkmarkCircleOutline} />
+            <IonIcon slot="start" icon={checkmarkCircleOutline} aria-hidden="true" />
             أنجزت التحدّي
           </IonButton>
           <IonButton shape="round" fill="outline">
-            <IonIcon slot="start" icon={addOutline} />
+            <IonIcon slot="start" icon={addOutline} aria-hidden="true" />
             أضف عادة
           </IonButton>
           <IonButton shape="round" aria-label="إضافة">
-            <IonIcon slot="icon-only" icon={addOutline} />
+            <IonIcon slot="icon-only" icon={addOutline} aria-hidden="true" />
           </IonButton>
         </div>
 
@@ -166,7 +176,7 @@ export function IonicShowcase() {
             </IonItem>
             <IonItemOptions side="end">
               <IonItemOption color="secondary">
-                <IonIcon slot="start" icon={archiveOutline} />
+                <IonIcon slot="start" icon={archiveOutline} aria-hidden="true" />
                 أرشفة
               </IonItemOption>
             </IonItemOptions>

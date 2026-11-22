@@ -9,15 +9,33 @@ import { Select } from "@/components/ui/Select";
 import { createHabit } from "@/server/actions/habits";
 import { HabitIconPicker } from "@/components/features/habits/HabitIconPicker";
 
-export function NewHabitForm({ areas = [], returnTo, defaultAreaId }: { areas?: { id: string; title: string }[]; returnTo?: "plan"; defaultAreaId?: string }) {
+export function NewHabitForm({
+  areas = [],
+  returnTo,
+  defaultAreaId,
+  prefill,
+}: {
+  areas?: { id: string; title: string }[];
+  returnTo?: "plan";
+  defaultAreaId?: string;
+  /** «اجعلها عادة» (spec 003 FR-021, FR-022): name from today's challenge, and whether it already exists. */
+  prefill?: { name: string; duplicate: boolean };
+}) {
   const t = useTranslations("habits");
+  const tm = useTranslations("makeHabit");
   const te = useTranslations("errors");
   const [state, action, pending] = useActionState(createHabit, null);
   const onSubmit = useKeepValuesSubmit(action);
   const error = (field: string) => (state && !state.ok && state.field === field ? te(state.error) : undefined);
   return (
     <form onSubmit={onSubmit} className="flex flex-col gap-5">
-      <Field name="name" label={t("name")} hint={t("nameHint")} maxLength={80} error={error("name")} required autoFocus />
+      {prefill && <p className="self-start rounded-full bg-gold-100 px-3 py-1 text-sm font-medium text-ink-900">{tm("fromChallenge")}</p>}
+      <Field name="name" label={t("name")} hint={t("nameHint")} maxLength={80} error={error("name")} defaultValue={prefill?.name} required autoFocus />
+      {prefill?.duplicate && (
+        <p role="status" className="text-sm text-dawn-700">
+          {tm("duplicate")}
+        </p>
+      )}
       <TextArea name="description" label={t("description")} maxLength={500} error={error("description")} />
       <HabitIconPicker />
       {areas.length > 0 && (

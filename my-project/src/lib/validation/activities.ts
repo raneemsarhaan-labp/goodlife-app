@@ -1,10 +1,12 @@
 import { z } from "zod";
+import { MAX_SESSIONS } from "@/lib/limits";
 import { emptyToUndefined, uuidSchema } from "./common";
+
+export { MAX_SESSIONS };
 
 const localDateTime = z.string().regex(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}/);
 
 // data-model.md activity_sessions.starts_at, activity_sessions.ends_at (1–52 per activity, ends after start)
-export const MAX_SESSIONS = 52;
 export const sessionsSchema = z
   .array(z.object({ startsAt: localDateTime, endsAt: z.preprocess(emptyToUndefined, localDateTime.optional()) }))
   .min(1)

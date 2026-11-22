@@ -2,7 +2,7 @@ import Link from "next/link";
 import { getTranslations } from "next-intl/server";
 import { Button } from "@/components/ui/Button";
 import { EmptyState } from "@/components/ui/EmptyState";
-import { formatDateTime } from "@/lib/format";
+import { formatDateTime, formatNumber } from "@/lib/format";
 import { cancelActivity } from "@/server/actions/activities";
 
 export type ActivityRow = {
@@ -43,7 +43,7 @@ export async function ActivityList({
           {a.audience && <p className="text-sm text-ink-500">{a.audience}</p>}
           {a.registration_open && registrationsHref && (
             <Link href={registrationsHref(a.id)} className="self-start text-sm text-sage-700 underline underline-offset-4">
-              {t("registeredCount", { count: a.registered ?? 0 })}
+              {t("registeredCount", { count: formatNumber(a.registered ?? 0) })}
             </Link>
           )}
           {a.editable && !a.cancelled_at && (

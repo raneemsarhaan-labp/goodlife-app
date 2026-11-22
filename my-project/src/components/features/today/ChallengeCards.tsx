@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { useState, useTransition } from "react";
@@ -18,6 +19,7 @@ type Kind = "journey" | "own";
 export function ChallengeCards({ journey, own, localDate }: { journey: TodayChallenge | null; own: TodayChallenge | null; localDate: string }) {
   const t = useTranslations("today");
   const te = useTranslations("errors");
+  const tm = useTranslations("makeHabit");
   const router = useRouter();
   const { submit } = useOutbox();
   const [done, setDone] = useState<Record<Kind, boolean>>({ journey: Boolean(journey?.done), own: Boolean(own?.done) });
@@ -56,6 +58,17 @@ export function ChallengeCards({ journey, own, localDate }: { journey: TodayChal
     </Button>
   );
 
+  // «اجعلها عادة» (spec 003 FR-020): opens the add-habit form prefilled from this challenge.
+  const makeHabit = (kind: Kind) => (
+    <Link
+      href={`/habits/new?from=${kind}`}
+      className="inline-flex min-h-11 items-center gap-1.5 rounded-full px-4 text-sm font-medium text-sage-700 ring-1 ring-sage-600"
+    >
+      <span aria-hidden="true">↻</span>
+      {tm("action")}
+    </Link>
+  );
+
   return (
     <div className="flex flex-col gap-3">
       {journey && (
@@ -67,7 +80,10 @@ export function ChallengeCards({ journey, own, localDate }: { journey: TodayChal
             {t("journeyChallenge")}
           </h2>
           <p className="text-lg text-ink-900">{journey.text}</p>
-          {doneButton("journey")}
+          <div className="flex flex-wrap items-center gap-2">
+            {doneButton("journey")}
+            {makeHabit("journey")}
+          </div>
         </section>
       )}
 
@@ -100,6 +116,7 @@ export function ChallengeCards({ journey, own, localDate }: { journey: TodayChal
             <p className="text-lg text-ink-900">{text}</p>
             <div className="flex flex-wrap gap-2">
               {doneButton("own")}
+              {makeHabit("own")}
               <Button variant="quiet" onClick={() => setEditing(true)}>
                 {t("editChallenge")}
               </Button>

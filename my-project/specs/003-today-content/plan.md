@@ -124,6 +124,15 @@ tests/
 4. US3 «اجعلها عادة».
 5. Export, a11y sweep and screenshots for new routes, quickstart run.
 
+### Implementation notes (2026-11-22)
+
+- Upcoming activities on «يومك» now list each activity by its next session within 7 days.
+- `«اجعلها عادة»` uses a link and the existing add-habit sheet; no new action.
+- Shared field limits live in `src/lib/limits.ts` so client components do not ship Zod (measured:
+  «يومك» 168 KB gzipped, budget 200 KB).
+- Facilitators see registrants on `/activities/[id]` and counts on their group page; admins on
+  `/admin/activities/[id]`.
+
 ## Complexity Tracking
 
 No constitution violations; nothing to justify.

@@ -43,5 +43,12 @@ test("data export downloads my data as JSON", async ({ page }) => {
   await page.goto("/account");
   const download = page.waitForEvent("download");
   await page.getByRole("button", { name: "نزّل بياناتي" }).click();
-  expect((await download).suggestedFilename()).toBe("goodlife-my-data.json");
+  const file = await download;
+  expect(file.suggestedFilename()).toBe("goodlife-my-data.json");
+  // Spec 003 FR-007 (T032): the export includes the desired state, reflections and registrations.
+  const { readFile } = await import("node:fs/promises");
+  const data = JSON.parse(await readFile((await file.path())!, "utf8"));
+  expect(data).toHaveProperty("reflections");
+  expect(data).toHaveProperty("activity_registrations");
+  expect(data.plans[0]).toHaveProperty("desired_state");
 });

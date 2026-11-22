@@ -31,7 +31,7 @@ export default async function ActivityPage({ params }: { params: Promise<{ id: s
         <p className="flex items-center gap-1.5 text-sm font-semibold text-sage-700">
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img src={icon(a.mode === "online" ? "videocam" : "location_on")} alt="" aria-hidden="true" width={18} height={18} className="size-[18px]" />
-          {a.mode === "online" ? t("online") : t("inPerson")} · {t("sessions", { count: a.sessions.length })}
+          {a.mode === "online" ? t("online") : t("inPerson")} · {t("sessions", { count: a.sessions.length, n: formatNumber(a.sessions.length) })}
         </p>
         <h1 className="text-2xl font-semibold">{a.title}</h1>
         {a.cancelled_at && <p role="status" className="font-semibold text-dawn-700">{t("activityCancelled")}</p>}
@@ -71,7 +71,7 @@ export default async function ActivityPage({ params }: { params: Promise<{ id: s
           <p className="text-ink-700">{t("noRegistration")}</p>
         ) : (
           <>
-            <p className="text-ink-700">{a.places_left === null ? t("unlimited") : t("placesLeft", { count: a.places_left })}</p>
+            <p className="text-ink-700">{a.places_left === null ? t("unlimited") : t("placesLeft", { count: a.places_left, n: formatNumber(a.places_left) })}</p>
             {!a.registered && full && <p className="font-semibold text-dawn-700">{t("full")}</p>}
             {!a.registered && !a.window_open && !a.cancelled_at && <p className="text-ink-700">{t("closed")}</p>}
             {(a.registered ? a.window_open || Boolean(a.cancelled_at) : canRegister) && (

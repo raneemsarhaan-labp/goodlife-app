@@ -4,7 +4,7 @@ import { useTranslations } from "next-intl";
 import { useState } from "react";
 import { ActionForm } from "@/components/ui/ActionForm";
 import { Field, TextArea } from "@/components/ui/Field";
-import { MAX_SESSIONS } from "@/lib/validation/activities";
+import { MAX_SESSIONS } from "@/lib/limits";
 import { saveActivity } from "@/server/actions/activities";
 
 export type ActivityDraft = {

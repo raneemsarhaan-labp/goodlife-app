@@ -111,14 +111,14 @@ link only after registering, facilitator scope).
 
 ### Tests for User Story 3
 
-- [ ] T025 [P] [US3] Unit tests for shortening challenge text to the habit-name limit at a word boundary and for the duplicate-name check in `tests/unit/make-habit.test.ts`
-- [ ] T026 [P] [US3] e2e in `tests/e2e/us-make-habit.spec.ts`: journey and own challenge → prefilled form with «من تحدّي اليوم» → save → habit on «يومك» and «خطتي»; duplicate warning; cancel creates nothing
+- [X] T025 [P] [US3] Unit tests for shortening challenge text to the habit-name limit at a word boundary and for the duplicate-name check in `tests/unit/make-habit.test.ts`
+- [X] T026 [P] [US3] e2e in `tests/e2e/us-make-habit.spec.ts`: journey and own challenge → prefilled form with «من تحدّي اليوم» → save → habit on «يومك» and «خطتي»; duplicate warning; cancel creates nothing
 
 ### Implementation for User Story 3
 
-- [ ] T027 [P] [US3] Helper `src/lib/make-habit.ts` (shorten to 80 at a word boundary; normalise for duplicate check)
-- [ ] T028 [US3] `src/app/(member)/habits/new/page.tsx` reads `?from=journey|own`, loads today's challenge server-side, passes the default name, note and duplicate warning to `src/components/features/today/NewHabitForm.tsx`
-- [ ] T029 [US3] «اجعلها عادة» link next to «أنجزت التحدّي» for each present challenge in `src/components/features/today/ChallengeCards.tsx`
+- [X] T027 [P] [US3] Helper `src/lib/make-habit.ts` (shorten to 80 at a word boundary; normalise for duplicate check)
+- [X] T028 [US3] `src/app/(member)/habits/new/page.tsx` reads `?from=journey|own`, loads today's challenge server-side, passes the default name, note and duplicate warning to `src/components/features/today/NewHabitForm.tsx`
+- [X] T029 [US3] «اجعلها عادة» link next to «أنجزت التحدّي» for each present challenge in `src/components/features/today/ChallengeCards.tsx`
 
 **Checkpoint**: all three stories work independently.
 
@@ -126,10 +126,10 @@ link only after registering, facilitator scope).
 
 ## Phase 6: Polish & Cross-Cutting Concerns
 
-- [ ] T030 [P] Add `/plan/reflections`, `/activities/<seed id>`, `/admin/activities/<seed id>` to `tests/e2e/a11y-all-routes.spec.ts` and `tests/e2e/screenshots.spec.ts`
-- [ ] T031 [P] Contrast check of the new cards in the glass versions in `tests/e2e/ui-contrast.spec.ts`
-- [ ] T032 Account export UI check: export JSON contains desired state, reflections and registrations (extend `tests/e2e/us8-account.spec.ts`)
-- [ ] T033 Run quickstart.md checks (lint, typecheck, unit, DB, concurrency script, build + bundle budget); record results in `specs/003-today-content/checklists/quickstart-run.md`; screenshot the new cards in the three versions
+- [X] T030 [P] Add `/plan/reflections`, `/activities/<seed id>`, `/admin/activities/<seed id>` to `tests/e2e/a11y-all-routes.spec.ts` and `tests/e2e/screenshots.spec.ts`
+- [X] T031 [P] Contrast check of the new cards in the glass versions in `tests/e2e/ui-contrast.spec.ts`
+- [X] T032 Account export UI check: export JSON contains desired state, reflections and registrations (extend `tests/e2e/us8-account.spec.ts`)
+- [X] T033 Run quickstart.md checks (lint, typecheck, unit, DB, concurrency script, build + bundle budget); record results in `specs/003-today-content/checklists/quickstart-run.md`; screenshot the new cards in the three versions
 
 ---
 
