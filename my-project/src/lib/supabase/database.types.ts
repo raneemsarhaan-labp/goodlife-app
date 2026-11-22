@@ -947,6 +947,11 @@ isOneToOne: false
               "archived": boolean,"done_days": number,"habit_id": string,"name": string,"possible_days": number
             }[]
                            },
+"habit_streak_details":
+{ Args: { "p_cohort": string,"p_user": string }; Returns: {
+              "current_streak": number,"grace_this_week": boolean,"habit_id": string,"longest_streak": number
+            }[]
+                           },
 "habit_streaks":
 { Args: { "p_cohort": string,"p_user": string }; Returns: {
               "current_streak": number,"habit_id": string,"longest_streak": number
@@ -994,6 +999,9 @@ isOneToOne: false
       } },
 "mark_ritual_seen":
 { Args: Record<PropertyKey, never>; Returns: undefined
+                           },
+"member_insights":
+{ Args: { "p_from": string,"p_to": string }; Returns: Json
                            },
 "member_stats":
 { Args: { "p_from": string,"p_to": string }; Returns: Json

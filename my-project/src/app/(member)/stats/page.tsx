@@ -8,7 +8,11 @@ import { StreakCard } from "@/components/features/stats/StreakCard";
 import { Card, CardTitle } from "@/components/ui/Card";
 import { formatDate, formatNumber } from "@/lib/format";
 import { PERIODS, periodRange, type Period } from "@/lib/period";
-import { getMemberStats } from "@/server/queries/stats";
+import { CompletionBars } from "@/components/features/stats/CompletionBars";
+import { LifeAreas } from "@/components/features/stats/LifeAreas";
+import { PlanVsOther } from "@/components/features/stats/PlanVsOther";
+import { StatTiles } from "@/components/features/stats/StatTiles";
+import { getMemberInsights, getMemberStats } from "@/server/queries/stats";
 import { getToday } from "@/server/queries/today";
 
 export const generateMetadata = pageTitle("stats");
@@ -27,7 +31,7 @@ export default async function StatsPage({ searchParams }: { searchParams: Promis
     );
   }
   const { from, to } = periodRange(period, today.local_date, today.cohort.start_date);
-  const stats = await getMemberStats(from, to);
+  const [stats, insights] = await Promise.all([getMemberStats(from, to), getMemberInsights(from, to)]);
   const rate = stats && stats.habits_possible > 0 ? stats.habits_done / stats.habits_possible : 0;
   return (
     <main id="main" className="mx-auto flex max-w-lg flex-col gap-5 px-5 pt-6">
@@ -37,8 +41,11 @@ export default async function StatsPage({ searchParams }: { searchParams: Promis
       </header>
       <PeriodTabs active={period} basePath="/stats" />
       <p className="text-sm text-ink-500">{t("range", { from: formatDate(from, { withWeekday: false }), to: formatDate(to, { withWeekday: false }) })}</p>
-      {stats && (
+      {stats && insights && (
         <>
+          <StatTiles consecutive={insights.consecutive_days} rate={rate} activeHabits={insights.active_habits} challengesDone={stats.journey_done + stats.own_done} />
+          <CompletionBars buckets={insights.buckets} />
+          <PlanVsOther data={insights.plan_vs_other} />
           <Card aria-labelledby="overall" className="flex flex-col gap-2">
             <CardTitle id="overall">{t("overallTitle")}</CardTitle>
             <p className="text-3xl font-semibold text-sage-700">{t("overall", { rate: formatNumber(rate, undefined, { style: "percent" }) })}</p>
@@ -48,6 +55,7 @@ export default async function StatsPage({ searchParams }: { searchParams: Promis
           <StreakCard stats={stats} />
           <HabitRateList stats={stats} />
           <ChallengeSummary stats={stats} />
+          <LifeAreas domains={insights.domains} />
         </>
       )}
     </main>
