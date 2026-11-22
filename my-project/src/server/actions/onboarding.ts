@@ -1,7 +1,8 @@
 "use server";
 
-import { cookies } from "next/headers";
+import { cookies, headers } from "next/headers";
 import { redirect } from "next/navigation";
+import { publicEnv } from "@/lib/env";
 import { log } from "@/lib/log";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { createClient } from "@/lib/supabase/server";
@@ -93,7 +94,7 @@ export async function completeJoin(
         return !verified.error;
       },
       sendSignInCode: async (email) => {
-        const { error } = await supabase.auth.signInWithOtp({ email, options: { shouldCreateUser: false } });
+        const { error } = await supabase.auth.signInWithOtp({ email, options: { shouldCreateUser: false, emailRedirectTo: await confirmUrl() } });
         if (error) log.warn("join: sending sign-in code failed", { code: error.code });
       },
     },
@@ -105,12 +106,21 @@ export async function completeJoin(
   return result;
 }
 
+/** Where the email's sign-in link should land (when the email template carries a link, not the code). */
+async function confirmUrl(): Promise<string> {
+  const origin = (await headers()).get("origin") ?? publicEnv.NEXT_PUBLIC_SITE_URL;
+  return `${origin}/auth/confirm`;
+}
+
 /** Sign-in step 1: always reports success, so the form never reveals whether an email exists. */
 export async function requestSignInCode(_prev: FormState<{ email: string }>, formData: FormData): Promise<FormState<{ email: string }>> {
   const parsed = emailSchema.safeParse(formData.get("email") ?? "");
   if (!parsed.success) return fail("invalid_input", "email");
   const supabase = await createClient();
-  const { error } = await supabase.auth.signInWithOtp({ email: parsed.data, options: { shouldCreateUser: false } });
+  const { error } = await supabase.auth.signInWithOtp({
+    email: parsed.data,
+    options: { shouldCreateUser: false, emailRedirectTo: await confirmUrl() },
+  });
   if (error && error.code !== "otp_disabled" && error.code !== "user_not_found") {
     log.warn("sign-in: request code failed", { code: error.code });
   }
