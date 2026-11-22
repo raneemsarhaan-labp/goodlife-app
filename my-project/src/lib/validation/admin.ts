@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { HABIT_ICON_NAMES } from "@/ui/icons.generated";
 import { registrationSettingsSchema, sessionsSchema } from "./activities";
 import { emptyToUndefined, localDateSchema, uuidSchema } from "./common";
 import { emailSchema } from "./onboarding";
@@ -82,5 +83,27 @@ export const quoteSchema = z.object({
   text: z.string().trim().min(10).max(400),
   source: z.preprocess(emptyToUndefined, z.string().trim().max(120).optional()),
   sortOrder: z.coerce.number().int().min(0).max(9999).default(0),
+  active: z.preprocess((v) => v === "on" || v === "true" || v === true, z.boolean()),
+});
+
+// data-model.md (spec 004) life_domains.name, life_domains.icon, life_domains.color, life_domains.sort_order
+export const lifeDomainSchema = z.object({
+  id: uuidSchema,
+  name: z.string().trim().min(2).max(40),
+  icon: z.enum(HABIT_ICON_NAMES),
+  color: z.enum(["sage", "dawn", "gold", "ink", "violet"]),
+  sortOrder: z.coerce.number().int().min(0).max(999).default(0),
+  active: z.preprocess((v) => v === "on" || v === "true" || v === true, z.boolean()),
+});
+
+// data-model.md (spec 004) habit_library.name, habit_library.amount, habit_library.hint, habit_library.icon
+export const libraryHabitSchema = z.object({
+  id: z.preprocess(emptyToUndefined, uuidSchema.optional()),
+  domainId: uuidSchema,
+  name: z.string().trim().min(1).max(80),
+  amount: z.preprocess(emptyToUndefined, z.string().trim().max(60).optional()),
+  hint: z.preprocess(emptyToUndefined, z.string().trim().max(120).optional()),
+  icon: z.preprocess(emptyToUndefined, z.enum(HABIT_ICON_NAMES).optional()),
+  sortOrder: z.coerce.number().int().min(0).max(999).default(0),
   active: z.preprocess((v) => v === "on" || v === "true" || v === true, z.boolean()),
 });

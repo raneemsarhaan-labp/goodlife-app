@@ -204,4 +204,36 @@ insert into public.activity_sessions (activity_id, starts_at, ends_at)
 insert into public.activity_links (activity_id, meeting_url) values
   ('00000000-0000-4000-8000-0000000000e2', 'https://meet.example.test/qulub');
 
+-- ── Spec 004: «مكتبة العادات» (from the designs) and habit domains for member1 ──
+insert into public.habit_library (domain_id, name, amount, hint, icon, sort_order) values
+  ((select id from public.life_domains where key = 'faith'), 'أذكار الصباح', '٥ دقائق', 'بعد الفجر، قبل أن يبدأ الزحام', 'wb_sunny', 1),
+  ((select id from public.life_domains where key = 'faith'), 'وردي من القرآن', 'نصف صفحة', 'صفحاتٌ معلومةٌ لا تُترك', 'menu_book', 2),
+  ((select id from public.life_domains where key = 'faith'), 'اقرأ صفحةً وقف عند آية', null, 'اسأل نفسك: ما الذي لو عملتُ به اليوم؟', 'auto_stories', 3),
+  ((select id from public.life_domains where key = 'faith'), 'صلاة الضحى', 'ركعتان', 'ركعتان خفيفتان', 'mosque', 4),
+  ((select id from public.life_domains where key = 'faith'), 'قيام ركعتين', 'ركعتان', 'ولو ركعتين قبل النوم', 'nightlight', 5),
+  ((select id from public.life_domains where key = 'faith'), 'الاستغفار', '٢٠ مرّة', 'موزَّعًا لا مجموعًا', 'favorite', 6),
+  ((select id from public.life_domains where key = 'faith'), 'دعاء قبل النوم', null, 'خاتمة هادئة ليومك', 'bedtime', 7),
+  ((select id from public.life_domains where key = 'faith'), 'ترك الغِيبة', null, 'أن أصمت حيث كنتُ أتكلّم', 'block', 8),
+  ((select id from public.life_domains where key = 'self'), 'مشي', '٢٠ دقيقة', 'في الهواء الطلق لا على جهاز', 'directions_walk', 1),
+  ((select id from public.life_domains where key = 'self'), 'النوم قبل الحادية عشرة', null, 'والهاتف خارج الغرفة', 'bedtime', 2),
+  ((select id from public.life_domains where key = 'self'), 'جلسة صمت', '٥ دقائق', 'بلا شاشة ولا صوت', 'self_improvement', 3),
+  ((select id from public.life_domains where key = 'self'), 'شرب الماء بانتظام', '٨ أكواب', 'موزّعة على اليوم', 'water_drop', 4),
+  ((select id from public.life_domains where key = 'self'), 'ترك السكّر المضاف', null, 'خطوة صغيرة للجسد', 'no_food', 5),
+  ((select id from public.life_domains where key = 'self'), 'ترك التصفّح العشوائي', null, 'أضع حدًّا للوقت', 'phone_disabled', 6),
+  ((select id from public.life_domains where key = 'family'), 'اتصال بأحد الوالدين', null, 'ولو دقائق', 'favorite', 1),
+  ((select id from public.life_domains where key = 'family'), 'وقت هادئ مع العائلة', null, 'بلا شاشات', 'family_restroom', 2),
+  ((select id from public.life_domains where key = 'family'), 'رسالة شكر لصديق', null, 'صِلة صغيرة تدوم', 'edit_note', 3),
+  ((select id from public.life_domains where key = 'family'), 'لقاء صديق', null, 'وجهًا لوجه لا رسالةً', 'family_restroom', 4),
+  ((select id from public.life_domains where key = 'work'), 'عمل عميق', '١٥ دقيقة', 'بلا إشعارات ولا مقاطعة', 'work', 1),
+  ((select id from public.life_domains where key = 'work'), 'ترتيب مهامّ الغد', '٣ مهامّ', 'قبل أن أُغلق يومي', 'edit_note', 2),
+  ((select id from public.life_domains where key = 'work'), 'مراجعة المصروف', null, 'في آخر اليوم', 'schedule', 3),
+  ((select id from public.life_domains where key = 'work'), 'صدقة من الرزق', null, 'ولو قليلة', 'volunteer_activism', 4),
+  ((select id from public.life_domains where key = 'work'), 'ترك تصفّح العمل ليلًا', null, 'بعد التاسعة أُغلق', 'phone_disabled', 5),
+  ((select id from public.life_domains where key = 'learning'), 'قراءة', '١٥ دقيقة', 'كتاب غير الشاشة', 'menu_book', 1),
+  ((select id from public.life_domains where key = 'learning'), 'تعلّم فكرة جديدة', null, 'ودوّنها', 'school', 2),
+  ((select id from public.life_domains where key = 'giving'), 'مساعدة شخص اليوم', null, 'ولو بكلمة طيّبة', 'volunteer_activism', 1),
+  ((select id from public.life_domains where key = 'giving'), 'تطوّع صغير', null, 'حسب وقتك', 'favorite', 2);
+update public.habits set domain_id = (select id from public.life_domains where key = 'learning') where id = '00000000-0000-4000-8000-000000000d01';
+update public.habits set domain_id = (select id from public.life_domains where key = 'self') where id in ('00000000-0000-4000-8000-000000000d02', '00000000-0000-4000-8000-000000000d03', '00000000-0000-4000-8000-000000000d04');
+
 commit;

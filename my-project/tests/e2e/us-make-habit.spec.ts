@@ -16,8 +16,10 @@ test("own challenge → prefilled habit → on «يومك»; duplicate warning; 
   await expect(page).toHaveURL("/habits/new?from=own");
   await checkA11y(page);
   await expect(page.getByText("من تحدّي اليوم")).toBeVisible();
+  // Spec 004: the flow opens at step 2 with the challenge as «عادة من عندي».
   await expect(page.getByLabel("اسم العادة")).toHaveValue("اشرب كوب ماء قبل أي مشروب آخر");
-  await page.getByRole("button", { name: "أضف العادة" }).click();
+  await page.getByRole("button", { name: "التالي" }).click();
+  await page.getByRole("button", { name: "حفظ العادة" }).click();
   await expect(page).toHaveURL("/");
   await expect(page.getByRole("button", { name: "اشرب كوب ماء قبل أي مشروب آخر", exact: true })).toBeVisible();
   // The challenge is unchanged.

@@ -22,7 +22,7 @@ const MEMBER = [
 ];
 const FACILITATOR = ["/groups", "/groups/00000000-0000-4000-8000-0000000000a1", "/activities/00000000-0000-4000-8000-0000000000e2"];
 const ADMIN = ["/admin", "/admin/activities/00000000-0000-4000-8000-0000000000e2", "/admin/cohorts", "/admin/cohorts/00000000-0000-4000-8000-0000000000c1", "/admin/invitations",
-  "/admin/activities", "/admin/resources", ...["challenges", "closing", "questions", "phrases", "stages", "guidelines", "quotes"].map((t) => `/admin/content?tab=${t}`)];
+  "/admin/activities", "/admin/resources", ...["challenges", "closing", "questions", "phrases", "stages", "guidelines", "quotes", "domains", "library"].map((t) => `/admin/content?tab=${t}`)];
 
 test("public routes", async ({ page }) => {
   for (const route of PUBLIC) {

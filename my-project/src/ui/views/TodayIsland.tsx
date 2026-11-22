@@ -23,7 +23,7 @@ export function TodayIsland({ data, isToday, ritual }: TodayIslandProps) {
   return (
     <div className="flex flex-col gap-4">
       {habits.length > 0 && (
-        <HabitRow key={data.local_date} habits={habits} localDate={data.local_date} onProgress={(done, total) => setProgress({ done, total })} />
+        <HabitRow key={data.local_date} habits={habits} localDate={data.local_date} isToday={isToday} onProgress={(done, total) => setProgress({ done, total })} />
       )}
       {habits.length > 0 && <ProgressCard done={progress.done} total={progress.total} />}
       {isToday && (

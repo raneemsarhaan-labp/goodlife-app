@@ -58,3 +58,19 @@ export async function signInFresh(browser: import("@playwright/test").Browser, e
   await signIn(page, email);
   return { context, page };
 }
+
+/**
+ * Adds an own habit through the 3-step flow (spec 004): first non-plan domain → «عادة من عندي» →
+ * defaults (daily, any time). Lands on «يومك».
+ */
+export async function addOwnHabit(page: Page, name: string, { domain }: { domain?: string } = {}) {
+  await page.goto("/habits/new");
+  const domains = page.getByRole("radio");
+  await (domain ? page.getByRole("radio", { name: new RegExp(domain) }) : domains.first()).click();
+  await page.getByRole("button", { name: "التالي" }).click();
+  await page.getByRole("button", { name: "عادة من عندي" }).click();
+  await page.getByLabel("اسم العادة").fill(name);
+  await page.getByRole("button", { name: "التالي" }).click();
+  await page.getByRole("button", { name: "حفظ العادة" }).click();
+  await expect(page).toHaveURL("/");
+}

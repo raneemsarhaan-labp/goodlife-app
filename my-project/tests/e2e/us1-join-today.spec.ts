@@ -1,6 +1,6 @@
 import { expect, test } from "@playwright/test";
 import { checkA11y } from "./helpers/axe";
-import { latestSignInCode } from "./helpers/auth";
+import { latestSignInCode, addOwnHabit } from "./helpers/auth";
 
 // quickstart.md scenario 1 (US1). Requires `supabase start` + `supabase db reset` (seed).
 test("join with a code and live a full day on «يومك»", async ({ page }) => {
@@ -34,10 +34,7 @@ test("join with a code and live a full day on «يومك»", async ({ page }) =>
   await expect(page.getByText("اليوم ١٢ من رحلتك")).toBeVisible();
   await checkA11y(page);
   for (const name of ["قراءة", "مشي", "نوم مبكر"]) {
-    await page.goto("/habits/new");
-    await page.getByLabel("اسم العادة").fill(name);
-    await page.getByRole("button", { name: "أضف العادة" }).click();
-    await expect(page).toHaveURL("/");
+    await addOwnHabit(page, name);
   }
 
   // Check two habits → ٢/٣.

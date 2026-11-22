@@ -2,7 +2,21 @@ import "server-only";
 import { isReviewPromptOpen, reviewMonthFor } from "@/lib/review-window";
 import { createClient } from "@/lib/supabase/server";
 
-export type TodayHabit = { id: string; name: string; done: boolean; icon?: string | null; description?: string | null; week_done?: number; current_streak?: number };
+export type TodayHabit = {
+  id: string;
+  name: string;
+  done: boolean;
+  icon?: string | null;
+  description?: string | null;
+  week_done?: number;
+  current_streak?: number;
+  /** Spec 004 */
+  amount?: string | null;
+  time_of_day?: "morning" | "noon" | "evening" | "any";
+  domain_id?: string | null;
+  week?: { date: string; scheduled: boolean; done: boolean }[];
+  week_scheduled?: number;
+};
 export type TodayChallenge = { id: string; text: string; done: boolean };
 export type TodayActivity = {
   id: string;

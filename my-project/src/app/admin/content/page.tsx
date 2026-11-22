@@ -6,6 +6,8 @@ import { ChallengesTab } from "@/components/features/admin/content/ChallengesTab
 import { ClosingTab } from "@/components/features/admin/content/ClosingTab";
 import { GuidelinesTab } from "@/components/features/admin/content/GuidelinesTab";
 import { PhrasesTab } from "@/components/features/admin/content/PhrasesTab";
+import { DomainsTab } from "@/components/features/admin/content/DomainsTab";
+import { LibraryTab } from "@/components/features/admin/content/LibraryTab";
 import { QuotesTab } from "@/components/features/admin/content/QuotesTab";
 import { QuestionsTab } from "@/components/features/admin/content/QuestionsTab";
 import { StagesTab } from "@/components/features/admin/content/StagesTab";
@@ -21,6 +23,8 @@ const TABS: Record<string, (params: { page: number }) => ReactNode> = {
   stages: () => <StagesTab />,
   guidelines: () => <GuidelinesTab />,
   quotes: () => <QuotesTab />,
+  domains: () => <DomainsTab />,
+  library: () => <LibraryTab />,
 };
 
 export default async function ContentPage({ searchParams }: { searchParams: Promise<{ tab?: string; page?: string }> }) {

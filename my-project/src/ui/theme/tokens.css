@@ -23,7 +23,7 @@
   --terracotta-100: #fbe3d6;
   --terracotta-300: #eba98a;
   --terracotta-500: #d6764f; /* graphics only: 3.2:1 with white */
-  --terracotta-700: #a85332; /* buttons with text: 5.3:1 with white */
+  --terracotta-700: #9c4b2c; /* text and buttons: ≥ 4.75:1 on every app surface (6.1:1 with white) */
   --gold-100: #fbedd1;
   --gold-300: #f0cd84;
   --gold-500: #dba649;
@@ -52,11 +52,11 @@
   --ion-text-color-rgb: 27, 43, 34;
   --ion-background-color: var(--surface);
   --ion-color-primary: var(--terracotta-700);
-  --ion-color-primary-rgb: 168, 83, 50;
+  --ion-color-primary-rgb: 156, 75, 44;
   --ion-color-primary-contrast: #ffffff;
   --ion-color-primary-contrast-rgb: 255, 255, 255;
-  --ion-color-primary-shade: #94492c;
-  --ion-color-primary-tint: #b16447;
+  --ion-color-primary-shade: #894227;
+  --ion-color-primary-tint: #a65d41;
   --ion-color-secondary: var(--green-500);
   --ion-color-secondary-rgb: 46, 74, 61;
   --ion-color-secondary-contrast: #ffffff;

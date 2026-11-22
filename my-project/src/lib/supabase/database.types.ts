@@ -295,17 +295,23 @@ isOneToOne: false
                   ]
                 },"focus_areas": {
                   Row: {
-                    "created_at": string,"description": string | null,"id": string,"plan_id": string,"sort_order": number,"title": string,"updated_at": string
+                    "created_at": string,"description": string | null,"domain_id": string | null,"id": string,"plan_id": string,"sort_order": number,"title": string,"updated_at": string
                   }
                   ComputedFields: never
                   Insert: {
-                    "created_at"?: string,"description"?: string | null,"id"?: string,"plan_id": string,"sort_order"?: number,"title": string,"updated_at"?: string
+                    "created_at"?: string,"description"?: string | null,"domain_id"?: string | null,"id"?: string,"plan_id": string,"sort_order"?: number,"title": string,"updated_at"?: string
                   }
                   Update: {
-                    "created_at"?: string,"description"?: string | null,"id"?: string,"plan_id"?: string,"sort_order"?: number,"title"?: string,"updated_at"?: string
+                    "created_at"?: string,"description"?: string | null,"domain_id"?: string | null,"id"?: string,"plan_id"?: string,"sort_order"?: number,"title"?: string,"updated_at"?: string
                   }
                   Relationships: [
                     {
+      foreignKeyName: "focus_areas_domain_id_fkey"
+      columns: ["domain_id"]
+isOneToOne: false
+      referencedRelation: "life_domains"
+      referencedColumns: ["id"]
+    },{
       foreignKeyName: "focus_areas_plan_id_fkey"
       columns: ["plan_id"]
 isOneToOne: false
@@ -399,23 +405,55 @@ isOneToOne: false
       referencedColumns: ["id"]
     }
                   ]
-                },"habits": {
+                },"habit_library": {
                   Row: {
-                    "archived_at": string | null,"created_at": string,"description": string | null,"focus_area_id": string | null,"icon": string | null,"id": string,"name": string,"plan_id": string,"sort_order": number,"updated_at": string
+                    "active": boolean,"amount": string | null,"created_at": string,"domain_id": string,"hint": string | null,"icon": string | null,"id": string,"name": string,"sort_order": number,"updated_at": string
                   }
                   ComputedFields: never
                   Insert: {
-                    "archived_at"?: string | null,"created_at"?: string,"description"?: string | null,"focus_area_id"?: string | null,"icon"?: string | null,"id"?: string,"name": string,"plan_id": string,"sort_order"?: number,"updated_at"?: string
+                    "active"?: boolean,"amount"?: string | null,"created_at"?: string,"domain_id": string,"hint"?: string | null,"icon"?: string | null,"id"?: string,"name": string,"sort_order"?: number,"updated_at"?: string
                   }
                   Update: {
-                    "archived_at"?: string | null,"created_at"?: string,"description"?: string | null,"focus_area_id"?: string | null,"icon"?: string | null,"id"?: string,"name"?: string,"plan_id"?: string,"sort_order"?: number,"updated_at"?: string
+                    "active"?: boolean,"amount"?: string | null,"created_at"?: string,"domain_id"?: string,"hint"?: string | null,"icon"?: string | null,"id"?: string,"name"?: string,"sort_order"?: number,"updated_at"?: string
                   }
                   Relationships: [
                     {
+      foreignKeyName: "habit_library_domain_id_fkey"
+      columns: ["domain_id"]
+isOneToOne: false
+      referencedRelation: "life_domains"
+      referencedColumns: ["id"]
+    }
+                  ]
+                },"habits": {
+                  Row: {
+                    "amount": string | null,"archived_at": string | null,"created_at": string,"days": number,"description": string | null,"domain_id": string | null,"focus_area_id": string | null,"icon": string | null,"id": string,"library_habit_id": string | null,"name": string,"plan_id": string,"sort_order": number,"time_of_day": Database["public"]['Enums']["habit_time"],"updated_at": string
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "amount"?: string | null,"archived_at"?: string | null,"created_at"?: string,"days"?: number,"description"?: string | null,"domain_id"?: string | null,"focus_area_id"?: string | null,"icon"?: string | null,"id"?: string,"library_habit_id"?: string | null,"name": string,"plan_id": string,"sort_order"?: number,"time_of_day"?: Database["public"]['Enums']["habit_time"],"updated_at"?: string
+                  }
+                  Update: {
+                    "amount"?: string | null,"archived_at"?: string | null,"created_at"?: string,"days"?: number,"description"?: string | null,"domain_id"?: string | null,"focus_area_id"?: string | null,"icon"?: string | null,"id"?: string,"library_habit_id"?: string | null,"name"?: string,"plan_id"?: string,"sort_order"?: number,"time_of_day"?: Database["public"]['Enums']["habit_time"],"updated_at"?: string
+                  }
+                  Relationships: [
+                    {
+      foreignKeyName: "habits_domain_id_fkey"
+      columns: ["domain_id"]
+isOneToOne: false
+      referencedRelation: "life_domains"
+      referencedColumns: ["id"]
+    },{
       foreignKeyName: "habits_focus_area_id_fkey"
       columns: ["focus_area_id"]
 isOneToOne: false
       referencedRelation: "focus_areas"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "habits_library_habit_id_fkey"
+      columns: ["library_habit_id"]
+isOneToOne: false
+      referencedRelation: "habit_library"
       referencedColumns: ["id"]
     },{
       foreignKeyName: "habits_plan_id_fkey"
@@ -481,6 +519,20 @@ isOneToOne: false
                   }
                   Update: {
                     "created_at"?: string,"description"?: string | null,"from_day"?: number,"id"?: string,"sort_order"?: number,"title"?: string,"to_day"?: number,"updated_at"?: string
+                  }
+                  Relationships: [
+                    
+                  ]
+                },"life_domains": {
+                  Row: {
+                    "active": boolean,"color": Database["public"]['Enums']["domain_color"],"created_at": string,"icon": string,"id": string,"key": string,"name": string,"sort_order": number,"updated_at": string
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "active"?: boolean,"color"?: Database["public"]['Enums']["domain_color"],"created_at"?: string,"icon"?: string,"id"?: string,"key": string,"name": string,"sort_order"?: number,"updated_at"?: string
+                  }
+                  Update: {
+                    "active"?: boolean,"color"?: Database["public"]['Enums']["domain_color"],"created_at"?: string,"icon"?: string,"id"?: string,"key"?: string,"name"?: string,"sort_order"?: number,"updated_at"?: string
                   }
                   Relationships: [
                     
@@ -757,6 +809,9 @@ isOneToOne: false
 "add_member":
 { Args: { "p_group": string,"p_user": string }; Returns: undefined
                            },
+"add_plan_domain":
+{ Args: { "p_domain": string }; Returns: string
+                           },
 "add_reflection":
 { Args: { "p_client_mutation_id": string,"p_local_date"?: string,"p_text": string }; Returns: string
                            },
@@ -832,6 +887,12 @@ isOneToOne: false
               "active": boolean,"d_from": string,"d_to": string,"user_id": string
             }[]
                            },
+"habit_icon_names":
+{ Args: Record<PropertyKey, never>; Returns: (string)[]
+                           },
+"habit_on":
+{ Args: { "p_date": string,"p_days": number }; Returns: boolean
+                           },
 "habit_rates":
 { Args: { "p_cohort": string,"p_from": string,"p_to": string,"p_user": string }; Returns: {
               "archived": boolean,"done_days": number,"habit_id": string,"name": string,"possible_days": number
@@ -877,7 +938,7 @@ isOneToOne: false
                            },
 "my_habit_details":
 { Args: { "p_date": string }; Returns: {
-              "current_streak": number,"habit_id": string,"week_done": number
+              "current_streak": number,"habit_id": string,"week": Json,"week_done": number,"week_scheduled": number
             }[]
                            },
 "my_reflections":
@@ -924,6 +985,9 @@ isOneToOne: false
 "remove_facilitator":
 { Args: { "p_group": string,"p_user": string }; Returns: undefined
                            },
+"remove_plan_domain":
+{ Args: { "p_domain": string }; Returns: undefined
+                           },
 "reorder_focus_areas":
 { Args: { "p_ids": (string)[] }; Returns: undefined
                            },
@@ -954,6 +1018,9 @@ isOneToOne: false
 "save_review":
 { Args: { "p_answers": Json,"p_complete": boolean,"p_month": string }; Returns: undefined
                            },
+"scheduled_ord":
+{ Args: { "p_date": string,"p_days": number }; Returns: number
+                           },
 "send_encouragement":
 { Args: { "p_phrase": string,"p_recipient": string }; Returns: undefined
                            },
@@ -980,7 +1047,7 @@ isOneToOne: false
                            }
           }
           Enums: {
-            "activity_mode": "in_person"|"online","app_role": "member"|"facilitator"|"admin","challenge_kind": "journey"|"own","gender": "male"|"female","membership_role": "member"|"facilitator","resource_audience": "program"|"cohorts"|"groups","resource_type": "recording"|"file"|"reference","review_status": "draft"|"completed","ui_version": "journey"|"glass"|"full_glass"
+            "activity_mode": "in_person"|"online","app_role": "member"|"facilitator"|"admin","challenge_kind": "journey"|"own","domain_color": "sage"|"dawn"|"gold"|"ink"|"violet","gender": "male"|"female","habit_time": "morning"|"noon"|"evening"|"any","membership_role": "member"|"facilitator","resource_audience": "program"|"cohorts"|"groups","resource_type": "recording"|"file"|"reference","review_status": "draft"|"completed","ui_version": "journey"|"glass"|"full_glass"
           }
           CompositeTypes: {
             [_ in never]: never
@@ -1096,7 +1163,7 @@ export type CompositeTypes<
 export const Constants = {
   "public": {
           Enums: {
-            "activity_mode": ["in_person", "online"],"app_role": ["member", "facilitator", "admin"],"challenge_kind": ["journey", "own"],"gender": ["male", "female"],"membership_role": ["member", "facilitator"],"resource_audience": ["program", "cohorts", "groups"],"resource_type": ["recording", "file", "reference"],"review_status": ["draft", "completed"],"ui_version": ["journey", "glass", "full_glass"]
+            "activity_mode": ["in_person", "online"],"app_role": ["member", "facilitator", "admin"],"challenge_kind": ["journey", "own"],"domain_color": ["sage", "dawn", "gold", "ink", "violet"],"gender": ["male", "female"],"habit_time": ["morning", "noon", "evening", "any"],"membership_role": ["member", "facilitator"],"resource_audience": ["program", "cohorts", "groups"],"resource_type": ["recording", "file", "reference"],"review_status": ["draft", "completed"],"ui_version": ["journey", "glass", "full_glass"]
           }
         }
 } as const

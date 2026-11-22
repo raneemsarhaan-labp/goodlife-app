@@ -1,5 +1,5 @@
 import { expect, test } from "@playwright/test";
-import { joinNewMember } from "./helpers/auth";
+import { joinNewMember, addOwnHabit } from "./helpers/auth";
 
 // Spec 002 US2 (T026, SC-003): the same day in each version stores the same state and stats.
 // Runs in every Playwright project (one per version); each run uses a fresh member.
@@ -8,10 +8,7 @@ test("same actions → same «يومك» and stats in this version", async ({ pa
   await page.goto("/setup/look");
   await page.getByRole("button", { name: "تخطَّ الآن" }).click();
   for (const name of ["قراءة", "مشي", "نوم مبكر"]) {
-    await page.goto("/habits/new");
-    await page.getByLabel("اسم العادة").fill(name);
-    await page.getByRole("button", { name: "أضف العادة" }).click();
-    await expect(page).toHaveURL("/");
+    await addOwnHabit(page, name);
   }
   await page.getByRole("button", { name: "قراءة", exact: true }).click();
   await page.getByRole("button", { name: "نوم مبكر", exact: true }).click();

@@ -1,15 +1,23 @@
 import { pageTitle } from "@/i18n/metadata";
 import { getTranslations } from "next-intl/server";
-import { NewHabitForm } from "@/components/features/today/NewHabitForm";
+import { AddHabitFlow } from "@/components/features/habits/AddHabitFlow";
 import { Sheet } from "@/components/ui/Sheet";
 import { habitNameFromChallenge, hasHabitNamed } from "@/lib/make-habit";
-import { getFocusAreas } from "@/server/queries/plan";
+import { getDomains, getLibrary, getPlanDomains } from "@/server/queries/domains";
 import { getToday } from "@/server/queries/today";
 
 export const generateMetadata = pageTitle("newHabit");
 
 export default async function NewHabitPage({ searchParams }: { searchParams: Promise<{ returnTo?: string; area?: string; from?: string }> }) {
-  const [{ returnTo, area, from }, t, areas] = await Promise.all([searchParams, getTranslations("habits"), getFocusAreas()]);
+  const [{ returnTo, area, from }, t, domains, planDomains, library] = await Promise.all([
+    searchParams,
+    getTranslations("addFlow"),
+    getDomains(),
+    getPlanDomains(),
+    getLibrary(),
+  ]);
+  // `?area=` (from «خطتي») preselects that area's domain when it has one.
+  const areaDomain = area ? planDomains.find((p) => p.focusAreaId === area)?.domainId : undefined;
   // «اجعلها عادة» (spec 003 US3): the challenge text is read here, never taken from the URL.
   let prefill: { name: string; duplicate: boolean } | undefined;
   if (from === "journey" || from === "own") {
@@ -21,13 +29,15 @@ export default async function NewHabitPage({ searchParams }: { searchParams: Pro
     }
   }
   return (
-    <Sheet title={t("newTitle")}>
-      <NewHabitForm
+    <Sheet title={t("title")}>
+      <AddHabitFlow
         key={prefill?.name ?? "new"}
-        areas={areas}
-        returnTo={returnTo === "plan" ? "plan" : undefined}
-        defaultAreaId={area}
+        domains={domains}
+        planDomains={planDomains}
+        library={library}
         prefill={prefill}
+        initialDomainId={areaDomain}
+        returnTo={returnTo === "plan" ? "plan" : undefined}
       />
     </Sheet>
   );

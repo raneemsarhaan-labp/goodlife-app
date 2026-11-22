@@ -2,7 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
-import { closingMessageSchema, encouragementPhraseSchema, journeyChallengeSchema, quoteSchema, reviewQuestionSchema } from "@/lib/validation/admin";
+import { closingMessageSchema, encouragementPhraseSchema, journeyChallengeSchema, libraryHabitSchema, lifeDomainSchema, quoteSchema, reviewQuestionSchema } from "@/lib/validation/admin";
 import { fail, fromDbError, ok, type Result } from "../result";
 import { currentAdmin, firstIssuePath, formObject } from "./guard";
 
@@ -75,5 +75,34 @@ export async function upsertQuote(_prev: State, formData: FormData): Promise<Sta
   const { error } = parsed.data.id ? await supabase.from("quotes").update(row).eq("id", parsed.data.id) : await supabase.from("quotes").insert(row);
   if (error) return fromDbError(error);
   revalidatePath("/admin/content");
+  return ok(null);
+}
+
+/** Renames, re-icons, reorders or hides a life domain (spec 004 FR-001). */
+export async function saveLifeDomain(_prev: State, formData: FormData): Promise<State> {
+  if (!(await currentAdmin())) return fail("forbidden");
+  const parsed = lifeDomainSchema.safeParse(formObject(formData));
+  if (!parsed.success) return fail("invalid_input", firstIssuePath(parsed.error));
+  const { id, name, icon, color, sortOrder, active } = parsed.data;
+  const supabase = await createClient();
+  const { error } = await supabase.from("life_domains").update({ name, icon, color, sort_order: sortOrder, active }).eq("id", id);
+  if (error) return fromDbError(error);
+  revalidatePath("/admin/content");
+  revalidatePath("/habits/new");
+  return ok(null);
+}
+
+/** Adds or edits a «مكتبة العادات» suggestion (spec 004 FR-009). */
+export async function upsertLibraryHabit(_prev: State, formData: FormData): Promise<State> {
+  if (!(await currentAdmin())) return fail("forbidden");
+  const parsed = libraryHabitSchema.safeParse(formObject(formData));
+  if (!parsed.success) return fail("invalid_input", firstIssuePath(parsed.error));
+  const d = parsed.data;
+  const row = { domain_id: d.domainId, name: d.name, amount: d.amount ?? null, hint: d.hint ?? null, icon: d.icon ?? null, sort_order: d.sortOrder, active: d.active };
+  const supabase = await createClient();
+  const { error } = d.id ? await supabase.from("habit_library").update(row).eq("id", d.id) : await supabase.from("habit_library").insert(row);
+  if (error) return fromDbError(error);
+  revalidatePath("/admin/content");
+  revalidatePath("/habits/new");
   return ok(null);
 }
