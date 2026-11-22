@@ -19,7 +19,8 @@ Optional: `NEXT_PUBLIC_SITE_URL` (defaults to the project's production domain).
 
 Supabase dashboard → Authentication:
 
-- **Sign In / Providers → Email**: enabled; "Confirm email" off; OTP length 6.
+- **Sign In / Providers → Email**: enabled; OTP length 6. ("Confirm email" can stay on: the app
+  creates members' accounts already confirmed.)
 - **Emails → Magic Link** template: paste `supabase/templates/sign-in-code.html` (it shows `{{ .Token }}`).
 - **URL Configuration**: Site URL = the Vercel production URL; add it to Redirect URLs.
 
@@ -27,11 +28,12 @@ Supabase dashboard → Authentication:
 
 Redeploy in Vercel. The build log shows `[migrate] …` lines: 22 files applied on the first deploy (21
 migrations and the starter content), then the first-admin invitation code. Open `/join`, enter that
-code and the `BOOTSTRAP_ADMIN_EMAIL` address: that account becomes admin. Later deploys apply only new
-migrations.
+code and the `BOOTSTRAP_ADMIN_EMAIL` address: that account becomes admin, and joining signs you in
+straight away (no email needed). Later deploys apply only new migrations.
 
 ## Notes
 
 - Demo people and cohorts (`supabase/seed.sql`) are local only; production gets `supabase/content.sql`.
-- Supabase's built-in email sender is rate-limited; set up custom SMTP (Authentication → SMTP) before
-  inviting a cohort.
+- Signing in again later uses a 6-digit code by email. Supabase's built-in sender only delivers to
+  members of the Supabase organization's team and only a few emails an hour, so set up custom SMTP
+  (Authentication → SMTP, e.g. Resend) before inviting a cohort.

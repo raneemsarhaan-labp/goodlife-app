@@ -57,6 +57,17 @@ try {
   if (await apply("content.sql", readFileSync(path.join(root, "supabase", "content.sql"), "utf8"))) applied++;
   console.log(`[migrate] ${applied} applied, ${files.length + 1 - applied} already in place.`);
 
+  // Accounts created before joining confirmed the address up front were left unconfirmed, and
+  // Supabase answers a sign-in request for those with a "confirm your signup" link, not the code.
+  // Every app member joined with an invitation code, so their addresses are confirmed here.
+  try {
+    const fixed = await sql`update auth.users set email_confirmed_at = now()
+                            where email_confirmed_at is null and id in (select id from public.users)`;
+    if (fixed.count) console.log(`[migrate] confirmed ${fixed.count} member email(s).`);
+  } catch (error) {
+    console.warn("[migrate] could not confirm member emails:", error.message);
+  }
+
   const email = process.env.BOOTSTRAP_ADMIN_EMAIL?.trim().toLowerCase();
   const [{ admins }] = await sql`select count(*)::int as admins from public.user_roles where role = 'admin'`;
   if (email && admins === 0) {

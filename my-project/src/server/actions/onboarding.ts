@@ -36,7 +36,10 @@ export async function pendingJoinCode(): Promise<string | null> {
 }
 
 /** Step 2: create the account (contracts/server-actions.md › completeJoin) and send the sign-in code. */
-export async function completeJoin(_prev: FormState<{ email: string }>, formData: FormData): Promise<FormState<{ email: string }>> {
+export async function completeJoin(
+  _prev: FormState<{ email: string; signedIn: boolean }>,
+  formData: FormData,
+): Promise<FormState<{ email: string; signedIn: boolean }>> {
   const code = await pendingJoinCode();
   if (!code) return fail("code_invalid");
   const parsed = profileSchema.safeParse({
@@ -54,8 +57,10 @@ export async function completeJoin(_prev: FormState<{ email: string }>, formData
   const result = await runCompleteJoin(
     {
       checkCode: async (c) => supabase.rpc("check_invitation", { p_code: c }),
+      // Confirmed at creation: an unconfirmed address makes Supabase send its "confirm your signup"
+      // link instead of the 6-digit sign-in code (hosted projects confirm emails by default).
       createAuthUser: async (email) => {
-        const { data, error } = await admin.auth.admin.createUser({ email, email_confirm: false });
+        const { data, error } = await admin.auth.admin.createUser({ email, email_confirm: true });
         if (error || !data.user) {
           return { error: error?.code === "email_exists" || error?.status === 422 ? "conflict" : "other" };
         }
@@ -76,6 +81,17 @@ export async function completeJoin(_prev: FormState<{ email: string }>, formData
         const { error } = await admin.auth.admin.deleteUser(id);
         if (error) log.error("join: failed to delete orphaned auth user", { code: error.code });
       },
+      startSession: async (email) => {
+        // A one-time token minted server-side and redeemed at once: no email involved.
+        const { data, error } = await admin.auth.admin.generateLink({ type: "magiclink", email });
+        if (error || !data.properties?.hashed_token) {
+          log.warn("join: could not mint a session token", { code: error?.code });
+          return false;
+        }
+        const verified = await supabase.auth.verifyOtp({ type: "email", token_hash: data.properties.hashed_token });
+        if (verified.error) log.warn("join: could not open the session", { code: verified.error.code });
+        return !verified.error;
+      },
       sendSignInCode: async (email) => {
         const { error } = await supabase.auth.signInWithOtp({ email, options: { shouldCreateUser: false } });
         if (error) log.warn("join: sending sign-in code failed", { code: error.code });
@@ -85,6 +101,7 @@ export async function completeJoin(_prev: FormState<{ email: string }>, formData
     parsed.data,
   );
   if (result.ok) (await cookies()).delete({ name: JOIN_COOKIE, path: "/join" });
+  if (result.ok && result.data.signedIn) redirect("/welcome");
   return result;
 }
 
