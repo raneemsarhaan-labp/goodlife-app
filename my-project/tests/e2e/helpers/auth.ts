@@ -42,8 +42,12 @@ export async function joinNewMember(page: Page, email = `e2e-${Date.now()}-${Mat
   await expect(page).toHaveURL("/join/profile");
   await page.getByLabel("الاسم الكامل").fill("مشارك الاختبار");
   await page.getByLabel("البريد الإلكتروني").fill(email);
-  // Joining signs the member in directly: no email round trip.
+  // The membership is created only after the code emailed to that address is entered.
+  const since = new Date(Date.now() - 1000);
   await page.getByRole("button", { name: "أنشئ حسابي" }).click();
+  const code = await latestSignInCode(email, since);
+  await page.getByLabel("رمز الدخول").fill(code);
+  await page.getByRole("button", { name: "دخول" }).click();
   await expect(page).toHaveURL("/welcome");
   return email;
 }

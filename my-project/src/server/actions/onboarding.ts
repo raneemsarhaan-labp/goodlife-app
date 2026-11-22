@@ -8,6 +8,7 @@ import { createAdminClient } from "@/lib/supabase/admin";
 import { createClient } from "@/lib/supabase/server";
 import { emailSchema, invitationCodeSchema, otpSchema, profileSchema } from "@/lib/validation/onboarding";
 import { runCompleteJoin } from "@/server/join";
+import { finishPendingJoin, savePendingJoin } from "@/server/join-session";
 import { fail, fromDbError, ok, type Result } from "./result";
 
 const JOIN_COOKIE = "gl_join_code";
@@ -36,11 +37,12 @@ export async function pendingJoinCode(): Promise<string | null> {
   return (await cookies()).get(JOIN_COOKIE)?.value ?? null;
 }
 
-/** Step 2: create the account (contracts/server-actions.md › completeJoin) and send the sign-in code. */
-export async function completeJoin(
-  _prev: FormState<{ email: string; signedIn: boolean }>,
-  formData: FormData,
-): Promise<FormState<{ email: string; signedIn: boolean }>> {
+/**
+ * Step 2 (contracts/server-actions.md › completeJoin): check everything and email the 6-digit code.
+ * Membership is created only after that code is entered (verifySignInCode → finishPendingJoin), so
+ * joining proves the email belongs to the person joining.
+ */
+export async function completeJoin(_prev: FormState<{ email: string }>, formData: FormData): Promise<FormState<{ email: string }>> {
   const code = await pendingJoinCode();
   if (!code) return fail("code_invalid");
   const parsed = profileSchema.safeParse({
@@ -55,44 +57,22 @@ export async function completeJoin(
 
   const supabase = await createClient();
   const admin = createAdminClient();
-  const result = await runCompleteJoin(
+  return runCompleteJoin(
     {
       checkCode: async (c) => supabase.rpc("check_invitation", { p_code: c }),
-      // Confirmed at creation: an unconfirmed address makes Supabase send its "confirm your signup"
-      // link instead of the 6-digit sign-in code (hosted projects confirm emails by default).
+      memberExists: async (email) => {
+        const { data } = await admin.from("users").select("id").eq("email", email.toLowerCase()).maybeSingle();
+        return Boolean(data);
+      },
+      // A login with no membership yet. Confirmed at creation, because Supabase answers an
+      // unconfirmed address with its "confirm your signup" link instead of the sign-in code; the
+      // address is proven when the code is entered, before any membership exists.
       createAuthUser: async (email) => {
         const { data, error } = await admin.auth.admin.createUser({ email, email_confirm: true });
-        if (error || !data.user) {
-          return { error: error?.code === "email_exists" || error?.status === 422 ? "conflict" : "other" };
-        }
+        if (error || !data.user) return { error: error?.code === "email_exists" || error?.status === 422 ? "exists" : "other" };
         return { id: data.user.id };
       },
-      redeem: async (c, authUserId, p) =>
-        admin.rpc("redeem_invitation", {
-          p_code: c,
-          p_auth_user: authUserId,
-          p_full_name: p.fullName,
-          p_email: p.email,
-          p_time_zone: p.timeZone,
-          p_phone: p.phone,
-          p_gender: p.gender,
-          p_city: p.city,
-        }),
-      deleteAuthUser: async (id) => {
-        const { error } = await admin.auth.admin.deleteUser(id);
-        if (error) log.error("join: failed to delete orphaned auth user", { code: error.code });
-      },
-      startSession: async (email) => {
-        // A one-time token minted server-side and redeemed at once: no email involved.
-        const { data, error } = await admin.auth.admin.generateLink({ type: "magiclink", email });
-        if (error || !data.properties?.hashed_token) {
-          log.warn("join: could not mint a session token", { code: error?.code });
-          return false;
-        }
-        const verified = await supabase.auth.verifyOtp({ type: "email", token_hash: data.properties.hashed_token });
-        if (verified.error) log.warn("join: could not open the session", { code: verified.error.code });
-        return !verified.error;
-      },
+      savePending: savePendingJoin,
       sendSignInCode: async (email) => {
         const { error } = await supabase.auth.signInWithOtp({ email, options: { shouldCreateUser: false, emailRedirectTo: await confirmUrl() } });
         if (error) log.warn("join: sending sign-in code failed", { code: error.code });
@@ -101,9 +81,6 @@ export async function completeJoin(
     code,
     parsed.data,
   );
-  if (result.ok) (await cookies()).delete({ name: JOIN_COOKIE, path: "/join" });
-  if (result.ok && result.data.signedIn) redirect("/welcome");
-  return result;
 }
 
 /** Where the email's sign-in link should land (when the email template carries a link, not the code). */
@@ -135,7 +112,12 @@ export async function verifySignInCode(_prev: FormState, formData: FormData): Pr
   const supabase = await createClient();
   const { error } = await supabase.auth.verifyOtp({ email: email.data, token: token.data, type: "email" });
   if (error) return fail("invalid_input", "token");
-  redirect(formData.get("next") === "welcome" ? "/welcome" : "/");
+  const joined = await finishPendingJoin();
+  if (!joined.ok) {
+    await supabase.auth.signOut();
+    return joined;
+  }
+  redirect(joined.data === "joined" || formData.get("next") === "welcome" ? "/welcome" : "/");
 }
 
 export async function signOut(): Promise<void> {

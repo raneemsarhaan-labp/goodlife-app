@@ -1,58 +1,72 @@
 import { describe, expect, it, vi } from "vitest";
-import { runCompleteJoin, type JoinDeps } from "@/server/join";
+import { runCompleteJoin, runFinishJoin, type FinishJoinDeps, type JoinDeps } from "@/server/join";
 
 const profile = { fullName: "عضو جديد", email: "new@example.test", timeZone: "Asia/Riyadh" };
 
 function deps(overrides: Partial<JoinDeps> = {}): JoinDeps {
   return {
     checkCode: vi.fn().mockResolvedValue({ error: null }),
+    memberExists: vi.fn().mockResolvedValue(false),
     createAuthUser: vi.fn().mockResolvedValue({ id: "auth-1" }),
-    redeem: vi.fn().mockResolvedValue({ error: null }),
-    deleteAuthUser: vi.fn().mockResolvedValue(undefined),
-    startSession: vi.fn().mockResolvedValue(true),
+    savePending: vi.fn().mockResolvedValue(undefined),
     sendSignInCode: vi.fn().mockResolvedValue(undefined),
     ...overrides,
   };
 }
 
 describe("runCompleteJoin", () => {
-  it("creates the auth user, redeems, and signs the member in without an email", async () => {
+  it("keeps the entry and emails a code, without creating any membership yet", async () => {
     const d = deps();
     const result = await runCompleteJoin(d, "TAYBAH26", profile);
-    expect(result).toEqual({ ok: true, data: { email: profile.email, signedIn: true } });
-    expect(d.redeem).toHaveBeenCalledWith("TAYBAH26", "auth-1", profile);
-    expect(d.startSession).toHaveBeenCalledWith(profile.email);
-    expect(d.sendSignInCode).not.toHaveBeenCalled();
-    expect(d.deleteAuthUser).not.toHaveBeenCalled();
-  });
-
-  it("falls back to emailing a code when the session cannot be opened", async () => {
-    const d = deps({ startSession: vi.fn().mockResolvedValue(false) });
-    const result = await runCompleteJoin(d, "TAYBAH26", profile);
-    expect(result).toEqual({ ok: true, data: { email: profile.email, signedIn: false } });
+    expect(result).toEqual({ ok: true, data: { email: profile.email } });
+    expect(d.savePending).toHaveBeenCalledWith({ code: "TAYBAH26", profile });
     expect(d.sendSignInCode).toHaveBeenCalledWith(profile.email);
   });
 
-  it("deletes the auth user when redemption fails (no orphaned account)", async () => {
-    const d = deps({ redeem: vi.fn().mockResolvedValue({ error: { code: "P0001", message: "code_used_up" } }) });
-    const result = await runCompleteJoin(d, "TAYBAH26", profile);
-    expect(result).toEqual({ ok: false, error: "code_used_up", field: undefined });
-    expect(d.deleteAuthUser).toHaveBeenCalledWith("auth-1");
-    expect(d.startSession).not.toHaveBeenCalled();
+  it("carries on when a login (without membership) already exists for the email", async () => {
+    const d = deps({ createAuthUser: vi.fn().mockResolvedValue({ error: "exists" }) });
+    expect(await runCompleteJoin(d, "TAYBAH26", profile)).toMatchObject({ ok: true });
+    expect(d.sendSignInCode).toHaveBeenCalled();
+  });
+
+  it("refuses an email that already belongs to a member", async () => {
+    const d = deps({ memberExists: vi.fn().mockResolvedValue(true) });
+    expect(await runCompleteJoin(d, "TAYBAH26", profile)).toEqual({ ok: false, error: "conflict", field: "email" });
+    expect(d.createAuthUser).not.toHaveBeenCalled();
     expect(d.sendSignInCode).not.toHaveBeenCalled();
   });
 
-  it("stops before creating anything when the code is no longer valid", async () => {
+  it("stops before anything when the code is no longer valid", async () => {
     const d = deps({ checkCode: vi.fn().mockResolvedValue({ error: { code: "P0001", message: "code_expired" } }) });
-    const result = await runCompleteJoin(d, "TAYBAH26", profile);
-    expect(result).toMatchObject({ ok: false, error: "code_expired" });
+    expect(await runCompleteJoin(d, "TAYBAH26", profile)).toMatchObject({ ok: false, error: "code_expired" });
     expect(d.createAuthUser).not.toHaveBeenCalled();
   });
+});
 
-  it("reports an existing email as a conflict on the email field", async () => {
-    const d = deps({ createAuthUser: vi.fn().mockResolvedValue({ error: "conflict" }) });
-    const result = await runCompleteJoin(d, "TAYBAH26", profile);
-    expect(result).toEqual({ ok: false, error: "conflict", field: "email" });
+describe("runFinishJoin", () => {
+  const finish = (overrides: Partial<FinishJoinDeps> = {}): FinishJoinDeps => ({
+    redeem: vi.fn().mockResolvedValue({ error: null }),
+    clearPending: vi.fn().mockResolvedValue(undefined),
+    ...overrides,
+  });
+  const pending = { code: "TAYBAH26", profile };
+
+  it("redeems the invitation for the account that verified the email", async () => {
+    const d = finish();
+    expect(await runFinishJoin(d, pending, { id: "auth-1", email: "NEW@example.test" })).toEqual({ ok: true, data: null });
+    expect(d.redeem).toHaveBeenCalledWith("TAYBAH26", "auth-1", profile);
+    expect(d.clearPending).toHaveBeenCalled();
+  });
+
+  it("refuses when the verified email is not the one entered", async () => {
+    const d = finish();
+    expect(await runFinishJoin(d, pending, { id: "auth-2", email: "other@example.test" })).toMatchObject({ ok: false, error: "forbidden" });
     expect(d.redeem).not.toHaveBeenCalled();
+  });
+
+  it("reports a code that expired meanwhile", async () => {
+    const d = finish({ redeem: vi.fn().mockResolvedValue({ error: { code: "P0001", message: "code_expired" } }) });
+    expect(await runFinishJoin(d, pending, { id: "auth-1", email: profile.email })).toMatchObject({ ok: false, error: "code_expired" });
+    expect(d.clearPending).not.toHaveBeenCalled();
   });
 });

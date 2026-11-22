@@ -10,9 +10,9 @@ export default async function SignInPage({ searchParams }: { searchParams: Promi
   const { link } = await searchParams;
   return (
     <main id="main" className="flex flex-col gap-6">
-      {link === "expired" && (
+      {(link === "expired" || link === "join_failed") && (
         <p role="alert" className="rounded-2xl bg-dawn-50 p-4 text-ink-900">
-          {t("linkExpired")}
+          {t(link === "expired" ? "linkExpired" : "joinFailed")}
         </p>
       )}
       <SignInForm />

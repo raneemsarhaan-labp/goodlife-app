@@ -5,10 +5,12 @@ import { useActionState } from "react";
 import { Button } from "@/components/ui/Button";
 import { Field } from "@/components/ui/Field";
 import { requestSignInCode, verifySignInCode } from "@/server/actions/onboarding";
+import { useErrorText } from "./useErrorText";
 
 /** Enter the 6-digit code sent by email. Accepts Arabic-Indic digits. */
 export function OtpForm({ email, next, onBack }: { email: string; next?: "welcome"; onBack?: () => void }) {
   const t = useTranslations("signIn");
+  const errorText = useErrorText();
   const [state, action, pending] = useActionState(verifySignInCode, null);
   const [resent, resend, resending] = useActionState(requestSignInCode, null);
   return (
@@ -21,7 +23,7 @@ export function OtpForm({ email, next, onBack }: { email: string; next?: "welcom
         <Field
           name="token"
           label={t("code")}
-          error={state && !state.ok ? t("wrongCode") : undefined}
+          error={state && !state.ok ? (state.error === "invalid_input" ? t("wrongCode") : errorText(state.error)) : undefined}
           inputMode="numeric"
           autoComplete="one-time-code"
           dir="ltr"

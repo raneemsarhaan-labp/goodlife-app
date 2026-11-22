@@ -1,12 +1,12 @@
 import { expect, test } from "@playwright/test";
 import { checkA11y } from "./helpers/axe";
-import { addOwnHabit } from "./helpers/auth";
+import { latestSignInCode, addOwnHabit } from "./helpers/auth";
 
 // quickstart.md scenario 1 (US1). Requires `supabase start` + `supabase db reset` (seed).
 test("join with a code and live a full day on «يومك»", async ({ page }) => {
   const email = `e2e-${Date.now()}@example.test`;
 
-  // Join: code → personal data → welcome (signed in, no email code).
+  // Join: code → personal data → 6-digit code → welcome.
   await page.goto("/join");
   await checkA11y(page);
   await page.getByLabel("رمز الدعوة").fill("taybah26");
@@ -17,8 +17,12 @@ test("join with a code and live a full day on «يومك»", async ({ page }) =>
 
   await page.getByLabel("الاسم الكامل").fill("مشارك الاختبار");
   await page.getByLabel("البريد الإلكتروني").fill(email);
-  // Joining signs the member in directly: no email round trip.
+  // The membership is created only after the code emailed to that address is entered.
+  const since = new Date(Date.now() - 1000);
   await page.getByRole("button", { name: "أنشئ حسابي" }).click();
+  const code = await latestSignInCode(email, since);
+  await page.getByLabel("رمز الدخول").fill(code);
+  await page.getByRole("button", { name: "دخول" }).click();
   await expect(page).toHaveURL("/welcome");
   await checkA11y(page);
   await page.getByRole("link", { name: "ابدأ رحلتك" }).click();
