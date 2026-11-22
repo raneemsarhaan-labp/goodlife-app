@@ -8,6 +8,8 @@ import { useOutbox } from "@/components/features/today/useOutbox";
 import { formatFraction, formatNumber } from "@/lib/format";
 import { weekdayOf, type TimeOfDay } from "@/lib/days";
 import { habitIcon, icon } from "@/ui/icons";
+import { usePrivateNames } from "@/components/features/habits/HabitName";
+import { displayName } from "@/lib/private-habits";
 import { GlassCard } from "./GlassCard";
 
 export type WeekDay = { date: string; scheduled: boolean; done: boolean };
@@ -24,6 +26,8 @@ export type RowHabit = {
   time_of_day?: TimeOfDay;
   week?: WeekDay[];
   week_scheduled?: number;
+  is_private?: boolean;
+  challenge?: { id: string; title: string; day: number; days: number } | null;
 };
 
 const GROUPS: TimeOfDay[] = ["morning", "noon", "evening", "any"];
@@ -49,6 +53,9 @@ export function HabitRow({
   const tt = useTranslations("times");
   const tw = useTranslations("weekdays");
   const tws = useTranslations("weekdaysShort");
+  const tg = useTranslations("groupChallenge");
+  const privateNames = usePrivateNames();
+  const nameOf = (h: RowHabit) => displayName(h.id, h.name, Boolean(h.is_private), privateNames);
   const te = useTranslations("errors");
   const [message, setMessage] = useState<string | null>(null);
   const { submit, pendingIds } = useOutbox({ onDropped: () => setMessage(t("dropped")) });
@@ -84,7 +91,7 @@ export function HabitRow({
                   <button
                     type="button"
                     aria-pressed={Boolean(done[h.id])}
-                    aria-label={h.name}
+                    aria-label={nameOf(h)}
                     onClick={() => void toggle(h)}
                     className={`relative flex size-14 items-center justify-center rounded-full border-2 transition-colors ${
                       done[h.id] ? "border-gold-500 bg-gold-100" : "border-transparent bg-sage-100"
@@ -97,7 +104,12 @@ export function HabitRow({
                       </span>
                     )}
                   </button>
-                  <span aria-hidden="true" className="text-xs font-semibold leading-tight text-ink-900">{h.name}</span>
+                  <span aria-hidden="true" className="text-xs font-semibold leading-tight text-ink-900">{nameOf(h)}</span>
+                  {h.challenge && (
+                    <span className="rounded-full bg-dawn-50 px-1.5 text-[0.6rem] font-semibold text-ink-900">
+                      {tg("flag", { day: formatNumber(h.challenge.day), days: formatNumber(h.challenge.days) })}
+                    </span>
+                  )}
                   {pendingIds.has(h.id) && <span className="text-[0.65rem] text-dawn-700">{t("pending")}</span>}
                 </li>
               ))}
@@ -118,7 +130,7 @@ export function HabitRow({
                 <IonItem key={h.id} className="[--background:transparent]">
                   <IonIcon slot="start" icon={habitIcon(h.icon)} aria-hidden="true" />
                   <IonLabel className="whitespace-normal">
-                    <h3 className="font-semibold">{h.name}</h3>
+                    <h3 className="font-semibold">{nameOf(h)}</h3>
                     {h.amount && <p>{t("amountLabel", { amount: h.amount })}</p>}
                     {h.description && <p>{h.description}</p>}
                     {week.length > 0 && (

@@ -19,6 +19,7 @@ export type ActivityDraft = {
   capacity?: number | null;
   mode?: "in_person" | "online";
   meetingUrl?: string;
+  presenter?: string | null;
 };
 
 type SessionRow = { key: number; startsAt: string; endsAt: string };
@@ -55,6 +56,7 @@ export function ActivityForm({
       {draft.id && <input type="hidden" name="id" value={draft.id} />}
       <Field name="title" label={t("fieldTitle")} defaultValue={draft.title} required minLength={2} maxLength={120} />
       <TextArea name="description" label={t("description")} defaultValue={draft.description ?? ""} maxLength={2000} />
+      <Field name="presenter" label={t("presenter")} defaultValue={draft.presenter ?? ""} maxLength={120} />
       <fieldset className="flex flex-col gap-3">
         <legend className="mb-1 font-medium">{t("sessionsTitle")}</legend>
         <p className="text-sm text-ink-500">{t("sessionsHint")} {t("timeZoneNote", { tz: timeZone })}</p>

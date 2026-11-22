@@ -38,6 +38,7 @@ export async function saveActivity(_prev: Result<{ id: string }> | null, formDat
     p_capacity: a.capacity,
     p_mode: a.mode,
     p_meeting_url: a.mode === "online" ? (a.meetingUrl ?? "") : "",
+    p_presenter: a.presenter ?? "",
   });
   if (error) return fromDbError(error);
   revalidatePath("/admin/activities");

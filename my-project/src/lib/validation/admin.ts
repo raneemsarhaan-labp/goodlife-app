@@ -119,3 +119,26 @@ export const libraryChallengeSchema = z.object({
   sortOrder: z.coerce.number().int().min(0).max(999).default(0),
   active: z.preprocess((v) => v === "on" || v === "true" || v === true, z.boolean()),
 });
+
+// data-model (spec 007) group_challenges: title ≤ 120, description ≤ 1000, habit_name ≤ 80, amount ≤ 60,
+// starts_on, duration_days 3–90, audience = one cohort or one group.
+export const groupChallengeSchema = z.object({
+  id: z.preprocess(emptyToUndefined, uuidSchema.optional()),
+  title: z.string().trim().min(2).max(120),
+  description: z.preprocess(emptyToUndefined, z.string().trim().max(1000).optional()),
+  domainId: z.preprocess(emptyToUndefined, uuidSchema.optional()),
+  habitName: z.string().trim().min(1).max(80),
+  amount: z.preprocess(emptyToUndefined, z.string().trim().max(60).optional()),
+  startsOn: localDateSchema,
+  durationDays: z.coerce.number().int().min(3).max(90),
+  audience: z.string().regex(/^(cohort|group):[0-9a-f-]{36}$/),
+});
+
+// data-model (spec 007) groups.status, groups.features
+export const groupSettingsSchema = z.object({
+  groupId: uuidSchema,
+  status: z.enum(["open", "closed"]),
+  sharing: z.preprocess((v) => v === "on", z.boolean()),
+  encouragement: z.preprocess((v) => v === "on", z.boolean()),
+  challenges: z.preprocess((v) => v === "on", z.boolean()),
+});

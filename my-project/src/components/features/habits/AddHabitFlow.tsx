@@ -9,6 +9,8 @@ import type { LibraryHabit, LifeDomain, PlanDomain } from "@/server/queries/doma
 import { habitIcon } from "@/ui/icons";
 import { DaysPicker } from "./DaysPicker";
 import { DOMAIN_TINT } from "./domainStyle";
+import { savePrivateName } from "@/lib/private-habits";
+import { SharingSwitches } from "./SharingSwitches";
 import { TimeOfDayPicker } from "./TimeOfDayPicker";
 
 type Step = 1 | 2 | 3;
@@ -47,6 +49,8 @@ export function AddHabitFlow({
   const [amount, setAmount] = useState("");
   const [time, setTime] = useState<TimeOfDay>("any");
   const [days, setDays] = useState(ALL_DAYS);
+  const [privacy, setPrivacy] = useState({ shared: false, isPrivate: false });
+  const [clientId, setClientId] = useState<string | null>(null);
   const [notice, setNotice] = useState<string | null>(null);
   const [planBusy, startPlan] = useTransition();
   const heading = useRef<HTMLHeadingElement>(null);
@@ -134,7 +138,14 @@ export function AddHabitFlow({
   };
 
   return (
-    <form action={dispatch} className="flex flex-col gap-5">
+    <form
+      action={dispatch}
+      onSubmit={() => {
+        // «عادة خاصّة»: keep the real name on this device before the placeholder is sent.
+        if (privacy.isPrivate && clientId) savePrivateName(clientId, name);
+      }}
+      className="flex flex-col gap-5"
+    >
       {/* Every choice travels as a hidden field; only step 3 submits. */}
       <input type="hidden" name="name" value={name} />
       <input type="hidden" name="description" value={choice?.kind === "own" ? ownDescription : ""} />
@@ -244,6 +255,15 @@ export function AddHabitFlow({
             <input key={d} type="hidden" name="days" value={d} />
           ))}
           <input type="hidden" name="timeOfDay" value={time} />
+          <SharingSwitches
+            shared={privacy.shared}
+            isPrivate={privacy.isPrivate}
+            onChange={(next) => {
+              setPrivacy(next);
+              if (next.isPrivate && !clientId) setClientId(crypto.randomUUID());
+            }}
+          />
+          {clientId && <input type="hidden" name="clientId" value={clientId} />}
         </div>
       )}
 

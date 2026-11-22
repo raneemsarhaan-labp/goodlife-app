@@ -1,4 +1,5 @@
 import { pageTitle } from "@/i18n/metadata";
+import { GroupSettingsForm } from "@/components/features/admin/GroupSettingsForm";
 import { getTranslations } from "next-intl/server";
 import { notFound } from "next/navigation";
 import { ActionForm } from "@/components/ui/ActionForm";
@@ -19,7 +20,7 @@ export default async function CohortDetailPage({ params }: { params: Promise<{ i
   const supabase = await createClient();
   const { data: cohort } = await supabase
     .from("cohorts")
-    .select("id, name, start_date, groups(id, name, group_memberships(role, ended_on, users(id, full_name, email)))")
+    .select("id, name, start_date, groups(id, name, status, features, group_memberships(role, ended_on, users(id, full_name, email)))")
     .eq("id", id)
     .maybeSingle();
   if (!cohort) notFound();
@@ -49,6 +50,7 @@ export default async function CohortDetailPage({ params }: { params: Promise<{ i
         return (
           <Card key={g.id} aria-labelledby={`group-${g.id}`} className="flex flex-col gap-5">
             <CardTitle id={`group-${g.id}`}>{g.name}</CardTitle>
+            <GroupSettingsForm groupId={g.id} status={g.status} features={g.features as Record<string, boolean>} />
 
             <section className="flex flex-col gap-2">
               <h3 className="font-medium">{t("groups.facilitators")}</h3>

@@ -16,6 +16,10 @@ export type TodayHabit = {
   domain_id?: string | null;
   week?: { date: string; scheduled: boolean; done: boolean }[];
   week_scheduled?: number;
+  /** Spec 007 */
+  shared?: boolean;
+  is_private?: boolean;
+  challenge?: { id: string; title: string; day: number; days: number } | null;
 };
 export type TodayChallenge = { id: string; text: string; done: boolean };
 export type TodayActivity = {

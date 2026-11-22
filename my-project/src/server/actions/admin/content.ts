@@ -2,7 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
-import { closingMessageSchema, encouragementPhraseSchema, journeyChallengeSchema, libraryChallengeSchema, libraryHabitSchema, lifeDomainSchema, quoteSchema, reviewQuestionSchema } from "@/lib/validation/admin";
+import { closingMessageSchema, encouragementPhraseSchema, groupChallengeSchema, journeyChallengeSchema, libraryChallengeSchema, libraryHabitSchema, lifeDomainSchema, quoteSchema, reviewQuestionSchema } from "@/lib/validation/admin";
 import { fail, fromDbError, ok, type Result } from "../result";
 import { currentAdmin, firstIssuePath, formObject } from "./guard";
 
@@ -120,4 +120,36 @@ export async function upsertLibraryChallenge(_prev: State, formData: FormData): 
   revalidatePath("/admin/content");
   revalidatePath("/");
   return ok(null);
+}
+
+/** Creates or edits a group challenge (spec 007 FR-003). */
+export async function saveGroupChallenge(_prev: State, formData: FormData): Promise<State> {
+  const admin = await currentAdmin();
+  if (!admin) return fail("forbidden");
+  const parsed = groupChallengeSchema.safeParse(formObject(formData));
+  if (!parsed.success) return fail("invalid_input", firstIssuePath(parsed.error));
+  const d = parsed.data;
+  const [kind, target] = d.audience.split(":") as ["cohort" | "group", string];
+  const row = {
+    title: d.title, description: d.description ?? null, domain_id: d.domainId ?? null, habit_name: d.habitName,
+    amount: d.amount ?? null, starts_on: d.startsOn, duration_days: d.durationDays,
+    cohort_id: kind === "cohort" ? target : null, group_id: kind === "group" ? target : null,
+  };
+  const supabase = await createClient();
+  const { error } = d.id
+    ? await supabase.from("group_challenges").update(row).eq("id", d.id)
+    : await supabase.from("group_challenges").insert({ ...row, created_by: admin.id });
+  if (error) return fromDbError(error);
+  revalidatePath("/admin/challenges");
+  revalidatePath("/stats/challenge");
+  return ok(null);
+}
+
+export async function cancelGroupChallenge(formData: FormData): Promise<void> {
+  if (!(await currentAdmin())) return;
+  const id = String(formData.get("id") ?? "");
+  const supabase = await createClient();
+  await supabase.from("group_challenges").update({ cancelled_at: new Date().toISOString() }).eq("id", id);
+  revalidatePath("/admin/challenges");
+  revalidatePath("/stats/challenge");
 }

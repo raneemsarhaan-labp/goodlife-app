@@ -27,6 +27,8 @@ export const registrationSettingsSchema = z.object({
   capacity: z.preprocess(emptyToUndefined, z.coerce.number().int().min(1).max(1000).optional()),
   mode: z.enum(["in_person", "online"]).default("in_person"),
   meetingUrl: z.preprocess(emptyToUndefined, z.string().trim().url().startsWith("https://").max(500).optional()),
+  // Spec 007: activities.presenter (≤ 120)
+  presenter: z.preprocess(emptyToUndefined, z.string().trim().max(120).optional()),
 });
 
 export const activityIdSchema = uuidSchema;

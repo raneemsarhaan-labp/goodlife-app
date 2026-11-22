@@ -2,7 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
-import { cohortSchema, groupSchema, personInGroupSchema, userInGroupSchema } from "@/lib/validation/admin";
+import { cohortSchema, groupSchema, personInGroupSchema, userInGroupSchema, groupSettingsSchema } from "@/lib/validation/admin";
 import { emailSchema } from "@/lib/validation/onboarding";
 import { uuidSchema } from "@/lib/validation/common";
 import { fail, fromDbError, ok, type Result } from "../result";
@@ -109,4 +109,19 @@ export async function revokeAdmin(formData: FormData): Promise<void> {
   const supabase = await createClient();
   await supabase.rpc("revoke_admin", { p_user: userId.data });
   revalidatePath("/admin", "layout");
+}
+
+/** Group status and the tools its members see (spec 007 FR-007). Closed groups reject codes (SQL). */
+export async function saveGroupSettings(_prev: State, formData: FormData): Promise<State> {
+  if (!(await currentAdmin())) return fail("forbidden");
+  const parsed = groupSettingsSchema.safeParse(formObject(formData));
+  if (!parsed.success) return fail("invalid_input", firstIssuePath(parsed.error));
+  const { groupId, status, sharing, encouragement, challenges } = parsed.data;
+  const supabase = await createClient();
+  const { error } = await supabase.from("groups").update({ status, features: { sharing, encouragement, challenges } }).eq("id", groupId);
+  if (error) return fromDbError(error);
+  revalidatePath("/admin/cohorts", "layout");
+  revalidatePath("/community");
+  revalidatePath("/stats", "layout");
+  return ok(null);
 }

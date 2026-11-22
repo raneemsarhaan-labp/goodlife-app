@@ -13,6 +13,7 @@ export type ActivityWithAudience = {
   cancelled_at: string | null;
   created_by: string | null;
   registration_open: boolean;
+  presenter: string | null;
   capacity: number | null;
   mode: "in_person" | "online";
   activity_sessions: { starts_at: string; ends_at: string | null }[];
@@ -25,7 +26,7 @@ export async function listActivities(groupIds?: string[]): Promise<ActivityWithA
   const supabase = await createClient();
   const { data } = await supabase
     .from("activities")
-    .select("id, title, description, starts_at, ends_at, location, cancelled_at, created_by, registration_open, capacity, mode, activity_sessions(starts_at, ends_at), activity_links(meeting_url), activity_audiences(cohort_id, group_id, cohorts(name), groups(name))")
+    .select("id, title, description, starts_at, ends_at, location, cancelled_at, created_by, registration_open, presenter, capacity, mode, activity_sessions(starts_at, ends_at), activity_links(meeting_url), activity_audiences(cohort_id, group_id, cohorts(name), groups(name))")
     .order("starts_at", { ascending: false })
     .limit(200);
   const rows = (data ?? []) as unknown as ActivityWithAudience[];
@@ -42,6 +43,7 @@ export function toDraft(a: ActivityWithAudience, timeZone: string): ActivityDraf
       .map((s) => ({ startsAt: utcToZonedLocal(s.starts_at, timeZone), endsAt: s.ends_at ? utcToZonedLocal(s.ends_at, timeZone) : "" })),
     location: a.location,
     registrationOpen: a.registration_open,
+    presenter: a.presenter,
     capacity: a.capacity,
     mode: a.mode,
     meetingUrl: a.activity_links?.meeting_url ?? "",

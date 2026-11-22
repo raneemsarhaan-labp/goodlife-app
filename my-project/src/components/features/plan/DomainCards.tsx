@@ -8,6 +8,7 @@ import type { LifeDomain } from "@/server/queries/domains";
 import type { FocusArea, PlanHabit } from "@/server/queries/plan";
 import { habitIcon } from "@/ui/icons";
 import { DOMAIN_TINT } from "../habits/domainStyle";
+import { HabitName } from "../habits/HabitName";
 
 /**
  * «مجالات عملي هذه السنة» (spec 005 US1): up to three domain cards with habit counts; each opens to
@@ -56,7 +57,7 @@ export async function DomainCards({ areas, habits, domains }: { areas: FocusArea
                     {own.map((h) => (
                       <li key={h.id}>
                         <Link href={`/habits/${h.id}`} className="inline-flex min-h-11 items-center text-ink-900 underline underline-offset-4">
-                          {h.name}
+                          <HabitName id={h.id} name={h.name} isPrivate={h.is_private} />
                         </Link>
                       </li>
                     ))}

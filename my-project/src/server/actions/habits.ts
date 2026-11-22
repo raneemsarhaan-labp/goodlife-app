@@ -6,6 +6,7 @@ import { createClient } from "@/lib/supabase/server";
 import { emptyToUndefined, uuidSchema } from "@/lib/validation/common";
 import { habitEditSchema, orderSchema } from "@/lib/validation/plan";
 import { habitShapeSchema } from "@/lib/validation/habits";
+import { PRIVATE_PLACEHOLDER } from "@/lib/private-habits";
 import { habitSchema } from "@/lib/validation/today";
 import { formObject, firstIssuePath } from "./admin/guard";
 import { fail, fromDbError, ok, type Result } from "./result";
@@ -39,10 +40,16 @@ export async function createHabit(_prev: State, formData: FormData): Promise<Sta
       ? supabase.from("focus_areas").select("id").eq("plan_id", planId).eq("domain_id", shape.data.domainId).maybeSingle()
       : Promise.resolve({ data: null }),
   ]);
+  // «عادة خاصّة»: the server never stores the real name (spec 007 FR-006); the client may choose the id
+  // so it can keep the name on the device.
+  const clientId = uuidSchema.optional().safeParse(emptyToUndefined(formData.get("clientId")));
   const { error } = await supabase.from("habits").insert({
+    ...(shape.data.isPrivate && clientId.success && clientId.data ? { id: clientId.data } : {}),
     plan_id: planId,
-    name: parsed.data.name,
-    description: parsed.data.description ?? null,
+    name: shape.data.isPrivate ? PRIVATE_PLACEHOLDER : parsed.data.name,
+    shared_with_group: shape.data.shared && !shape.data.isPrivate,
+    is_private: shape.data.isPrivate,
+    description: shape.data.isPrivate ? null : (parsed.data.description ?? null),
     icon: shape.data.icon ?? null,
     domain_id: shape.data.domainId ?? null,
     library_habit_id: shape.data.libraryHabitId ?? null,
@@ -102,8 +109,11 @@ export async function updateHabit(_prev: State, formData: FormData): Promise<Sta
   const { data, error } = await supabase
     .from("habits")
     .update({
-      name: parsed.data.name,
-      description: parsed.data.description ?? null,
+      // A private habit keeps the placeholder on the server (spec 007 FR-006).
+      name: shape.data.isPrivate ? PRIVATE_PLACEHOLDER : parsed.data.name,
+      shared_with_group: shape.data.shared && !shape.data.isPrivate,
+      is_private: shape.data.isPrivate,
+      description: shape.data.isPrivate ? null : (parsed.data.description ?? null),
       focus_area_id: focusAreaId,
       domain_id: domainId,
       amount: shape.data.amount ?? null,

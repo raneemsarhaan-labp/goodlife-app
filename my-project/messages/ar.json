@@ -202,7 +202,8 @@
       "activities": "الأنشطة",
       "content": "المحتوى",
       "backToApp": "العودة إلى التطبيق",
-      "resources": "المكتبة"
+      "resources": "المكتبة",
+      "challenges": "التحدّيات الجماعيّة"
     },
     "saved": "تمّ الحفظ.",
     "home": {
@@ -316,7 +317,8 @@
       "registrationOpen": "يحتاج إلى تسجيل",
       "capacity": "عدد المقاعد (اختياري)",
       "registrations": "المسجّلون",
-      "registeredCount": "المسجّلون: {count}"
+      "registeredCount": "المسجّلون: {count}",
+      "presenter": "المُقدِّم (اختياري)"
     },
     "content": {
       "title": "المحتوى",
@@ -434,6 +436,37 @@
       },
       "hasFile": "ملف مرفوع",
       "keepFile": "اترك الملف كما هو إن لم ترفع ملفًا جديدًا."
+    },
+    "challenges": {
+      "title": "التحدّيات الجماعيّة",
+      "intro": "تحدٍّ بعادةٍ ملزِمة لمدّة محدّدة. لا ترتيب بين المشاركين.",
+      "new": "تحدٍّ جديد",
+      "fTitle": "العنوان",
+      "fDescription": "الوصف (اختياري)",
+      "fDomain": "المجال",
+      "fHabit": "العادة الملزِمة",
+      "fAmount": "المقدار الموحّد (اختياري)",
+      "fStarts": "يبدأ في",
+      "fDuration": "المدّة بالأيام",
+      "fAudience": "لمن؟",
+      "save": "احفظ التحدّي",
+      "cancel": "ألغِ التحدّي",
+      "participants": "المنضمّون: {count}",
+      "none": "لا تحدّيات.",
+      "cohort": "الدفعة",
+      "noDomain": "بلا مجال"
+    },
+    "groupSettings": {
+      "title": "إعدادات المجموعة",
+      "status": "حالة المجموعة",
+      "open": "مفتوحة",
+      "closed": "مغلقة",
+      "closedHint": "المغلقة لا تقبل منضمّين جددًا برموز الدعوة.",
+      "tools": "ما يظهر لهم من أدوات التطبيق",
+      "sharing": "مشاركة العادات",
+      "encouragement": "كلمات التشجيع",
+      "challenges": "التحدّيات الجماعيّة",
+      "save": "احفظ"
     }
   },
   "plan": {
@@ -680,7 +713,10 @@
     "reflections": "تأمّلاتي",
     "activity": "النشاط",
     "adminActivity": "المسجّلون في النشاط",
-    "planReview": "مراجعة الخطة"
+    "planReview": "مراجعة الخطة",
+    "statsGroup": "مجموعتي",
+    "statsChallenge": "التحدّي",
+    "adminChallenges": "التحدّيات الجماعيّة"
   },
   "versions": {
     "label": "شكل التطبيق",
@@ -935,5 +971,65 @@
     "areasHabits": "{count, plural, =0 {لا عادة} one {عادة واحدة} two {عادتان} few {{n} عادات} many {{n} عادة} other {{n} عادة}}",
     "areasAverage": "المتوسط: {rate}",
     "areasViews": "طريقة العرض"
+  },
+  "together": {
+    "tabs": {
+      "me": "أنا",
+      "group": "مجموعتي",
+      "challenge": "التحدّي"
+    },
+    "tabsLabel": "أقسام الأثر",
+    "startedTogether": "بدأتم معًا في {date}",
+    "members": "{count, plural, one {مشارك واحد} two {مشاركان} few {{n} مشاركين} many {{n} مشاركًا} other {{n} مشارك}}",
+    "peersTitle": "من يمشي معك على العادة نفسها",
+    "peersEmpty": "لم يشارك أحد في مجموعتك عادةً بعد.",
+    "together": "{n} منكم",
+    "doneToday": "أنجزها اليوم",
+    "notYet": "لم تُنجَز بعد",
+    "you": "أنت",
+    "youShowTitle": "ما تظهره أنت",
+    "youShowNone": "لا تظهر لهم أي عادة. يمكنك مشاركة عادة من تعديلها.",
+    "youShowList": "تظهر لهم: {list}.",
+    "youShowNote": "ولا يرون مجالاتك ولا خطتك ولا ما كتبتَ في وقفات التأمل.",
+    "sharingOff": "المشاركة متوقّفة في هذه المجموعة.",
+    "noGroup": "لست ضمن مجموعة الآن."
+  },
+  "groupChallenge": {
+    "title": "التحدّي الجماعيّ",
+    "none": "لا تحدّي جماعيًّا الآن.",
+    "active": "جارٍ",
+    "upcoming": "تحدٍّ قادم",
+    "dayOf": "اليوم {day} من {days}",
+    "habit": "العادة: {name}",
+    "amount": "المقدار: {amount}",
+    "startsOn": "يبدأ {date} · {days} يومًا",
+    "join": "انضمّ",
+    "withdraw": "انسحب من التحدّي",
+    "withdrawConfirm": "تنسحب من التحدّي؟ تُؤرشف عادته ويبقى سجلّها.",
+    "yourProgress": "حالك في التحدّي",
+    "kept": "{kept} من {possible} أيام مكتملة",
+    "groupProgress": "{done} منكم أتمّوا اليوم · {joined} انضمّوا من مجموعتك",
+    "joined": "انضممتَ. تجد العادة في «يومك».",
+    "withdrawn": "انسحبتَ من التحدّي.",
+    "flag": "تحدّي المجموعة · اليوم {day} من {days}",
+    "off": "التحدّيات متوقّفة في مجموعتك."
+  },
+  "communityList": {
+    "title": "أنشطة قادمة",
+    "intro": "اكتشف وتعلّم وتواصل مع المجتمع.",
+    "count": "{n}",
+    "empty": "لا أنشطة قادمة الآن.",
+    "new": "جديد",
+    "registered": "مسجَّل",
+    "presenter": "المُقدِّم: {name}",
+    "details": "التفاصيل"
+  },
+  "privateHabit": {
+    "shareLabel": "أظهر هذه العادة لمجموعتي",
+    "shareHint": "يرون اسمها وحالها اليوم فقط. الأصل ألّا تُشارَك.",
+    "privateLabel": "عادة خاصّة",
+    "privateHint": "يبقى نصّها على جهازك وحده ولا يُحفظ على الخادم؛ يُحفظ تنفيذها فقط. على جهاز آخر تظهر «عادة خاصّة»، ولا يدخل نصّها في تصدير بياناتك، ويضيع إن مسحتَ بيانات المتصفّح.",
+    "placeholder": "عادة خاصّة",
+    "privacyTitle": "الخصوصيّة"
   }
 }

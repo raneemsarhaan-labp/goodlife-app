@@ -7,14 +7,14 @@ export type Database = {
           Tables: {
             "activities": {
                   Row: {
-                    "cancelled_at": string | null,"capacity": number | null,"created_at": string,"created_by": string | null,"description": string | null,"ends_at": string | null,"id": string,"location": string | null,"mode": Database["public"]['Enums']["activity_mode"],"registration_open": boolean,"starts_at": string,"title": string,"updated_at": string
+                    "cancelled_at": string | null,"capacity": number | null,"created_at": string,"created_by": string | null,"description": string | null,"ends_at": string | null,"id": string,"location": string | null,"mode": Database["public"]['Enums']["activity_mode"],"presenter": string | null,"registration_open": boolean,"starts_at": string,"title": string,"updated_at": string
                   }
                   ComputedFields: never
                   Insert: {
-                    "cancelled_at"?: string | null,"capacity"?: number | null,"created_at"?: string,"created_by"?: string | null,"description"?: string | null,"ends_at"?: string | null,"id"?: string,"location"?: string | null,"mode"?: Database["public"]['Enums']["activity_mode"],"registration_open"?: boolean,"starts_at": string,"title": string,"updated_at"?: string
+                    "cancelled_at"?: string | null,"capacity"?: number | null,"created_at"?: string,"created_by"?: string | null,"description"?: string | null,"ends_at"?: string | null,"id"?: string,"location"?: string | null,"mode"?: Database["public"]['Enums']["activity_mode"],"presenter"?: string | null,"registration_open"?: boolean,"starts_at": string,"title": string,"updated_at"?: string
                   }
                   Update: {
-                    "cancelled_at"?: string | null,"capacity"?: number | null,"created_at"?: string,"created_by"?: string | null,"description"?: string | null,"ends_at"?: string | null,"id"?: string,"location"?: string | null,"mode"?: Database["public"]['Enums']["activity_mode"],"registration_open"?: boolean,"starts_at"?: string,"title"?: string,"updated_at"?: string
+                    "cancelled_at"?: string | null,"capacity"?: number | null,"created_at"?: string,"created_by"?: string | null,"description"?: string | null,"ends_at"?: string | null,"id"?: string,"location"?: string | null,"mode"?: Database["public"]['Enums']["activity_mode"],"presenter"?: string | null,"registration_open"?: boolean,"starts_at"?: string,"title"?: string,"updated_at"?: string
                   }
                   Relationships: [
                     {
@@ -365,6 +365,76 @@ isOneToOne: false
       referencedColumns: ["id"]
     }
                   ]
+                },"group_challenge_participants": {
+                  Row: {
+                    "challenge_id": string,"habit_id": string | null,"id": string,"joined_at": string,"user_id": string,"withdrawn_at": string | null
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "challenge_id": string,"habit_id"?: string | null,"id"?: string,"joined_at"?: string,"user_id": string,"withdrawn_at"?: string | null
+                  }
+                  Update: {
+                    "challenge_id"?: string,"habit_id"?: string | null,"id"?: string,"joined_at"?: string,"user_id"?: string,"withdrawn_at"?: string | null
+                  }
+                  Relationships: [
+                    {
+      foreignKeyName: "group_challenge_participants_challenge_id_fkey"
+      columns: ["challenge_id"]
+isOneToOne: false
+      referencedRelation: "group_challenges"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "group_challenge_participants_habit_id_fkey"
+      columns: ["habit_id"]
+isOneToOne: false
+      referencedRelation: "habits"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "group_challenge_participants_user_id_fkey"
+      columns: ["user_id"]
+isOneToOne: false
+      referencedRelation: "users"
+      referencedColumns: ["id"]
+    }
+                  ]
+                },"group_challenges": {
+                  Row: {
+                    "amount": string | null,"cancelled_at": string | null,"cohort_id": string | null,"created_at": string,"created_by": string | null,"days": number,"description": string | null,"domain_id": string | null,"duration_days": number,"group_id": string | null,"habit_name": string,"id": string,"starts_on": string,"title": string,"updated_at": string
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "amount"?: string | null,"cancelled_at"?: string | null,"cohort_id"?: string | null,"created_at"?: string,"created_by"?: string | null,"days"?: number,"description"?: string | null,"domain_id"?: string | null,"duration_days": number,"group_id"?: string | null,"habit_name": string,"id"?: string,"starts_on": string,"title": string,"updated_at"?: string
+                  }
+                  Update: {
+                    "amount"?: string | null,"cancelled_at"?: string | null,"cohort_id"?: string | null,"created_at"?: string,"created_by"?: string | null,"days"?: number,"description"?: string | null,"domain_id"?: string | null,"duration_days"?: number,"group_id"?: string | null,"habit_name"?: string,"id"?: string,"starts_on"?: string,"title"?: string,"updated_at"?: string
+                  }
+                  Relationships: [
+                    {
+      foreignKeyName: "group_challenges_cohort_id_fkey"
+      columns: ["cohort_id"]
+isOneToOne: false
+      referencedRelation: "cohorts"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "group_challenges_created_by_fkey"
+      columns: ["created_by"]
+isOneToOne: false
+      referencedRelation: "users"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "group_challenges_domain_id_fkey"
+      columns: ["domain_id"]
+isOneToOne: false
+      referencedRelation: "life_domains"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "group_challenges_group_id_fkey"
+      columns: ["group_id"]
+isOneToOne: false
+      referencedRelation: "groups"
+      referencedColumns: ["id"]
+    }
+                  ]
                 },"group_memberships": {
                   Row: {
                     "created_at": string,"ended_on": string | null,"group_id": string,"id": string,"role": Database["public"]['Enums']["membership_role"],"started_on": string,"updated_at": string,"user_id": string
@@ -393,14 +463,14 @@ isOneToOne: false
                   ]
                 },"groups": {
                   Row: {
-                    "cohort_id": string,"created_at": string,"id": string,"name": string,"updated_at": string
+                    "cohort_id": string,"created_at": string,"features": NonNullable<Json>,"id": string,"name": string,"status": Database["public"]['Enums']["group_status"],"updated_at": string
                   }
                   ComputedFields: never
                   Insert: {
-                    "cohort_id": string,"created_at"?: string,"id"?: string,"name": string,"updated_at"?: string
+                    "cohort_id": string,"created_at"?: string,"features"?: NonNullable<Json>,"id"?: string,"name": string,"status"?: Database["public"]['Enums']["group_status"],"updated_at"?: string
                   }
                   Update: {
-                    "cohort_id"?: string,"created_at"?: string,"id"?: string,"name"?: string,"updated_at"?: string
+                    "cohort_id"?: string,"created_at"?: string,"features"?: NonNullable<Json>,"id"?: string,"name"?: string,"status"?: Database["public"]['Enums']["group_status"],"updated_at"?: string
                   }
                   Relationships: [
                     {
@@ -473,14 +543,14 @@ isOneToOne: false
                   ]
                 },"habits": {
                   Row: {
-                    "amount": string | null,"archived_at": string | null,"created_at": string,"days": number,"description": string | null,"domain_id": string | null,"focus_area_id": string | null,"icon": string | null,"id": string,"library_habit_id": string | null,"name": string,"plan_id": string,"sort_order": number,"time_of_day": Database["public"]['Enums']["habit_time"],"updated_at": string
+                    "amount": string | null,"archived_at": string | null,"created_at": string,"days": number,"description": string | null,"domain_id": string | null,"focus_area_id": string | null,"group_challenge_id": string | null,"icon": string | null,"id": string,"is_private": boolean,"library_habit_id": string | null,"name": string,"plan_id": string,"shared_with_group": boolean,"sort_order": number,"time_of_day": Database["public"]['Enums']["habit_time"],"updated_at": string
                   }
                   ComputedFields: never
                   Insert: {
-                    "amount"?: string | null,"archived_at"?: string | null,"created_at"?: string,"days"?: number,"description"?: string | null,"domain_id"?: string | null,"focus_area_id"?: string | null,"icon"?: string | null,"id"?: string,"library_habit_id"?: string | null,"name": string,"plan_id": string,"sort_order"?: number,"time_of_day"?: Database["public"]['Enums']["habit_time"],"updated_at"?: string
+                    "amount"?: string | null,"archived_at"?: string | null,"created_at"?: string,"days"?: number,"description"?: string | null,"domain_id"?: string | null,"focus_area_id"?: string | null,"group_challenge_id"?: string | null,"icon"?: string | null,"id"?: string,"is_private"?: boolean,"library_habit_id"?: string | null,"name": string,"plan_id": string,"shared_with_group"?: boolean,"sort_order"?: number,"time_of_day"?: Database["public"]['Enums']["habit_time"],"updated_at"?: string
                   }
                   Update: {
-                    "amount"?: string | null,"archived_at"?: string | null,"created_at"?: string,"days"?: number,"description"?: string | null,"domain_id"?: string | null,"focus_area_id"?: string | null,"icon"?: string | null,"id"?: string,"library_habit_id"?: string | null,"name"?: string,"plan_id"?: string,"sort_order"?: number,"time_of_day"?: Database["public"]['Enums']["habit_time"],"updated_at"?: string
+                    "amount"?: string | null,"archived_at"?: string | null,"created_at"?: string,"days"?: number,"description"?: string | null,"domain_id"?: string | null,"focus_area_id"?: string | null,"group_challenge_id"?: string | null,"icon"?: string | null,"id"?: string,"is_private"?: boolean,"library_habit_id"?: string | null,"name"?: string,"plan_id"?: string,"shared_with_group"?: boolean,"sort_order"?: number,"time_of_day"?: Database["public"]['Enums']["habit_time"],"updated_at"?: string
                   }
                   Relationships: [
                     {
@@ -494,6 +564,12 @@ isOneToOne: false
       columns: ["focus_area_id"]
 isOneToOne: false
       referencedRelation: "focus_areas"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "habits_group_challenge_id_fkey"
+      columns: ["group_challenge_id"]
+isOneToOne: false
+      referencedRelation: "group_challenges"
       referencedColumns: ["id"]
     },{
       foreignKeyName: "habits_library_habit_id_fkey"
@@ -879,6 +955,9 @@ isOneToOne: false
 "can_see_activity_link":
 { Args: { "p_activity": string }; Returns: boolean
                            },
+"can_see_group_challenge":
+{ Args: { "p_challenge": string }; Returns: boolean
+                           },
 "can_see_resource":
 { Args: { "p_resource": string }; Returns: boolean
                            },
@@ -893,6 +972,9 @@ isOneToOne: false
                            },
 "close_day":
 { Args: { "p_reflection"?: string }; Returns: Json
+                           },
+"community_activities":
+{ Args: Record<PropertyKey, never>; Returns: Json
                            },
 "complete_plan_review":
 { Args: { "p_next": string }; Returns: undefined
@@ -918,6 +1000,9 @@ isOneToOne: false
 "grant_admin":
 { Args: { "p_user": string }; Returns: undefined
                            },
+"group_feature":
+{ Args: { "p_feature": string,"p_group": string }; Returns: boolean
+                           },
 "group_member_signals":
 { Args: { "p_from": string,"p_group": string,"p_to": string }; Returns: {
               "completion_rate": number,"days_closed": number,"full_name": string,"last_active": string,"user_id": string
@@ -930,6 +1015,9 @@ isOneToOne: false
                            },
 "group_stats":
 { Args: { "p_from": string,"p_group": string,"p_to": string }; Returns: Json
+                           },
+"group_together":
+{ Args: Record<PropertyKey, never>; Returns: Json
                            },
 "group_windows":
 { Args: { "p_from": string,"p_group": string,"p_to": string }; Returns: {
@@ -975,6 +1063,9 @@ isOneToOne: false
 "is_in_cohort":
 { Args: { "p_cohort": string }; Returns: boolean
                            },
+"join_group_challenge":
+{ Args: { "p_challenge": string }; Returns: string
+                           },
 "journey_day":
 { Args: { "p_local_date": string,"p_user": string }; Returns: number
                            },
@@ -1012,10 +1103,16 @@ isOneToOne: false
 "move_member":
 { Args: { "p_group": string,"p_user": string }; Returns: undefined
                            },
+"my_group_challenges":
+{ Args: Record<PropertyKey, never>; Returns: Json
+                           },
 "my_habit_details":
 { Args: { "p_date": string }; Returns: {
               "current_streak": number,"habit_id": string,"week": Json,"week_done": number,"week_scheduled": number
             }[]
+                           },
+"my_member_group":
+{ Args: Record<PropertyKey, never>; Returns: string
                            },
 "my_reflections":
 { Args: { "p_before"?: string,"p_days"?: number }; Returns: {
@@ -1089,7 +1186,7 @@ isOneToOne: false
 { Args: { "p_user": string }; Returns: undefined
                            },
 "save_activity":
-{ Args: { "p_capacity"?: number,"p_cohort_id"?: string,"p_description"?: string,"p_ends_at"?: string,"p_group_ids"?: (string)[],"p_id"?: string,"p_location"?: string,"p_meeting_url"?: string,"p_mode"?: Database["public"]['Enums']["activity_mode"],"p_registration_open"?: boolean,"p_sessions"?: Json,"p_starts_at"?: string,"p_title"?: string }; Returns: string
+{ Args: { "p_capacity"?: number,"p_cohort_id"?: string,"p_description"?: string,"p_ends_at"?: string,"p_group_ids"?: (string)[],"p_id"?: string,"p_location"?: string,"p_meeting_url"?: string,"p_mode"?: Database["public"]['Enums']["activity_mode"],"p_presenter"?: string,"p_registration_open"?: boolean,"p_sessions"?: Json,"p_starts_at"?: string,"p_title"?: string }; Returns: string
                            },
 "save_resource":
 { Args: { "p_audience"?: Database["public"]['Enums']["resource_audience"],"p_category"?: string,"p_cohort_ids"?: (string)[],"p_description"?: string,"p_group_ids"?: (string)[],"p_id"?: string,"p_storage_path"?: string,"p_title"?: string,"p_type"?: Database["public"]['Enums']["resource_type"],"p_url"?: string }; Returns: string
@@ -1123,10 +1220,13 @@ isOneToOne: false
                            },
 "user_local_date":
 { Args: { "p_user": string }; Returns: string
+                           },
+"withdraw_group_challenge":
+{ Args: { "p_challenge": string }; Returns: undefined
                            }
           }
           Enums: {
-            "activity_mode": "in_person"|"online","app_role": "member"|"facilitator"|"admin","challenge_kind": "journey"|"own","challenge_style": "action"|"reflection","domain_color": "sage"|"dawn"|"gold"|"ink"|"violet","gender": "male"|"female","habit_time": "morning"|"noon"|"evening"|"any","membership_role": "member"|"facilitator","resource_audience": "program"|"cohorts"|"groups","resource_type": "recording"|"file"|"reference","review_status": "draft"|"completed","ui_version": "journey"|"glass"|"full_glass"
+            "activity_mode": "in_person"|"online","app_role": "member"|"facilitator"|"admin","challenge_kind": "journey"|"own","challenge_style": "action"|"reflection","domain_color": "sage"|"dawn"|"gold"|"ink"|"violet","gender": "male"|"female","group_status": "open"|"closed","habit_time": "morning"|"noon"|"evening"|"any","membership_role": "member"|"facilitator","resource_audience": "program"|"cohorts"|"groups","resource_type": "recording"|"file"|"reference","review_status": "draft"|"completed","ui_version": "journey"|"glass"|"full_glass"
           }
           CompositeTypes: {
             [_ in never]: never
@@ -1242,7 +1342,7 @@ export type CompositeTypes<
 export const Constants = {
   "public": {
           Enums: {
-            "activity_mode": ["in_person", "online"],"app_role": ["member", "facilitator", "admin"],"challenge_kind": ["journey", "own"],"challenge_style": ["action", "reflection"],"domain_color": ["sage", "dawn", "gold", "ink", "violet"],"gender": ["male", "female"],"habit_time": ["morning", "noon", "evening", "any"],"membership_role": ["member", "facilitator"],"resource_audience": ["program", "cohorts", "groups"],"resource_type": ["recording", "file", "reference"],"review_status": ["draft", "completed"],"ui_version": ["journey", "glass", "full_glass"]
+            "activity_mode": ["in_person", "online"],"app_role": ["member", "facilitator", "admin"],"challenge_kind": ["journey", "own"],"challenge_style": ["action", "reflection"],"domain_color": ["sage", "dawn", "gold", "ink", "violet"],"gender": ["male", "female"],"group_status": ["open", "closed"],"habit_time": ["morning", "noon", "evening", "any"],"membership_role": ["member", "facilitator"],"resource_audience": ["program", "cohorts", "groups"],"resource_type": ["recording", "file", "reference"],"review_status": ["draft", "completed"],"ui_version": ["journey", "glass", "full_glass"]
           }
         }
 } as const

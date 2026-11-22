@@ -18,10 +18,10 @@ const MEMBER = [
   "/resources/recording", "/resources/file", "/resources/reference", "/more", "/account", "/account/archived-habits",
   "/account/appearance", "/setup/look",
   // Spec 003 (T030)
-  "/plan/reflections", "/activities/00000000-0000-4000-8000-0000000000e2", "/habits/new?from=journey", "/plan/review",
+  "/plan/reflections", "/activities/00000000-0000-4000-8000-0000000000e2", "/habits/new?from=journey", "/plan/review", "/stats/group", "/stats/challenge",
 ];
 const FACILITATOR = ["/groups", "/groups/00000000-0000-4000-8000-0000000000a1", "/activities/00000000-0000-4000-8000-0000000000e2"];
-const ADMIN = ["/admin", "/admin/activities/00000000-0000-4000-8000-0000000000e2", "/admin/cohorts", "/admin/cohorts/00000000-0000-4000-8000-0000000000c1", "/admin/invitations",
+const ADMIN = ["/admin", "/admin/challenges", "/admin/activities/00000000-0000-4000-8000-0000000000e2", "/admin/cohorts", "/admin/cohorts/00000000-0000-4000-8000-0000000000c1", "/admin/invitations",
   "/admin/activities", "/admin/resources", ...["challenges", "closing", "questions", "phrases", "stages", "guidelines", "quotes", "domains", "library", "challengeLibrary"].map((t) => `/admin/content?tab=${t}`)];
 
 test("public routes", async ({ page }) => {

@@ -4,6 +4,7 @@ import { buttonClass } from "@/components/ui/Button";
 import { Card, CardTitle } from "@/components/ui/Card";
 import { reorderHabits } from "@/server/actions/habits";
 import type { FocusArea, PlanHabit } from "@/server/queries/plan";
+import { HabitName } from "../habits/HabitName";
 import { ReorderList } from "../habits/ReorderList";
 
 export async function HabitsByArea({ areas, habits }: { areas: FocusArea[]; habits: PlanHabit[] }) {
@@ -29,7 +30,7 @@ export async function HabitsByArea({ areas, habits }: { areas: FocusArea[]; habi
             <ul className="flex flex-col gap-1">
               {g.habits.map((h) => (
                 <li key={h.id} className="flex items-center justify-between gap-2 rounded-xl bg-sand-50 px-3">
-                  <span>{h.name}</span>
+                  <span><HabitName id={h.id} name={h.name} isPrivate={h.is_private} /></span>
                   <Link href={`/habits/${h.id}`} className={buttonClass("quiet", "text-sm")} aria-label={`${t("editHabit")}: ${h.name}`}>
                     {t("editHabit")}
                   </Link>

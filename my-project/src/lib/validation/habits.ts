@@ -14,5 +14,8 @@ export const habitShapeSchema = z.object({
     .min(1)
     .transform((list) => toMask(list)),
   icon: z.preprocess(emptyToUndefined, z.enum(HABIT_ICON_NAMES).optional()),
+  // Spec 007: habits.shared_with_group, habits.is_private (never both)
+  shared: z.preprocess((v) => v === "on" || v === "true" || v === true, z.boolean()).default(false),
+  isPrivate: z.preprocess((v) => v === "on" || v === "true" || v === true, z.boolean()).default(false),
 });
 export type HabitShape = z.infer<typeof habitShapeSchema>;

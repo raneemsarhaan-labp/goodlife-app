@@ -261,4 +261,17 @@ insert into public.focus_areas (plan_id, title, description, sign, domain_id, so
   ('00000000-0000-4000-8000-0000000000b3', 'النفس والبدن', 'جسدٌ نشيط ونومٌ مبكر.', 'أستيقظ دون منبّه.',
    (select id from public.life_domains where key = 'self'), 11);
 
+-- ── Spec 007: member1 shares two habits; member2 shares the same walk; a running group challenge ──
+update public.habits set shared_with_group = true
+where id in ('00000000-0000-4000-8000-000000000d01', '00000000-0000-4000-8000-000000000d02');
+insert into public.habits (id, plan_id, name, sort_order, shared_with_group, domain_id) values
+  ('00000000-0000-4000-8000-000000000d21', '00000000-0000-4000-8000-0000000000b4', 'مشي عشرين دقيقة', 1, true,
+   (select id from public.life_domains where key = 'self'));
+update public.activities set presenter = 'أ. سارة الأحمد' where id = '00000000-0000-4000-8000-0000000000e2';
+insert into public.group_challenges (title, description, domain_id, habit_name, amount, starts_on, duration_days, cohort_id, created_by) values
+  ('أسبوع الصلة', 'سبعة أيام نقرأ فيها وِردًا يوميًّا معًا.', (select id from public.life_domains where key = 'faith'),
+   'وردي من القرآن', 'صفحة', current_date - 5, 7, '00000000-0000-4000-8000-0000000000c1', '00000000-0000-4000-8000-000000000001'),
+  ('شهر الحركة', 'ثلاثون يومًا من المشي.', (select id from public.life_domains where key = 'self'),
+   'مشي ١٥ دقيقة', '١٥ دقيقة', current_date + 7, 30, '00000000-0000-4000-8000-0000000000c1', '00000000-0000-4000-8000-000000000001');
+
 commit;

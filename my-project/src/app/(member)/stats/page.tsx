@@ -12,6 +12,7 @@ import { CompletionBars } from "@/components/features/stats/CompletionBars";
 import { LifeAreas } from "@/components/features/stats/LifeAreas";
 import { PlanVsOther } from "@/components/features/stats/PlanVsOther";
 import { StatTiles } from "@/components/features/stats/StatTiles";
+import { StatsTabs } from "@/components/features/stats/StatsTabs";
 import { getMemberInsights, getMemberStats } from "@/server/queries/stats";
 import { getToday } from "@/server/queries/today";
 
@@ -39,6 +40,7 @@ export default async function StatsPage({ searchParams }: { searchParams: Promis
         <h1 className="text-2xl font-semibold">{t("title")}</h1>
         <p className="text-ink-700">{t("intro")}</p>
       </header>
+      <StatsTabs active="me" />
       <PeriodTabs active={period} basePath="/stats" />
       <p className="text-sm text-ink-500">{t("range", { from: formatDate(from, { withWeekday: false }), to: formatDate(to, { withWeekday: false }) })}</p>
       {stats && insights && (

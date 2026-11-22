@@ -16,12 +16,12 @@ specs 001–003 built. The Glass Edition file is the only design with screens be
 
 ## Roadmap
 
-| Spec | Scope | Priority |
-|------|-------|----------|
-| 004 | **Life domains, habit shape, add-habit flow**: seven admin-managed life domains; plan domains (up to three) map to focus areas; habits gain domain, amount (free text, not tracked), time of day, repeat days. Every "possible days" figure respects the schedule. 3-step add flow with the admin «مكتبة العادات». «يومك» groups habits by time of day. The habit detail gains weekday circles and «سجّل اليوم». | P1 |
-| 005 | **«خطتي» by domain and review rhythm, challenge by domain**: «هويّتي»; per domain «من أريد أن أكون», «العلامة» and a review date; the review flow «من أنت وما تريد» with a member-chosen next review; the «حان موعد مراجعتك» card; admin «مكتبة التحدّيات»; «تحدّي اليوم» by domain with refresh. | P2 |
-| 006 | **«أثرك ← أنا» stats**: consecutive days, active habits, «خطتي مقابل ما سواها», week/month/year bars, streaks with grace, life wheel («التوزيع» / «الالتزام»). Member-only. | P2 |
-| 007 | **Walking together**: habit sharing (peers only) and «عادة خاصّة»; «مجموعتي» (peers on the same habit, «ما تظهره أنت»); group challenge without ranking; «المجتمع» as the full activity list («جديد»، «مسجَّل»، presenter, inline «سجّلني»); admin group status, «معروضة», tool toggles. | P3 |
+| Spec | Scope | Priority | Status |
+|------|-------|----------|--------|
+| 004 | **Life domains, habit shape, add-habit flow**: seven admin-managed life domains; plan domains (up to three) map to focus areas; habits gain domain, amount (free text, not tracked), time of day, repeat days. Every "possible days" figure respects the schedule. 3-step add flow with the admin «مكتبة العادات». «يومك» groups habits by time of day. The habit detail gains weekday circles and «سجّل اليوم». | P1 | Built (2026-11-22) |
+| 005 | **«خطتي» by domain and review rhythm, challenge by domain**: «هويّتي»; per domain «من أريد أن أكون», «العلامة» and a review date; the review flow «من أنت وما تريد» with a member-chosen next review; the «حان موعد مراجعتك» card; admin «مكتبة التحدّيات»; «تحدّي اليوم» by domain with refresh. | P2 | Built (2026-11-22) |
+| 006 | **«أثرك ← أنا» stats**: consecutive days, active habits, «خطتي مقابل ما سواها», week/month/year bars, streaks with grace, life wheel («التوزيع» / «الالتزام»). Member-only. | P2 | Built (2026-11-22) |
+| 007 | **Walking together**: habit sharing (peers only) and «عادة خاصّة»; «مجموعتي» (peers on the same habit, «ما تظهره أنت»); group challenge without ranking; «المجتمع» as the full activity list («جديد»، «مسجَّل»، presenter, inline «سجّلني»); admin group status, «معروضة», tool toggles. | P3 | Built (2026-11-22) |
 
 ## Excluded as design decoration
 
