@@ -12,6 +12,8 @@ createdb "$DB"
 for f in supabase/migrations/*.sql; do
   "${PSQL[@]}" -d "$DB" -f "$f"
 done
+# Starter content is part of every environment; demo people and cohorts are seed only.
+"${PSQL[@]}" -d "$DB" -f supabase/content.sql
 if [[ "${1:-}" != "--no-seed" && -f supabase/seed.sql ]]; then
   "${PSQL[@]}" -d "$DB" -f supabase/seed.sql
 fi
