@@ -13,7 +13,7 @@
 
 ## Requirement Completeness
 
-- [ ] No [NEEDS CLARIFICATION] markers remain
+- [x] No [NEEDS CLARIFICATION] markers remain
 - [x] Requirements are testable and unambiguous
 - [x] Success criteria are measurable
 - [x] Success criteria are technology-agnostic (no implementation details)
@@ -31,5 +31,4 @@
 
 ## Notes
 
-- Three open questions (FR-001 desired state vs «واقعي الآن»; FR-004 «وقفة تأمل» vs the «ختام اليوم»
-  reflection; registering after a multi-session activity has started). Resolve before `/speckit-plan`.
+- Clarified 2026-11-22 (Q1 A, Q2 A, Q3 B); all items pass.

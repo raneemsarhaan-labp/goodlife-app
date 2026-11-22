@@ -15,6 +15,17 @@ admins see registrations and can set a capacity; facilitators see which of their
 (3) «اجعلها عادة» on the challenge card turns today's challenge into a habit. Works in all three visual
 versions, Arabic RTL, offline-friendly where spec 001 already is, WCAG 2.1 AA."
 
+## Clarifications
+
+### Session 2026-11-22
+
+- Q: Is «حالي المنشود» a new text, or the existing «واقعي الآن» under a new title? → A: A new, separate
+  text in «خطتي» (where the member wants to be); «واقعي الآن» stays as is.
+- Q: Is «وقفة تأمل» the same as the «ختام اليوم» reflection? → A: No. Separate short notes, several per day
+  allowed; the end-of-day reflection is unchanged. Both appear in the member's reflection history.
+- Q: Can members register for or cancel a multi-session activity after it has started? → A: Yes, until
+  the last session starts.
+
 **Builds on**: [spec 001](../001-goodlife-journey-app/spec.md) (plan, habits, challenges, activities,
 export) and [spec 002](../002-selectable-ui-themes/spec.md) (three visual versions; this content was
 explicitly deferred there).
@@ -90,13 +101,15 @@ on «يومك» with the next session and the meeting link; the facilitator sees
    shown; members who are not registered see that a link is given after registering.
 5. **Given** a capacity has been reached, **When** another member opens the activity, **Then** it shows
    as full and registration is not offered; when someone cancels, a place opens again.
-6. **Given** a registered member, **When** they cancel before the first session starts, **Then** they
+6. **Given** a registered member, **When** they cancel before the last session starts, **Then** they
    are removed, the place is freed, and the «يومك» card disappears.
-7. **Given** an admin, **When** they open an activity, **Then** they see the registered members and the
+7. **Given** a multi-session activity whose first session has passed, **When** a member opens it before
+   the last session starts, **Then** they can still register and see which sessions already took place.
+8. **Given** an admin, **When** they open an activity, **Then** they see the registered members and the
    count; a facilitator sees only which members of their own groups registered.
-8. **Given** an organizer cancels an activity, **When** a registered member opens «يومك», **Then** the
+9. **Given** an organizer cancels an activity, **When** a registered member opens «يومك», **Then** the
    card shows the activity as cancelled for that day and then disappears.
-9. **Given** an activity whose last session has ended, **When** the member opens «يومك», **Then** no
+10. **Given** an activity whose last session has ended, **When** the member opens «يومك», **Then** no
    card is shown for it.
 
 ---
@@ -104,8 +117,7 @@ on «يومك» with the next session and the meeting link; the facilitator sees
 ### User Story 3 - «اجعلها عادة»: turn today's challenge into a habit (Priority: P3)
 
 The challenge card offers «اجعلها عادة» next to «أنجزت التحدّي». Tapping it opens the add-habit form with
-the challenge text already in the name and, when the challenge belongs to a focus area the member has,
-that focus area selected. The member edits if they wish, confirms, and the habit joins «خطتي» and
+the challenge text already in the name. The member may pick a focus area as usual. The member edits if they wish, confirms, and the habit joins «خطتي» and
 «يومك».
 
 **Why this priority**: Small, and it builds on existing habit creation, but it is a clear bridge from a
@@ -141,14 +153,13 @@ one-day challenge to a lasting practice.
 - An activity with no capacity set: unlimited places.
 - Capacity is lowered below the number already registered: existing registrations stay; no new ones
   until places open.
-- Registration for an activity whose first session has started: [NEEDS CLARIFICATION: Can members still
-  register (or cancel) after the first session of a multi-session activity has started?]
+- Registration after the first session has started: allowed (registering and cancelling) until the last
+  session starts; the member sees which sessions have already taken place.
 - A member moves to another group: registrations for activities aimed at the old group stay, but new
   registrations follow the new group's audience.
 - Two members take the last place at the same time: exactly one succeeds; the other sees it is full.
 - Offline: registering and cancelling need a connection and say so; the «يومك» card shows the last
   known details.
-- «اجعلها عادة» when the member has reached the habit limit (spec 001): the form explains the limit.
 - No challenge today: the «اجعلها عادة» action is not shown.
 
 ## Requirements *(mandatory)*
@@ -158,16 +169,15 @@ one-day challenge to a lasting practice.
 **Desired state and reflections (US1)**
 
 - **FR-001**: «خطتي» MUST let the member write and edit a free-text «حالي المنشود» (the state they want
-  to reach), separate from «واقعي الآن» (spec 001 FR-020). [NEEDS CLARIFICATION: Is «حالي المنشود» a new
-  text separate from «واقعي الآن», or should «يومك» simply show the existing «واقعي الآن» text under the
-  new title?]
+  to reach), up to 2,000 characters, separate from «واقعي الآن» (spec 001 FR-020), which is unchanged.
 - **FR-002**: «يومك» MUST show the «حالي المنشود» card near the top in all three visual versions, with
   the member's text (shortened if long), a link to edit it in «خطتي», and an invitation to write it when
   empty.
 - **FR-003**: Members MUST be able to save short reflections («وقفة تأمل», up to 500 characters) from the
   card; each is dated with the member's local date and records the desired-state wording at that time.
-- **FR-004**: [NEEDS CLARIFICATION: Are «وقفة تأمل» entries separate from the end-of-day reflection in
-  «ختام اليوم» (spec 001 days.reflection), or the same text written from two places?]
+- **FR-004**: «وقفة تأمل» entries MUST be separate from the «ختام اليوم» reflection (spec 001), which is
+  unchanged; a member MAY save several in one day. The reflection history MUST show both kinds by date,
+  each labelled («وقفة تأمل» or «ختام اليوم»).
 - **FR-005**: Members MUST be able to read all their reflections, newest first, grouped by date, and
   delete one.
 - **FR-006**: Reflections and the desired state MUST be visible only to the member; facilitators, group
@@ -184,7 +194,8 @@ one-day challenge to a lasting practice.
 - **FR-011**: An activity MUST be able to have one or more sessions, each with a start and optional end;
   registering registers for all sessions.
 - **FR-012**: Members MUST be able to register for an activity that takes registrations and whose
-  audience includes their group or cohort, while places remain, and to cancel their registration.
+  audience includes their group or cohort, while places remain, and to cancel their registration; both
+  stay possible until the last session starts.
 - **FR-013**: Capacity MUST never be exceeded, including when members register at the same moment.
 - **FR-014**: For online activities the meeting link MUST be shown only to registered members and
   organizers; for in-person activities the place is shown to everyone in the audience.
@@ -204,7 +215,7 @@ one-day challenge to a lasting practice.
 - **FR-020**: The challenge card MUST offer «اجعلها عادة» for today's journey challenge and own challenge
   when present.
 - **FR-021**: «اجعلها عادة» MUST open the add-habit form prefilled with the challenge text (within the
-  habit name limit) and, when known, the matching focus area; nothing is saved until the member confirms.
+  habit name limit); the member may pick a focus area as usual; nothing is saved until they confirm.
 - **FR-022**: If an active habit with the same name exists, the form MUST say so before saving.
 - **FR-023**: Creating a habit this way MUST NOT change the challenge or its done state.
 
@@ -247,9 +258,8 @@ one-day challenge to a lasting practice.
 
 ## Assumptions
 
-- «حالي المنشود» in the designs is the member's desired state, which differs from spec 001's «واقعي
-  الآن» (current reality); the default is a new, separate text in «خطتي» (see FR-001 question).
 - Reflection history lives in «خطتي», next to the desired state; the monthly review may link to it.
+- When «يومك» shows only the first lines of the desired state, the full text opens in place.
 - Reflections can be deleted by their author; there is no editing after saving (they are quick notes).
 - Registration is open to the activity's audience without approval; there is no waiting list.
 - No reminders or notifications for sessions in this feature (consistent with spec 001's scope).
