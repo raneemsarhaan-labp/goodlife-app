@@ -8,7 +8,7 @@
   },
   "scripts": {
     "dev": "next dev --webpack",
-    "build": "node scripts/migrate.mjs && next build --webpack",
+    "build": "node scripts/check-env.mjs && node scripts/migrate.mjs && next build --webpack",
     "start": "next start",
     "lint": "eslint .",
     "typecheck": "tsc --noEmit",
