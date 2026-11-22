@@ -79,3 +79,12 @@ export async function closeDay(
   revalidatePath("/");
   return ok({ closingMessage: (data as { closing_message: string | null }).closing_message });
 }
+
+/** ↻ «تحدٍّ آخر» (spec 005 FR-005): up to three times a day for a library challenge not yet done. */
+export async function refreshChallenge(): Promise<Result<null>> {
+  const supabase = await createClient();
+  const { error } = await supabase.rpc("refresh_challenge");
+  if (error) return fromDbError(error);
+  revalidatePath("/");
+  return ok(null);
+}

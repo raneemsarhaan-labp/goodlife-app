@@ -236,4 +236,29 @@ insert into public.habit_library (domain_id, name, amount, hint, icon, sort_orde
 update public.habits set domain_id = (select id from public.life_domains where key = 'learning') where id = '00000000-0000-4000-8000-000000000d01';
 update public.habits set domain_id = (select id from public.life_domains where key = 'self') where id in ('00000000-0000-4000-8000-000000000d02', '00000000-0000-4000-8000-000000000d03', '00000000-0000-4000-8000-000000000d04');
 
+-- ── Spec 005: «مكتبة التحدّيات»; member1 «هويّتي», plan domains with texts, review due today ──
+insert into public.challenge_library (domain_id, style, title, prompt, habit_name, sort_order) values
+  ((select id from public.life_domains where key = 'faith'), 'action', 'اقرأ صفحةً واحدةً وقف عند آية', 'اسأل نفسك: لو عملتَ بها اليوم، ما الذي كان سيتغيّر؟', 'اقرأ صفحةً وقف عند آية', 1),
+  ((select id from public.life_domains where key = 'faith'), 'reflection', 'تأمّل نعمةً واحدةً قبل النوم', 'سمِّها، واشكر عليها بكلمة.', 'شكر نعمة قبل النوم', 2),
+  ((select id from public.life_domains where key = 'faith'), 'action', 'أدِّ صلاةً في أول وقتها اليوم', 'لاحظ كيف يتغيّر يومك حولها.', null, 3),
+  ((select id from public.life_domains where key = 'self'), 'action', 'اشرب كوب ماء قبل أي مشروب آخر اليوم', 'خطوة صغيرة، تصنع فرقًا في جسدك', 'اشرب كوب ماء أولًا', 4),
+  ((select id from public.life_domains where key = 'self'), 'action', 'امشِ عشر دقائق بلا هاتف', 'انتبه لما حولك.', 'مشي بلا هاتف', 5),
+  ((select id from public.life_domains where key = 'self'), 'reflection', 'ما الذي أتعبك اليوم أكثر مما يستحق؟', 'اكتب سطرًا واحدًا.', null, 6),
+  ((select id from public.life_domains where key = 'family'), 'action', 'اتصل بشخص لم تسأل عنه منذ زمن', 'صِلة صغيرة قد تُسعد يومكما', 'اتصل بشخص غفلت عنه', 7),
+  ((select id from public.life_domains where key = 'family'), 'action', 'اجلس مع أهلك عشر دقائق بلا شاشات', 'استمع أكثر مما تتكلّم.', 'وقت هادئ مع العائلة', 8),
+  ((select id from public.life_domains where key = 'work'), 'action', 'أنجز أصعب مهمّة قبل الظهر', 'ابدأ بها قبل البريد.', 'عمل عميق صباحًا', 9),
+  ((select id from public.life_domains where key = 'work'), 'reflection', 'ما العمل الذي يقرّبك من رزقٍ أطيب؟', 'فكّرة واحدة تكفي.', null, 10),
+  ((select id from public.life_domains where key = 'learning'), 'action', 'اقرأ عشر صفحات من كتاب نافع', 'ودوّن فكرة واحدة.', 'قراءة ١٠ صفحات', 11),
+  ((select id from public.life_domains where key = 'learning'), 'reflection', 'ما الفكرة التي تعلّمتها هذا الأسبوع؟', 'كيف ستعمل بها؟', null, 12),
+  ((select id from public.life_domains where key = 'giving'), 'action', 'ساعد شخصًا دون أن يطلب', 'ولو بكلمة طيّبة.', 'مساعدة شخص اليوم', 13),
+  ((select id from public.life_domains where key = 'leisure'), 'action', 'خذ عشرين دقيقة لما تحبّ', 'بلا شعور بالذنب.', 'وقت لما أحب', 14);
+update public.plans set identity = 'أنا ساعٍ إلى حياةٍ أهدأ، أرعى أهلي وأطلب العلم، وأريد أن يكون لي وقتٌ مع الله كل يوم.',
+  next_review_on = current_date
+where id = '00000000-0000-4000-8000-0000000000b3';
+insert into public.focus_areas (plan_id, title, description, sign, domain_id, sort_order) values
+  ('00000000-0000-4000-8000-0000000000b3', 'الصلة بالله', 'أن يكون لي وِردٌ لا أتركه، ووقتٌ هادئ قبل الفجر.', 'أفتقد الوِرد إذا فاتني.',
+   (select id from public.life_domains where key = 'faith'), 10),
+  ('00000000-0000-4000-8000-0000000000b3', 'النفس والبدن', 'جسدٌ نشيط ونومٌ مبكر.', 'أستيقظ دون منبّه.',
+   (select id from public.life_domains where key = 'self'), 11);
+
 commit;

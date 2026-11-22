@@ -12,7 +12,7 @@ const SCREENS: [string, string][] = [
   ["account", "/account"], ["archived-habits", "/account/archived-habits"],
   ["appearance", "/account/appearance"], ["setup-look", "/setup/look"],
   ["reflections", "/plan/reflections"], ["activity", "/activities/00000000-0000-4000-8000-0000000000e2"],
-  ["make-habit", "/habits/new?from=journey"],
+  ["make-habit", "/habits/new?from=journey"], ["plan-review", "/plan/review"],
 ];
 
 test("member screens", async ({ page }, info) => {

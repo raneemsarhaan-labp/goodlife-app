@@ -2,7 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
-import { closingMessageSchema, encouragementPhraseSchema, journeyChallengeSchema, libraryHabitSchema, lifeDomainSchema, quoteSchema, reviewQuestionSchema } from "@/lib/validation/admin";
+import { closingMessageSchema, encouragementPhraseSchema, journeyChallengeSchema, libraryChallengeSchema, libraryHabitSchema, lifeDomainSchema, quoteSchema, reviewQuestionSchema } from "@/lib/validation/admin";
 import { fail, fromDbError, ok, type Result } from "../result";
 import { currentAdmin, firstIssuePath, formObject } from "./guard";
 
@@ -104,5 +104,20 @@ export async function upsertLibraryHabit(_prev: State, formData: FormData): Prom
   if (error) return fromDbError(error);
   revalidatePath("/admin/content");
   revalidatePath("/habits/new");
+  return ok(null);
+}
+
+/** Adds or edits a «مكتبة التحدّيات» challenge (spec 005 FR-003). */
+export async function upsertLibraryChallenge(_prev: State, formData: FormData): Promise<State> {
+  if (!(await currentAdmin())) return fail("forbidden");
+  const parsed = libraryChallengeSchema.safeParse(formObject(formData));
+  if (!parsed.success) return fail("invalid_input", firstIssuePath(parsed.error));
+  const d = parsed.data;
+  const row = { domain_id: d.domainId, style: d.style, title: d.title, prompt: d.prompt ?? null, habit_name: d.habitName ?? null, sort_order: d.sortOrder, active: d.active };
+  const supabase = await createClient();
+  const { error } = d.id ? await supabase.from("challenge_library").update(row).eq("id", d.id) : await supabase.from("challenge_library").insert(row);
+  if (error) return fromDbError(error);
+  revalidatePath("/admin/content");
+  revalidatePath("/");
   return ok(null);
 }

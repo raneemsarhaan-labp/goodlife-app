@@ -1,9 +1,10 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
+import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { uuidSchema } from "@/lib/validation/common";
-import { currentStateSchema, focusAreaSchema, orderSchema } from "@/lib/validation/plan";
+import { currentStateSchema, domainAreaSchema, focusAreaSchema, identitySchema, nextReviewSchema, orderSchema } from "@/lib/validation/plan";
 import { desiredStateSchema } from "@/lib/validation/reflections";
 import { formObject, firstIssuePath } from "./admin/guard";
 import { fail, fromDbError, ok, type Result } from "./result";
@@ -88,4 +89,46 @@ export async function copyHabitsFromPreviousPlan(
   if (error) return fromDbError(error);
   refresh();
   return ok({ count: Number(data ?? 0) });
+}
+
+/** «هويّتي» (spec 005 FR-001). */
+export async function saveIdentity(_prev: State, formData: FormData): Promise<State> {
+  const parsed = identitySchema.safeParse(formData.get("identity") ?? "");
+  if (!parsed.success) return fail("invalid_input", "identity");
+  const supabase = await createClient();
+  const { data: planId } = await supabase.rpc("current_plan_id");
+  if (!planId) return fail("forbidden");
+  const { error } = await supabase.from("plans").update({ identity: parsed.data }).eq("id", planId);
+  if (error) return fromDbError(error);
+  refresh();
+  revalidatePath("/plan/review");
+  return ok(null);
+}
+
+/** A plan domain's «من أريد أن أكون», «العلامة» and review date (spec 005 FR-002). */
+export async function saveDomainArea(_prev: State, formData: FormData): Promise<State> {
+  const parsed = domainAreaSchema.safeParse(formObject(formData));
+  if (!parsed.success) return fail("invalid_input", firstIssuePath(parsed.error));
+  const supabase = await createClient();
+  const { data, error } = await supabase
+    .from("focus_areas")
+    .update({ description: parsed.data.description ?? null, sign: parsed.data.sign ?? null, review_on: parsed.data.reviewOn ?? null })
+    .eq("id", parsed.data.id)
+    .select("id");
+  if (error) return fromDbError(error);
+  if (!data?.length) return fail("not_found");
+  refresh();
+  revalidatePath("/plan/review");
+  return ok(null);
+}
+
+/** Completes «من أنت وما تريد» with the next review date (spec 005 FR-009). */
+export async function completePlanReview(_prev: State, formData: FormData): Promise<State> {
+  const parsed = nextReviewSchema.safeParse(formData.get("nextReviewOn"));
+  if (!parsed.success) return fail("invalid_input", "nextReviewOn");
+  const supabase = await createClient();
+  const { error } = await supabase.rpc("complete_plan_review", { p_next: parsed.data });
+  if (error) return fromDbError(error);
+  refresh();
+  redirect("/plan");
 }

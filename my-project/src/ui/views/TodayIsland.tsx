@@ -28,7 +28,7 @@ export function TodayIsland({ data, isToday, ritual }: TodayIslandProps) {
       {habits.length > 0 && <ProgressCard done={progress.done} total={progress.total} />}
       {isToday && (
         <>
-          <ChallengeCards journey={data.journey_challenge ?? null} own={data.own_challenge ?? null} localDate={data.local_date} />
+          <ChallengeCards journey={data.journey_challenge ?? null} own={data.own_challenge ?? null} library={data.library_challenge ?? null} localDate={data.local_date} />
           <ActivitiesCard activities={data.activities ?? []} timeZone={data.time_zone} />
           <QuickActions closed={closed} />
           {ritual.show && ritual.quote && <QuoteModal quote={ritual.quote} />}

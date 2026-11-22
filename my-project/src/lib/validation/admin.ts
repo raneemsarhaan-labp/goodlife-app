@@ -107,3 +107,15 @@ export const libraryHabitSchema = z.object({
   sortOrder: z.coerce.number().int().min(0).max(999).default(0),
   active: z.preprocess((v) => v === "on" || v === "true" || v === true, z.boolean()),
 });
+
+// data-model.md (spec 005) challenge_library.title, challenge_library.prompt, challenge_library.habit_name, challenge_library.style
+export const libraryChallengeSchema = z.object({
+  id: z.preprocess(emptyToUndefined, uuidSchema.optional()),
+  domainId: uuidSchema,
+  style: z.enum(["action", "reflection"]),
+  title: z.string().trim().min(2).max(200),
+  prompt: z.preprocess(emptyToUndefined, z.string().trim().max(300).optional()),
+  habitName: z.preprocess(emptyToUndefined, z.string().trim().max(80).optional()),
+  sortOrder: z.coerce.number().int().min(0).max(999).default(0),
+  active: z.preprocess((v) => v === "on" || v === "true" || v === true, z.boolean()),
+});

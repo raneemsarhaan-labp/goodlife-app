@@ -10,6 +10,7 @@ import { DayRollover } from "@/components/features/today/useDayRollover";
 import { DesiredStateCard } from "@/components/features/today/DesiredStateCard";
 import { RegisteredActivityCard } from "@/components/features/today/RegisteredActivityCard";
 import { isActivityCardVisible } from "@/lib/activity-card";
+import { ReviewDueCard } from "@/components/features/plan/ReviewDueCard";
 import { buttonClass } from "@/components/ui/Button";
 import { Card, CardTitle } from "@/components/ui/Card";
 import { RoleSwitcher } from "@/components/ui/RoleSwitcher";
@@ -58,6 +59,7 @@ export default async function TodayPage({ searchParams }: { searchParams: Promis
       <RoleSwitcher roles={user.roles} active={user.activeRole} />
       {!user.uiChosenAt && <ChooseLookCard />}
       <Greeting name={user.fullName} timeZone={data.time_zone} localDate={data.local_date} journeyDay={data.journey_status === "active" ? data.journey_day : undefined} />
+      {isToday && data.plan_review_due && <ReviewDueCard nextReviewOn={data.next_review_on ?? null} />}
       {isToday && <DesiredStateCard text={data.desired_state ?? ""} localDate={data.local_date} />}
       {isToday &&
         (data.registered_activities ?? [])

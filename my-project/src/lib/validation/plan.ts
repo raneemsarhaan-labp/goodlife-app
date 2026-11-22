@@ -24,3 +24,17 @@ export const habitEditSchema = z.object({
 
 // data-model.md habits.sort_order, focus_areas.sort_order (new order = position in the list)
 export const orderSchema = z.array(uuidSchema).min(1).max(200);
+
+// data-model.md (spec 005) plans.identity
+export const identitySchema = z.string().trim().max(2000);
+
+// data-model.md (spec 005) focus_areas.description («من أريد أن أكون»), focus_areas.sign, focus_areas.review_on
+export const domainAreaSchema = z.object({
+  id: uuidSchema,
+  description: z.preprocess(emptyToUndefined, z.string().trim().max(500).optional()),
+  sign: z.preprocess(emptyToUndefined, z.string().trim().max(300).optional()),
+  reviewOn: z.preprocess(emptyToUndefined, z.string().regex(/^\d{4}-\d{2}-\d{2}$/).optional()),
+});
+
+// data-model.md (spec 005) plans.next_review_on (tomorrow … one year ahead; checked again in SQL)
+export const nextReviewSchema = z.string().regex(/^\d{4}-\d{2}-\d{2}$/);

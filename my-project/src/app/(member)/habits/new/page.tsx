@@ -20,11 +20,15 @@ export default async function NewHabitPage({ searchParams }: { searchParams: Pro
   const areaDomain = area ? planDomains.find((p) => p.focusAreaId === area)?.domainId : undefined;
   // «اجعلها عادة» (spec 003 US3): the challenge text is read here, never taken from the URL.
   let prefill: { name: string; duplicate: boolean } | undefined;
+  let challengeDomain: string | undefined;
   if (from === "journey" || from === "own") {
     const today = await getToday("today");
-    const challenge = from === "journey" ? today?.journey_challenge : today?.own_challenge;
-    if (challenge?.text) {
-      const name = habitNameFromChallenge(challenge.text);
+    // Spec 005: without a program challenge, the library challenge's linked habit and domain.
+    const library = from === "journey" && !today?.journey_challenge ? today?.library_challenge : null;
+    const text = library ? (library.habit_name ?? library.title) : (from === "journey" ? today?.journey_challenge : today?.own_challenge)?.text;
+    challengeDomain = library?.domain.id;
+    if (text) {
+      const name = habitNameFromChallenge(text);
       prefill = { name, duplicate: hasHabitNamed((today?.habits ?? []).map((h) => h.name), name) };
     }
   }
@@ -36,7 +40,7 @@ export default async function NewHabitPage({ searchParams }: { searchParams: Pro
         planDomains={planDomains}
         library={library}
         prefill={prefill}
-        initialDomainId={areaDomain}
+        initialDomainId={areaDomain ?? challengeDomain}
         returnTo={returnTo === "plan" ? "plan" : undefined}
       />
     </Sheet>

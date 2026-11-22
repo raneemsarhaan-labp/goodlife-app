@@ -39,6 +39,16 @@ export type RegisteredActivity = {
   cancelled: boolean;
   dismissed_on: string | null;
 };
+export type LibraryChallenge = {
+  id: string;
+  title: string;
+  prompt: string | null;
+  style: "action" | "reflection";
+  habit_name: string | null;
+  domain: { id: string; name: string; icon: string; color: "sage" | "dawn" | "gold" | "ink" | "violet" };
+  done: boolean;
+  can_refresh: boolean;
+};
 export type JourneyStatus = "none" | "not_started" | "active" | "ended";
 
 export type TodayData = {
@@ -54,6 +64,10 @@ export type TodayData = {
   day?: { intention: string | null; reflection: string | null; closed_at: string | null } | null;
   activities?: TodayActivity[];
   registered_activities?: RegisteredActivity[];
+  /** Spec 005: the day's challenge from the library, and the plan review rhythm. */
+  library_challenge?: LibraryChallenge | null;
+  plan_review_due?: boolean | null;
+  next_review_on?: string | null;
   /** «حالي المنشود» from the plan (spec 003). */
   desired_state?: string | null;
   /** First day of the month to review, when the review prompt should show (FR-030). */

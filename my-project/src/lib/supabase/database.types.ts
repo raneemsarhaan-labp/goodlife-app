@@ -151,14 +151,14 @@ isOneToOne: false
                   ]
                 },"challenge_completions": {
                   Row: {
-                    "client_mutation_id": string,"cohort_id": string,"created_at": string,"id": string,"journey_challenge_id": string | null,"kind": Database["public"]['Enums']["challenge_kind"],"local_date": string,"own_challenge_id": string | null,"recorded_at": string | null,"user_id": string
+                    "client_mutation_id": string,"cohort_id": string,"created_at": string,"id": string,"journey_challenge_id": string | null,"kind": Database["public"]['Enums']["challenge_kind"],"library_challenge_id": string | null,"local_date": string,"own_challenge_id": string | null,"recorded_at": string | null,"user_id": string
                   }
                   ComputedFields: never
                   Insert: {
-                    "client_mutation_id": string,"cohort_id": string,"created_at"?: string,"id"?: string,"journey_challenge_id"?: string | null,"kind": Database["public"]['Enums']["challenge_kind"],"local_date": string,"own_challenge_id"?: string | null,"recorded_at"?: string | null,"user_id": string
+                    "client_mutation_id": string,"cohort_id": string,"created_at"?: string,"id"?: string,"journey_challenge_id"?: string | null,"kind": Database["public"]['Enums']["challenge_kind"],"library_challenge_id"?: string | null,"local_date": string,"own_challenge_id"?: string | null,"recorded_at"?: string | null,"user_id": string
                   }
                   Update: {
-                    "client_mutation_id"?: string,"cohort_id"?: string,"created_at"?: string,"id"?: string,"journey_challenge_id"?: string | null,"kind"?: Database["public"]['Enums']["challenge_kind"],"local_date"?: string,"own_challenge_id"?: string | null,"recorded_at"?: string | null,"user_id"?: string
+                    "client_mutation_id"?: string,"cohort_id"?: string,"created_at"?: string,"id"?: string,"journey_challenge_id"?: string | null,"kind"?: Database["public"]['Enums']["challenge_kind"],"library_challenge_id"?: string | null,"local_date"?: string,"own_challenge_id"?: string | null,"recorded_at"?: string | null,"user_id"?: string
                   }
                   Relationships: [
                     {
@@ -174,6 +174,12 @@ isOneToOne: false
       referencedRelation: "journey_challenges"
       referencedColumns: ["id"]
     },{
+      foreignKeyName: "challenge_completions_library_challenge_id_fkey"
+      columns: ["library_challenge_id"]
+isOneToOne: false
+      referencedRelation: "challenge_library"
+      referencedColumns: ["id"]
+    },{
       foreignKeyName: "challenge_completions_own_challenge_id_fkey"
       columns: ["own_challenge_id"]
 isOneToOne: false
@@ -184,6 +190,26 @@ isOneToOne: false
       columns: ["user_id"]
 isOneToOne: false
       referencedRelation: "users"
+      referencedColumns: ["id"]
+    }
+                  ]
+                },"challenge_library": {
+                  Row: {
+                    "active": boolean,"created_at": string,"domain_id": string,"habit_name": string | null,"id": string,"prompt": string | null,"sort_order": number,"style": Database["public"]['Enums']["challenge_style"],"title": string,"updated_at": string
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "active"?: boolean,"created_at"?: string,"domain_id": string,"habit_name"?: string | null,"id"?: string,"prompt"?: string | null,"sort_order"?: number,"style"?: Database["public"]['Enums']["challenge_style"],"title": string,"updated_at"?: string
+                  }
+                  Update: {
+                    "active"?: boolean,"created_at"?: string,"domain_id"?: string,"habit_name"?: string | null,"id"?: string,"prompt"?: string | null,"sort_order"?: number,"style"?: Database["public"]['Enums']["challenge_style"],"title"?: string,"updated_at"?: string
+                  }
+                  Relationships: [
+                    {
+      foreignKeyName: "challenge_library_domain_id_fkey"
+      columns: ["domain_id"]
+isOneToOne: false
+      referencedRelation: "life_domains"
       referencedColumns: ["id"]
     }
                   ]
@@ -214,6 +240,26 @@ isOneToOne: false
                   }
                   Relationships: [
                     
+                  ]
+                },"daily_challenge_refreshes": {
+                  Row: {
+                    "local_date": string,"refreshes": number,"user_id": string
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "local_date": string,"refreshes"?: number,"user_id": string
+                  }
+                  Update: {
+                    "local_date"?: string,"refreshes"?: number,"user_id"?: string
+                  }
+                  Relationships: [
+                    {
+      foreignKeyName: "daily_challenge_refreshes_user_id_fkey"
+      columns: ["user_id"]
+isOneToOne: false
+      referencedRelation: "users"
+      referencedColumns: ["id"]
+    }
                   ]
                 },"day_entries": {
                   Row: {
@@ -295,14 +341,14 @@ isOneToOne: false
                   ]
                 },"focus_areas": {
                   Row: {
-                    "created_at": string,"description": string | null,"domain_id": string | null,"id": string,"plan_id": string,"sort_order": number,"title": string,"updated_at": string
+                    "created_at": string,"description": string | null,"domain_id": string | null,"id": string,"plan_id": string,"review_on": string | null,"sign": string | null,"sort_order": number,"title": string,"updated_at": string
                   }
                   ComputedFields: never
                   Insert: {
-                    "created_at"?: string,"description"?: string | null,"domain_id"?: string | null,"id"?: string,"plan_id": string,"sort_order"?: number,"title": string,"updated_at"?: string
+                    "created_at"?: string,"description"?: string | null,"domain_id"?: string | null,"id"?: string,"plan_id": string,"review_on"?: string | null,"sign"?: string | null,"sort_order"?: number,"title": string,"updated_at"?: string
                   }
                   Update: {
-                    "created_at"?: string,"description"?: string | null,"domain_id"?: string | null,"id"?: string,"plan_id"?: string,"sort_order"?: number,"title"?: string,"updated_at"?: string
+                    "created_at"?: string,"description"?: string | null,"domain_id"?: string | null,"id"?: string,"plan_id"?: string,"review_on"?: string | null,"sign"?: string | null,"sort_order"?: number,"title"?: string,"updated_at"?: string
                   }
                   Relationships: [
                     {
@@ -591,14 +637,14 @@ isOneToOne: false
                   ]
                 },"plans": {
                   Row: {
-                    "cohort_id": string,"created_at": string,"current_state": string,"desired_state": string,"id": string,"updated_at": string,"user_id": string
+                    "cohort_id": string,"created_at": string,"current_state": string,"desired_state": string,"id": string,"identity": string,"last_reviewed_at": string | null,"next_review_on": string | null,"updated_at": string,"user_id": string
                   }
                   ComputedFields: never
                   Insert: {
-                    "cohort_id": string,"created_at"?: string,"current_state"?: string,"desired_state"?: string,"id"?: string,"updated_at"?: string,"user_id": string
+                    "cohort_id": string,"created_at"?: string,"current_state"?: string,"desired_state"?: string,"id"?: string,"identity"?: string,"last_reviewed_at"?: string | null,"next_review_on"?: string | null,"updated_at"?: string,"user_id": string
                   }
                   Update: {
-                    "cohort_id"?: string,"created_at"?: string,"current_state"?: string,"desired_state"?: string,"id"?: string,"updated_at"?: string,"user_id"?: string
+                    "cohort_id"?: string,"created_at"?: string,"current_state"?: string,"desired_state"?: string,"id"?: string,"identity"?: string,"last_reviewed_at"?: string | null,"next_review_on"?: string | null,"updated_at"?: string,"user_id"?: string
                   }
                   Relationships: [
                     {
@@ -848,6 +894,9 @@ isOneToOne: false
 "close_day":
 { Args: { "p_reflection"?: string }; Returns: Json
                            },
+"complete_plan_review":
+{ Args: { "p_next": string }; Returns: undefined
+                           },
 "copy_habits_from_previous_plan":
 { Args: { "p_habit_ids"?: (string)[] }; Returns: number
                            },
@@ -924,6 +973,25 @@ isOneToOne: false
 "journey_day":
 { Args: { "p_local_date": string,"p_user": string }; Returns: number
                            },
+"library_challenge_for":
+{ Args: { "p_date": string,"p_user": string }; Returns: {
+              "active": boolean,
+"created_at": string,
+"domain_id": string,
+"habit_name": string | null,
+"id": string,
+"prompt": string | null,
+"sort_order": number,
+"style": Database["public"]['Enums']["challenge_style"],
+"title": string,
+"updated_at": string
+            }
+                          SetofOptions: {
+        from: "*"
+        to: "challenge_library"
+        isOneToOne: true
+        isSetofReturn: false
+      } },
 "mark_ritual_seen":
 { Args: Record<PropertyKey, never>; Returns: undefined
                            },
@@ -978,6 +1046,9 @@ isOneToOne: false
                            },
 "redeem_invitation":
 { Args: { "p_auth_user": string,"p_city"?: string,"p_code": string,"p_email": string,"p_full_name": string,"p_gender"?: Database["public"]['Enums']["gender"],"p_phone"?: string,"p_time_zone": string }; Returns: string
+                           },
+"refresh_challenge":
+{ Args: Record<PropertyKey, never>; Returns: undefined
                            },
 "register_for_activity":
 { Args: { "p_activity": string }; Returns: undefined
@@ -1047,7 +1118,7 @@ isOneToOne: false
                            }
           }
           Enums: {
-            "activity_mode": "in_person"|"online","app_role": "member"|"facilitator"|"admin","challenge_kind": "journey"|"own","domain_color": "sage"|"dawn"|"gold"|"ink"|"violet","gender": "male"|"female","habit_time": "morning"|"noon"|"evening"|"any","membership_role": "member"|"facilitator","resource_audience": "program"|"cohorts"|"groups","resource_type": "recording"|"file"|"reference","review_status": "draft"|"completed","ui_version": "journey"|"glass"|"full_glass"
+            "activity_mode": "in_person"|"online","app_role": "member"|"facilitator"|"admin","challenge_kind": "journey"|"own","challenge_style": "action"|"reflection","domain_color": "sage"|"dawn"|"gold"|"ink"|"violet","gender": "male"|"female","habit_time": "morning"|"noon"|"evening"|"any","membership_role": "member"|"facilitator","resource_audience": "program"|"cohorts"|"groups","resource_type": "recording"|"file"|"reference","review_status": "draft"|"completed","ui_version": "journey"|"glass"|"full_glass"
           }
           CompositeTypes: {
             [_ in never]: never
@@ -1163,7 +1234,7 @@ export type CompositeTypes<
 export const Constants = {
   "public": {
           Enums: {
-            "activity_mode": ["in_person", "online"],"app_role": ["member", "facilitator", "admin"],"challenge_kind": ["journey", "own"],"domain_color": ["sage", "dawn", "gold", "ink", "violet"],"gender": ["male", "female"],"habit_time": ["morning", "noon", "evening", "any"],"membership_role": ["member", "facilitator"],"resource_audience": ["program", "cohorts", "groups"],"resource_type": ["recording", "file", "reference"],"review_status": ["draft", "completed"],"ui_version": ["journey", "glass", "full_glass"]
+            "activity_mode": ["in_person", "online"],"app_role": ["member", "facilitator", "admin"],"challenge_kind": ["journey", "own"],"challenge_style": ["action", "reflection"],"domain_color": ["sage", "dawn", "gold", "ink", "violet"],"gender": ["male", "female"],"habit_time": ["morning", "noon", "evening", "any"],"membership_role": ["member", "facilitator"],"resource_audience": ["program", "cohorts", "groups"],"resource_type": ["recording", "file", "reference"],"review_status": ["draft", "completed"],"ui_version": ["journey", "glass", "full_glass"]
           }
         }
 } as const

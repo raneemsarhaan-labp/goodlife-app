@@ -6,8 +6,10 @@ import { useTranslations } from "next-intl";
 import { useState, useTransition } from "react";
 import { Button } from "@/components/ui/Button";
 import { Toast } from "@/components/ui/Toast";
-import { setOwnChallenge } from "@/server/actions/today";
-import type { TodayChallenge } from "@/server/queries/today";
+import { refreshChallenge, setOwnChallenge } from "@/server/actions/today";
+import type { LibraryChallenge, TodayChallenge } from "@/server/queries/today";
+import { habitIcon } from "@/ui/icons";
+import { DOMAIN_TINT } from "../habits/domainStyle";
 import { useOutbox } from "./useOutbox";
 
 type Kind = "journey" | "own";
@@ -16,13 +18,25 @@ type Kind = "journey" | "own";
  * The two kinds of daily challenge, always visually distinct (FR-013):
  * «تحدّي الرحلة» (sun, sage) written by the program; «تحدّي ذاتي» (pen, dawn, dashed) by the member.
  */
-export function ChallengeCards({ journey, own, localDate }: { journey: TodayChallenge | null; own: TodayChallenge | null; localDate: string }) {
+export function ChallengeCards({
+  journey,
+  own,
+  library = null,
+  localDate,
+}: {
+  journey: TodayChallenge | null;
+  own: TodayChallenge | null;
+  /** Spec 005: the day's challenge from the library when the program has none. */
+  library?: LibraryChallenge | null;
+  localDate: string;
+}) {
   const t = useTranslations("today");
   const te = useTranslations("errors");
   const tm = useTranslations("makeHabit");
   const router = useRouter();
   const { submit } = useOutbox();
-  const [done, setDone] = useState<Record<Kind, boolean>>({ journey: Boolean(journey?.done), own: Boolean(own?.done) });
+  const [done, setDone] = useState<Record<Kind, boolean>>({ journey: Boolean(journey?.done ?? library?.done), own: Boolean(own?.done) });
+  const [refreshing, startRefresh] = useTransition();
   const [editing, setEditing] = useState(!own);
   const [text, setText] = useState(own?.text ?? "");
   const [message, setMessage] = useState<string | null>(null);
@@ -69,8 +83,51 @@ export function ChallengeCards({ journey, own, localDate }: { journey: TodayChal
     </Link>
   );
 
+  function another() {
+    startRefresh(async () => {
+      const result = await refreshChallenge();
+      if (!result.ok) setMessage(result.error === "limit_reached" ? t("refreshLimit") : te(result.error));
+      router.refresh();
+    });
+  }
+
   return (
     <div className="flex flex-col gap-3">
+      {!journey && library && (
+        <section aria-labelledby="journey-challenge" className="flex flex-col gap-3 rounded-[var(--radius-card)] border border-sage-100 bg-sage-50 p-5">
+          <div className="flex items-start justify-between gap-2">
+            <h2 id="journey-challenge" className="text-sm font-semibold text-sage-700">{t("todayChallenge")}</h2>
+            {library.can_refresh && !done.journey && (
+              <button
+                type="button"
+                onClick={another}
+                disabled={refreshing}
+                aria-label={t("refreshChallenge")}
+                title={t("refreshChallenge")}
+                className="-m-2 flex size-11 items-center justify-center rounded-full text-xl text-sage-700 disabled:opacity-50"
+              >
+                <span aria-hidden="true">↻</span>
+              </button>
+            )}
+          </div>
+          <div className="flex flex-wrap gap-2">
+            <span className={`inline-flex items-center gap-1 rounded-full px-3 py-1 text-xs font-semibold text-ink-900 ${DOMAIN_TINT[library.domain.color]}`}>
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img src={habitIcon(library.domain.icon)} alt="" aria-hidden="true" width={14} height={14} className="size-3.5" />
+              {library.domain.name}
+            </span>
+            <span className="rounded-full bg-white/80 px-3 py-1 text-xs font-semibold text-ink-900">
+              {library.style === "reflection" ? t("styleReflection") : t("styleAction")}
+            </span>
+          </div>
+          <p className="text-lg text-ink-900">{library.title}</p>
+          {library.prompt && <p className="text-ink-700">{library.prompt}</p>}
+          <div className="flex flex-wrap items-center gap-2">
+            {doneButton("journey")}
+            {makeHabit("journey")}
+          </div>
+        </section>
+      )}
       {journey && (
         <section aria-labelledby="journey-challenge" className="flex flex-col gap-3 rounded-[var(--radius-card)] border border-sage-100 bg-sage-50 p-5">
           <h2 id="journey-challenge" className="flex items-center gap-2 text-sm font-semibold text-sage-700">
