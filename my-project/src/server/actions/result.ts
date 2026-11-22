@@ -29,6 +29,8 @@ const SQL_CODES: ErrorCode[] = [
   "code_used_up",
   "forbidden",
   "not_found",
+  "conflict",
+  "invalid_input",
 ];
 
 /** Maps a PostgREST/Postgres error to an ErrorCode. Never passes database messages to users. */

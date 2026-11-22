@@ -7,14 +7,14 @@ export type Database = {
           Tables: {
             "activities": {
                   Row: {
-                    "cancelled_at": string | null,"created_at": string,"created_by": string | null,"description": string | null,"ends_at": string | null,"id": string,"location": string | null,"starts_at": string,"title": string,"updated_at": string
+                    "cancelled_at": string | null,"capacity": number | null,"created_at": string,"created_by": string | null,"description": string | null,"ends_at": string | null,"id": string,"location": string | null,"mode": Database["public"]['Enums']["activity_mode"],"registration_open": boolean,"starts_at": string,"title": string,"updated_at": string
                   }
                   ComputedFields: never
                   Insert: {
-                    "cancelled_at"?: string | null,"created_at"?: string,"created_by"?: string | null,"description"?: string | null,"ends_at"?: string | null,"id"?: string,"location"?: string | null,"starts_at": string,"title": string,"updated_at"?: string
+                    "cancelled_at"?: string | null,"capacity"?: number | null,"created_at"?: string,"created_by"?: string | null,"description"?: string | null,"ends_at"?: string | null,"id"?: string,"location"?: string | null,"mode"?: Database["public"]['Enums']["activity_mode"],"registration_open"?: boolean,"starts_at": string,"title": string,"updated_at"?: string
                   }
                   Update: {
-                    "cancelled_at"?: string | null,"created_at"?: string,"created_by"?: string | null,"description"?: string | null,"ends_at"?: string | null,"id"?: string,"location"?: string | null,"starts_at"?: string,"title"?: string,"updated_at"?: string
+                    "cancelled_at"?: string | null,"capacity"?: number | null,"created_at"?: string,"created_by"?: string | null,"description"?: string | null,"ends_at"?: string | null,"id"?: string,"location"?: string | null,"mode"?: Database["public"]['Enums']["activity_mode"],"registration_open"?: boolean,"starts_at"?: string,"title"?: string,"updated_at"?: string
                   }
                   Relationships: [
                     {
@@ -54,6 +54,98 @@ isOneToOne: false
       columns: ["group_id"]
 isOneToOne: false
       referencedRelation: "groups"
+      referencedColumns: ["id"]
+    }
+                  ]
+                },"activity_card_dismissals": {
+                  Row: {
+                    "activity_id": string,"dismissed_on": string,"user_id": string
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "activity_id": string,"dismissed_on": string,"user_id": string
+                  }
+                  Update: {
+                    "activity_id"?: string,"dismissed_on"?: string,"user_id"?: string
+                  }
+                  Relationships: [
+                    {
+      foreignKeyName: "activity_card_dismissals_activity_id_fkey"
+      columns: ["activity_id"]
+isOneToOne: false
+      referencedRelation: "activities"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "activity_card_dismissals_user_id_fkey"
+      columns: ["user_id"]
+isOneToOne: false
+      referencedRelation: "users"
+      referencedColumns: ["id"]
+    }
+                  ]
+                },"activity_links": {
+                  Row: {
+                    "activity_id": string,"meeting_url": string
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "activity_id": string,"meeting_url": string
+                  }
+                  Update: {
+                    "activity_id"?: string,"meeting_url"?: string
+                  }
+                  Relationships: [
+                    {
+      foreignKeyName: "activity_links_activity_id_fkey"
+      columns: ["activity_id"]
+isOneToOne: true
+      referencedRelation: "activities"
+      referencedColumns: ["id"]
+    }
+                  ]
+                },"activity_registrations": {
+                  Row: {
+                    "activity_id": string,"cancelled_at": string | null,"id": string,"registered_at": string,"user_id": string
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "activity_id": string,"cancelled_at"?: string | null,"id"?: string,"registered_at"?: string,"user_id": string
+                  }
+                  Update: {
+                    "activity_id"?: string,"cancelled_at"?: string | null,"id"?: string,"registered_at"?: string,"user_id"?: string
+                  }
+                  Relationships: [
+                    {
+      foreignKeyName: "activity_registrations_activity_id_fkey"
+      columns: ["activity_id"]
+isOneToOne: false
+      referencedRelation: "activities"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "activity_registrations_user_id_fkey"
+      columns: ["user_id"]
+isOneToOne: false
+      referencedRelation: "users"
+      referencedColumns: ["id"]
+    }
+                  ]
+                },"activity_sessions": {
+                  Row: {
+                    "activity_id": string,"ends_at": string | null,"id": string,"starts_at": string
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "activity_id": string,"ends_at"?: string | null,"id"?: string,"starts_at": string
+                  }
+                  Update: {
+                    "activity_id"?: string,"ends_at"?: string | null,"id"?: string,"starts_at"?: string
+                  }
+                  Relationships: [
+                    {
+      foreignKeyName: "activity_sessions_activity_id_fkey"
+      columns: ["activity_id"]
+isOneToOne: false
+      referencedRelation: "activities"
       referencedColumns: ["id"]
     }
                   ]
@@ -447,14 +539,14 @@ isOneToOne: false
                   ]
                 },"plans": {
                   Row: {
-                    "cohort_id": string,"created_at": string,"current_state": string,"id": string,"updated_at": string,"user_id": string
+                    "cohort_id": string,"created_at": string,"current_state": string,"desired_state": string,"id": string,"updated_at": string,"user_id": string
                   }
                   ComputedFields: never
                   Insert: {
-                    "cohort_id": string,"created_at"?: string,"current_state"?: string,"id"?: string,"updated_at"?: string,"user_id": string
+                    "cohort_id": string,"created_at"?: string,"current_state"?: string,"desired_state"?: string,"id"?: string,"updated_at"?: string,"user_id": string
                   }
                   Update: {
-                    "cohort_id"?: string,"created_at"?: string,"current_state"?: string,"id"?: string,"updated_at"?: string,"user_id"?: string
+                    "cohort_id"?: string,"created_at"?: string,"current_state"?: string,"desired_state"?: string,"id"?: string,"updated_at"?: string,"user_id"?: string
                   }
                   Relationships: [
                     {
@@ -484,6 +576,32 @@ isOneToOne: false
                   }
                   Relationships: [
                     
+                  ]
+                },"reflections": {
+                  Row: {
+                    "client_mutation_id": string,"cohort_id": string,"created_at": string,"desired_state_snapshot": string,"id": string,"local_date": string,"text": string,"user_id": string
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "client_mutation_id": string,"cohort_id": string,"created_at"?: string,"desired_state_snapshot"?: string,"id"?: string,"local_date": string,"text": string,"user_id": string
+                  }
+                  Update: {
+                    "client_mutation_id"?: string,"cohort_id"?: string,"created_at"?: string,"desired_state_snapshot"?: string,"id"?: string,"local_date"?: string,"text"?: string,"user_id"?: string
+                  }
+                  Relationships: [
+                    {
+      foreignKeyName: "reflections_cohort_id_fkey"
+      columns: ["cohort_id"]
+isOneToOne: false
+      referencedRelation: "cohorts"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "reflections_user_id_fkey"
+      columns: ["user_id"]
+isOneToOne: false
+      referencedRelation: "users"
+      referencedColumns: ["id"]
+    }
                   ]
                 },"resource_audiences": {
                   Row: {
@@ -622,11 +740,25 @@ isOneToOne: false
             "activity_created_by_me":
 { Args: { "p_activity": string }; Returns: boolean
                            },
+"activity_details":
+{ Args: { "p_activity": string }; Returns: Json
+                           },
 "activity_led_by_me":
+{ Args: { "p_activity": string }; Returns: boolean
+                           },
+"activity_registrations":
+{ Args: { "p_activity": string }; Returns: {
+              "full_name": string,"group_name": string,"registered_at": string,"user_id": string
+            }[]
+                           },
+"activity_window_open":
 { Args: { "p_activity": string }; Returns: boolean
                            },
 "add_member":
 { Args: { "p_group": string,"p_user": string }; Returns: undefined
+                           },
+"add_reflection":
+{ Args: { "p_client_mutation_id": string,"p_local_date"?: string,"p_text": string }; Returns: string
                            },
 "assert_day_editable":
 { Args: { "p_cohort": string,"p_date": string,"p_recorded_at": string,"p_user": string }; Returns: undefined
@@ -634,10 +766,16 @@ isOneToOne: false
 "assign_facilitator":
 { Args: { "p_group": string,"p_user": string }; Returns: undefined
                            },
+"can_manage_activity":
+{ Args: { "p_activity": string }; Returns: boolean
+                           },
 "can_read_resource_object":
 { Args: { "p_name": string }; Returns: boolean
                            },
 "can_see_activity":
+{ Args: { "p_activity": string }; Returns: boolean
+                           },
+"can_see_activity_link":
 { Args: { "p_activity": string }; Returns: boolean
                            },
 "can_see_resource":
@@ -645,6 +783,9 @@ isOneToOne: false
                            },
 "cancel_activity":
 { Args: { "p_id": string }; Returns: undefined
+                           },
+"cancel_activity_registration":
+{ Args: { "p_activity": string }; Returns: undefined
                            },
 "check_invitation":
 { Args: { "p_code": string }; Returns: Record<string, unknown>
@@ -660,6 +801,9 @@ isOneToOne: false
                            },
 "current_plan_id":
 { Args: Record<PropertyKey, never>; Returns: string
+                           },
+"dismiss_activity_card":
+{ Args: { "p_activity": string }; Returns: undefined
                            },
 "export_my_data":
 { Args: Record<PropertyKey, never>; Returns: Json
@@ -736,6 +880,11 @@ isOneToOne: false
               "current_streak": number,"habit_id": string,"week_done": number
             }[]
                            },
+"my_reflections":
+{ Args: { "p_before"?: string,"p_days"?: number }; Returns: {
+              "created_at": string,"desired_state_snapshot": string,"id": string,"kind": string,"local_date": string,"text": string
+            }[]
+                           },
 "normalize_invitation_code":
 { Args: { "p_code": string }; Returns: string
                            },
@@ -769,6 +918,9 @@ isOneToOne: false
 "redeem_invitation":
 { Args: { "p_auth_user": string,"p_city"?: string,"p_code": string,"p_email": string,"p_full_name": string,"p_gender"?: Database["public"]['Enums']["gender"],"p_phone"?: string,"p_time_zone": string }; Returns: string
                            },
+"register_for_activity":
+{ Args: { "p_activity": string }; Returns: undefined
+                           },
 "remove_facilitator":
 { Args: { "p_group": string,"p_user": string }; Returns: undefined
                            },
@@ -794,7 +946,7 @@ isOneToOne: false
 { Args: { "p_user": string }; Returns: undefined
                            },
 "save_activity":
-{ Args: { "p_cohort_id"?: string,"p_description"?: string,"p_ends_at"?: string,"p_group_ids"?: (string)[],"p_id"?: string,"p_location"?: string,"p_starts_at"?: string,"p_title"?: string }; Returns: string
+{ Args: { "p_capacity"?: number,"p_cohort_id"?: string,"p_description"?: string,"p_ends_at"?: string,"p_group_ids"?: (string)[],"p_id"?: string,"p_location"?: string,"p_meeting_url"?: string,"p_mode"?: Database["public"]['Enums']["activity_mode"],"p_registration_open"?: boolean,"p_sessions"?: Json,"p_starts_at"?: string,"p_title"?: string }; Returns: string
                            },
 "save_resource":
 { Args: { "p_audience"?: Database["public"]['Enums']["resource_audience"],"p_category"?: string,"p_cohort_ids"?: (string)[],"p_description"?: string,"p_group_ids"?: (string)[],"p_id"?: string,"p_storage_path"?: string,"p_title"?: string,"p_type"?: Database["public"]['Enums']["resource_type"],"p_url"?: string }; Returns: string
@@ -828,7 +980,7 @@ isOneToOne: false
                            }
           }
           Enums: {
-            "app_role": "member"|"facilitator"|"admin","challenge_kind": "journey"|"own","gender": "male"|"female","membership_role": "member"|"facilitator","resource_audience": "program"|"cohorts"|"groups","resource_type": "recording"|"file"|"reference","review_status": "draft"|"completed","ui_version": "journey"|"glass"|"full_glass"
+            "activity_mode": "in_person"|"online","app_role": "member"|"facilitator"|"admin","challenge_kind": "journey"|"own","gender": "male"|"female","membership_role": "member"|"facilitator","resource_audience": "program"|"cohorts"|"groups","resource_type": "recording"|"file"|"reference","review_status": "draft"|"completed","ui_version": "journey"|"glass"|"full_glass"
           }
           CompositeTypes: {
             [_ in never]: never
@@ -944,7 +1096,7 @@ export type CompositeTypes<
 export const Constants = {
   "public": {
           Enums: {
-            "app_role": ["member", "facilitator", "admin"],"challenge_kind": ["journey", "own"],"gender": ["male", "female"],"membership_role": ["member", "facilitator"],"resource_audience": ["program", "cohorts", "groups"],"resource_type": ["recording", "file", "reference"],"review_status": ["draft", "completed"],"ui_version": ["journey", "glass", "full_glass"]
+            "activity_mode": ["in_person", "online"],"app_role": ["member", "facilitator", "admin"],"challenge_kind": ["journey", "own"],"gender": ["male", "female"],"membership_role": ["member", "facilitator"],"resource_audience": ["program", "cohorts", "groups"],"resource_type": ["recording", "file", "reference"],"review_status": ["draft", "completed"],"ui_version": ["journey", "glass", "full_glass"]
           }
         }
 } as const

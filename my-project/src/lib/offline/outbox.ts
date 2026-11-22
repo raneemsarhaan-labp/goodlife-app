@@ -1,5 +1,5 @@
 /**
- * Offline outbox for check-offs (research.md §4). Mutations that cannot reach the server are
+ * Offline outbox for check-offs and «وقفة تأمل» notes (spec 001 research §4; spec 003 research §4). Mutations that cannot reach the server are
  * stored in IndexedDB with the tap time (`recordedAt`) and replayed in order when the device is
  * back online. Each carries a clientMutationId, so replays are idempotent on the server.
  */
@@ -8,7 +8,7 @@ import type { ErrorCode, Result } from "@/server/actions/result";
 
 export type Mutation = {
   clientMutationId: string;
-  kind: "habit" | "challenge";
+  kind: "habit" | "challenge" | "reflection";
   payload: Record<string, unknown>;
   recordedAt: string; // ISO time of the tap
   createdAt: number;

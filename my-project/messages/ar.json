@@ -37,7 +37,8 @@
     "code_used_up": "استُخدم رمز الدعوة بالكامل. اطلب رمزًا جديدًا من إدارة البرنامج.",
     "limit_reached": "وصلت إلى الحد المسموح لهذا اليوم.",
     "conflict": "هذا موجود مسبقًا.",
-    "generic": "حدث خطأ غير متوقع. حاول مرة أخرى بعد قليل."
+    "generic": "حدث خطأ غير متوقع. حاول مرة أخرى بعد قليل.",
+    "full": "اكتمل العدد."
   },
   "join": {
     "title": "انضم إلى الرحلة",
@@ -270,7 +271,7 @@
       "description": "الوصف (اختياري)",
       "startsAt": "يبدأ",
       "endsAt": "ينتهي (اختياري)",
-      "location": "المكان أو الرابط (اختياري)",
+      "location": "المكان (للحضوري، اختياري)",
       "audience": "لمن هذا النشاط؟",
       "audienceGroups": "مجموعات محددة",
       "audienceCohort": "دفعة كاملة",
@@ -284,7 +285,20 @@
       "none": "لا أنشطة.",
       "forCohort": "للدفعة: {name}",
       "forGroups": "للمجموعات: {names}",
-      "timeZoneNote": "الأوقات بتوقيتك: {tz}"
+      "timeZoneNote": "الأوقات بتوقيتك: {tz}",
+      "sessionsTitle": "اللقاءات",
+      "sessionsHint": "لقاء واحد أو أكثر (حتى ٥٢). يسجّل المشارك في الكل مرة واحدة.",
+      "addSession": "أضف لقاءً",
+      "removeSession": "احذف اللقاء {number}",
+      "sessionNumber": "اللقاء {number}",
+      "modeLabel": "طريقة الحضور",
+      "modeInPerson": "حضوري",
+      "modeOnline": "أونلاين",
+      "meetingUrl": "رابط اللقاء (يظهر للمسجّلين فقط)",
+      "registrationOpen": "يحتاج إلى تسجيل",
+      "capacity": "عدد المقاعد (اختياري)",
+      "registrations": "المسجّلون",
+      "registeredCount": "المسجّلون: {count}"
     },
     "content": {
       "title": "المحتوى",
@@ -612,7 +626,10 @@
     "newHabit": "عادة جديدة",
     "editHabit": "تعديل العادة",
     "setupLook": "شكل التطبيق",
-    "appearance": "المظهر"
+    "appearance": "المظهر",
+    "reflections": "تأمّلاتي",
+    "activity": "النشاط",
+    "adminActivity": "المسجّلون في النشاط"
   },
   "versions": {
     "label": "شكل التطبيق",
@@ -662,5 +679,72 @@
     "ownChallenge": "تحدٍّ ذاتي لليوم",
     "startDay": "ابدأ يومي",
     "closeDay": "ختام اليوم"
+  },
+  "desiredState": {
+    "title": "حالي المنشود",
+    "edit": "تعديل «حالي المنشود» في «خطتي»",
+    "readMore": "اقرأ المزيد",
+    "readLess": "أقلّ",
+    "emptyTitle": "صِف الحال الذي تريد أن تبلغه",
+    "emptyBody": "اكتب في «خطتي» كيف تريد أن يكون يومك وحالك هذا العام، ليكون أمامك كل صباح.",
+    "emptyAction": "اكتب حالي المنشود",
+    "planTitle": "حالي المنشود",
+    "planHint": "صِف الحال الذي تتمنّى أن تكون عليه: كيف تستيقظ، وكيف تمضي يومك، وكيف تنام.",
+    "planPlaceholder": "أستيقظ ولي وقتٌ لنفسي…",
+    "save": "احفظ",
+    "saved": "تمّ الحفظ."
+  },
+  "reflections": {
+    "prompt": "وقفة تأمل: ما الذي يقرّبك اليوم من هذا الحال؟",
+    "placeholder": "اكتب سطرًا أو سطرين…",
+    "save": "احفظ التأمل",
+    "saved": "تمّ حفظ تأمّلك",
+    "pending": "سيُحفظ تأمّلك عند عودة الاتصال",
+    "historyLink": "تأمّلاتي",
+    "historyTitle": "تأمّلاتي",
+    "historyIntro": "وقفاتك خلال اليوم وما كتبته في «ختام اليوم». لا يراها أحد غيرك.",
+    "kindPause": "وقفة تأمل",
+    "kindClosing": "ختام اليوم",
+    "onState": "على: «{text}»",
+    "delete": "احذف",
+    "deleteConfirm": "احذف هذا التأمل؟",
+    "none": "لا تأمّلات في هذه الفترة.",
+    "older": "الأقدم",
+    "newer": "الأحدث"
+  },
+  "activityRegistration": {
+    "registeredLabel": "نشاط سجّلت فيه",
+    "online": "أونلاين",
+    "inPerson": "حضوري",
+    "sessions": "{count, plural, one {لقاء واحد} two {لقاءان} few {# لقاءات} many {# لقاءً} other {# لقاء}}",
+    "nextSession": "اللقاء القادم: {when}",
+    "close": "أخفِ البطاقة اليوم",
+    "open": "تفاصيل النشاط",
+    "cancelledToday": "أُلغي هذا النشاط",
+    "detailsTitle": "تفاصيل النشاط",
+    "sessionsTitle": "اللقاءات",
+    "sessionPast": "تمّ",
+    "place": "المكان: {place}",
+    "link": "رابط اللقاء",
+    "linkAfterRegistering": "يظهر رابط اللقاء بعد التسجيل.",
+    "placesLeft": "{count, plural, =0 {لا مقاعد متبقية} one {مقعد واحد متبقٍّ} two {مقعدان متبقيان} few {# مقاعد متبقية} many {# مقعدًا متبقيًا} other {# مقعد متبقٍّ}}",
+    "unlimited": "المقاعد غير محدودة",
+    "register": "سجّلني",
+    "cancel": "ألغِ تسجيلي",
+    "registered": "سجّلتَ في هذا النشاط.",
+    "cancelledRegistration": "أُلغي تسجيلك.",
+    "full": "اكتمل العدد",
+    "closed": "انتهى التسجيل في هذا النشاط.",
+    "noRegistration": "لا يحتاج هذا النشاط إلى تسجيل.",
+    "activityCancelled": "أُلغي هذا النشاط.",
+    "registrantsTitle": "المسجّلون ({count})",
+    "registrantsFacilitator": "المسجّلون من مجموعاتك ({count})",
+    "noRegistrants": "لا أحد بعد.",
+    "registeredCount": "المسجّلون: {count}"
+  },
+  "makeHabit": {
+    "action": "اجعلها عادة",
+    "fromChallenge": "من تحدّي اليوم",
+    "duplicate": "لديك عادة بالاسم نفسه. يمكنك المتابعة أو تعديل الاسم."
   }
 }

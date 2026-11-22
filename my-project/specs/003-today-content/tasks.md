@@ -28,8 +28,8 @@ checks and e2e before merge; the spec adds privacy (SC-002) and capacity under c
 
 **Purpose**: Seed data and message keys every story uses.
 
-- [ ] T001 Add Arabic strings under `desiredState`, `reflections`, `activityRegistration`, `makeHabit` (card titles, empty states, «تمّ حفظ تأمّلك», «سجّلني», «ألغِ تسجيلي», «مكتمل العدد», «نشاط سجّلت فيه», «أونلاين»/«حضوري», «اجعلها عادة», «من تحدّي اليوم», errors) and `meta` page titles in `messages/ar.json`
-- [ ] T002 [P] Extend `supabase/seed.sql`: desired state for member1; one registration-open online activity for the seed cohort with four weekly sessions, capacity 2 and a meeting link (data-model.md `activities.registration_open`, `activities.capacity`, `activities.mode`, `activity_links.meeting_url`)
+- [X] T001 Add Arabic strings under `desiredState`, `reflections`, `activityRegistration`, `makeHabit` (card titles, empty states, «تمّ حفظ تأمّلك», «سجّلني», «ألغِ تسجيلي», «مكتمل العدد», «نشاط سجّلت فيه», «أونلاين»/«حضوري», «اجعلها عادة», «من تحدّي اليوم», errors) and `meta` page titles in `messages/ar.json`
+- [X] T002 [P] Extend `supabase/seed.sql`: desired state for member1; one registration-open online activity for the seed cohort with four weekly sessions, capacity 2 and a meeting link (data-model.md `activities.registration_open`, `activities.capacity`, `activities.mode`, `activity_links.meeting_url`)
 
 ---
 
@@ -39,11 +39,11 @@ checks and e2e before merge; the spec adds privacy (SC-002) and capacity under c
 
 **⚠️ CRITICAL**: No user story work can begin until this phase is complete.
 
-- [ ] T003 Write pgTAP tests first in `supabase/tests/today_content.test.sql`: `plans.desired_state` self-only; reflections self-only (facilitator, group member, admin denied), insert only via function, idempotent on `client_mutation_id`; sessions/links/registrations RLS per role; meeting link hidden from non-registered audience members; register/cancel window, closed and cancelled activities, capacity reached; `activity_registrations()` facilitator sees own groups only; existing activities back-filled with one session; export contains the new keys
-- [ ] T004 Create `supabase/migrations/0016_today_content.sql` per data-model.md: column `plans.desired_state` (+ self-update grant); tables `reflections` (`reflections.text`, `reflections.local_date`, `reflections.desired_state_snapshot`, `reflections.client_mutation_id`), `activity_sessions` (`activity_sessions.starts_at`, `activity_sessions.ends_at`), `activity_links` (`activity_links.meeting_url`), `activity_registrations` (`activity_registrations.cancelled_at`), `activity_card_dismissals` (`activity_card_dismissals.dismissed_on`); enum `activity_mode` and columns `activities.registration_open`, `activities.capacity`, `activities.mode`; trigger keeping `activities.starts_at`/`ends_at` equal to first/last session; back-fill one session per existing activity; RLS and grants as data-model.md
-- [ ] T005 In the same migration, SQL functions from data-model.md › SQL functions: `add_reflection`, `my_reflections`, `register_for_activity` (row lock, research §7), `cancel_activity_registration`, `activity_details`, `activity_registrations`, `dismiss_activity_card`; `save_activity` extended with sessions and registration settings; `get_today` + `registered_activities` (research §9); `export_my_data` + `desired_state`, `reflections`, `activity_registrations`
-- [ ] T006 Run `npm run db:test:local` until T003 passes (seeded and no-seed); regenerate `src/lib/supabase/database.types.ts` with `npm run gen:types:local`
-- [ ] T007 [P] Capacity check under parallel sessions in `scripts/db-concurrency-check.sh`: 25 concurrent `register_for_activity` calls for 2 places → exactly 2 active registrations (SC-004)
+- [X] T003 Write pgTAP tests first in `supabase/tests/today_content.test.sql`: `plans.desired_state` self-only; reflections self-only (facilitator, group member, admin denied), insert only via function, idempotent on `client_mutation_id`; sessions/links/registrations RLS per role; meeting link hidden from non-registered audience members; register/cancel window, closed and cancelled activities, capacity reached; `activity_registrations()` facilitator sees own groups only; existing activities back-filled with one session; export contains the new keys
+- [X] T004 Create `supabase/migrations/0016_today_content.sql` per data-model.md: column `plans.desired_state` (+ self-update grant); tables `reflections` (`reflections.text`, `reflections.local_date`, `reflections.desired_state_snapshot`, `reflections.client_mutation_id`), `activity_sessions` (`activity_sessions.starts_at`, `activity_sessions.ends_at`), `activity_links` (`activity_links.meeting_url`), `activity_registrations` (`activity_registrations.cancelled_at`), `activity_card_dismissals` (`activity_card_dismissals.dismissed_on`); enum `activity_mode` and columns `activities.registration_open`, `activities.capacity`, `activities.mode`; trigger keeping `activities.starts_at`/`ends_at` equal to first/last session; back-fill one session per existing activity; RLS and grants as data-model.md
+- [X] T005 In the same migration, SQL functions from data-model.md › SQL functions: `add_reflection`, `my_reflections`, `register_for_activity` (row lock, research §7), `cancel_activity_registration`, `activity_details`, `activity_registrations`, `dismiss_activity_card`; `save_activity` extended with sessions and registration settings; `get_today` + `registered_activities` (research §9); `export_my_data` + `desired_state`, `reflections`, `activity_registrations`
+- [X] T006 Run `npm run db:test:local` until T003 passes (seeded and no-seed); regenerate `src/lib/supabase/database.types.ts` with `npm run gen:types:local`
+- [X] T007 [P] Capacity check under parallel sessions in `scripts/db-concurrency-check.sh`: 25 concurrent `register_for_activity` calls for 2 places → exactly 2 active registrations (SC-004)
 
 **Checkpoint**: data layer complete and tested; stories can start.
 
@@ -59,17 +59,17 @@ in the history, and confirm a facilitator cannot see it.
 
 ### Tests for User Story 1
 
-- [ ] T008 [P] [US1] Unit tests for the reflection schema (trim, 1–500 per data-model.md `reflections.text`) and the outbox `reflection` kind replay in `tests/unit/reflections.test.ts`
-- [ ] T009 [P] [US1] e2e in `tests/e2e/us-desired-state.spec.ts`: write desired state → «يومك» card → save reflection → status message → history shows it labelled «وقفة تأمل» next to a «ختام اليوم» entry → delete it; empty state for a member without a desired state; offline save is replayed once; facilitator sees nothing; axe on `/plan` and `/plan/reflections`
+- [X] T008 [P] [US1] Unit tests for the reflection schema (trim, 1–500 per data-model.md `reflections.text`) and the outbox `reflection` kind replay in `tests/unit/reflections.test.ts`
+- [X] T009 [P] [US1] e2e in `tests/e2e/us-desired-state.spec.ts`: write desired state → «يومك» card → save reflection → status message → history shows it labelled «وقفة تأمل» next to a «ختام اليوم» entry → delete it; empty state for a member without a desired state; offline save is replayed once; facilitator sees nothing; axe on `/plan` and `/plan/reflections`
 
 ### Implementation for User Story 1
 
-- [ ] T010 [P] [US1] Zod schemas for desired state (data-model.md `plans.desired_state`) and reflections (data-model.md `reflections.text`, `reflections.local_date`, `reflections.client_mutation_id`) in `src/lib/validation/reflections.ts`
-- [ ] T011 [US1] `saveDesiredState` in `src/server/actions/plan.ts`; `saveReflection` and `deleteReflection` in `src/server/actions/reflections.ts` (contracts/server-actions.md)
-- [ ] T012 [US1] Add `kind: "reflection"` to `src/lib/offline/outbox.ts` and its replay in `src/components/features/today/useOutbox.ts`
-- [ ] T013 [P] [US1] `src/components/features/plan/DesiredStateForm.tsx` and the «حالي المنشود» section above «واقعي الآن» in `src/app/(member)/plan/page.tsx`, with a link to the history
-- [ ] T014 [US1] `src/components/features/today/DesiredStateCard.tsx`: `.gl-surface` card with the text (first lines + «اقرأ المزيد»), arrow to `/plan#desired-state`, empty-state invitation, and the «وقفة تأمل» form through the outbox; rendered near the top of `src/app/(member)/page.tsx` from `plans.desired_state`
-- [ ] T015 [US1] Reflection history route `src/app/(member)/plan/reflections/page.tsx` using `my_reflections` (30 days per page, newest first, kind labels, delete for «وقفة تأمل»)
+- [X] T010 [P] [US1] Zod schemas for desired state (data-model.md `plans.desired_state`) and reflections (data-model.md `reflections.text`, `reflections.local_date`, `reflections.client_mutation_id`) in `src/lib/validation/reflections.ts`
+- [X] T011 [US1] `saveDesiredState` in `src/server/actions/plan.ts`; `saveReflection` and `deleteReflection` in `src/server/actions/reflections.ts` (contracts/server-actions.md)
+- [X] T012 [US1] Add `kind: "reflection"` to `src/lib/offline/outbox.ts` and its replay in `src/components/features/today/useOutbox.ts`
+- [X] T013 [P] [US1] `src/components/features/plan/DesiredStateForm.tsx` and the «حالي المنشود» section above «واقعي الآن» in `src/app/(member)/plan/page.tsx`, with a link to the history
+- [X] T014 [US1] `src/components/features/today/DesiredStateCard.tsx`: `.gl-surface` card with the text (first lines + «اقرأ المزيد»), arrow to `/plan#desired-state`, empty-state invitation, and the «وقفة تأمل» form through the outbox; rendered near the top of `src/app/(member)/page.tsx` from `plans.desired_state`
+- [X] T015 [US1] Reflection history route `src/app/(member)/plan/reflections/page.tsx` using `my_reflections` (30 days per page, newest first, kind labels, delete for «وقفة تأمل»)
 
 **Checkpoint**: US1 is usable on its own in all three visual versions.
 

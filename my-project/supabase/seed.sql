@@ -185,4 +185,23 @@ update public.habits set icon = 'directions_walk' where id = '00000000-0000-4000
 update public.habits set icon = 'bedtime' where id = '00000000-0000-4000-8000-000000000d03';
 update public.habits set icon = 'self_improvement' where id = '00000000-0000-4000-8000-000000000d04';
 
+-- ── Spec 003: «حالي المنشود» for member1; a registration-open online reading circle ──
+update public.plans set desired_state =
+  'أستيقظ ولي وقتٌ لنفسي قبل أن يبدأ يومي مع الناس. أمشي بخُطًى ثابتة، وأُنجز ما نويت دون استعجالٍ أو ضغط، وأنام وأنا مطمئن أنّي عشتُ يومي كما أحب.'
+where id = '00000000-0000-4000-8000-0000000000b3';
+
+insert into public.activities (id, title, description, starts_at, location, created_by, registration_open, capacity, mode) values
+  ('00000000-0000-4000-8000-0000000000e2', 'نشاط قراءة: أمراض القلوب', 'أربعة لقاءات أسبوعية نقرأ فيها معًا ونتدارس.',
+   date_trunc('day', now()) + interval '2 days' + interval '18 hours', null, '00000000-0000-4000-8000-000000000001', true, 2, 'online');
+insert into public.activity_audiences (activity_id, group_id) values
+  ('00000000-0000-4000-8000-0000000000e2', '00000000-0000-4000-8000-0000000000a1');
+delete from public.activity_sessions where activity_id = '00000000-0000-4000-8000-0000000000e2';
+insert into public.activity_sessions (activity_id, starts_at, ends_at)
+  select '00000000-0000-4000-8000-0000000000e2',
+         date_trunc('day', now()) + interval '2 days' + interval '18 hours' + i * interval '7 days',
+         date_trunc('day', now()) + interval '2 days' + interval '19 hours' + i * interval '7 days'
+  from generate_series(0, 3) i;
+insert into public.activity_links (activity_id, meeting_url) values
+  ('00000000-0000-4000-8000-0000000000e2', 'https://meet.example.test/qulub');
+
 commit;

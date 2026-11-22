@@ -4,6 +4,7 @@ import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
 import { uuidSchema } from "@/lib/validation/common";
 import { currentStateSchema, focusAreaSchema, orderSchema } from "@/lib/validation/plan";
+import { desiredStateSchema } from "@/lib/validation/reflections";
 import { formObject, firstIssuePath } from "./admin/guard";
 import { fail, fromDbError, ok, type Result } from "./result";
 
@@ -21,6 +22,19 @@ export async function saveCurrentState(_prev: State, formData: FormData): Promis
   const { data: planId } = await supabase.rpc("current_plan_id");
   if (!planId) return fail("forbidden");
   const { error } = await supabase.from("plans").update({ current_state: parsed.data }).eq("id", planId);
+  if (error) return fromDbError(error);
+  refresh();
+  return ok(null);
+}
+
+/** «حالي المنشود» (spec 003 FR-001): the state the member wants to reach this year. */
+export async function saveDesiredState(_prev: State, formData: FormData): Promise<State> {
+  const parsed = desiredStateSchema.safeParse(formData.get("desiredState") ?? "");
+  if (!parsed.success) return fail("invalid_input", "desiredState");
+  const supabase = await createClient();
+  const { data: planId } = await supabase.rpc("current_plan_id");
+  if (!planId) return fail("forbidden");
+  const { error } = await supabase.from("plans").update({ desired_state: parsed.data }).eq("id", planId);
   if (error) return fromDbError(error);
   refresh();
   return ok(null);

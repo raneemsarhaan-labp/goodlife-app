@@ -10,7 +10,7 @@ export async function getPlan() {
   const { data: planId } = await supabase.rpc("current_plan_id");
   if (!planId) return null;
   const [{ data: plan }, { data: areas }, { data: habits }, { data: previousCount }] = await Promise.all([
-    supabase.from("plans").select("id, current_state, updated_at").eq("id", planId).single(),
+    supabase.from("plans").select("id, current_state, desired_state, updated_at").eq("id", planId).single(),
     supabase.from("focus_areas").select("id, title, description, sort_order").eq("plan_id", planId).order("sort_order"),
     supabase
       .from("habits")

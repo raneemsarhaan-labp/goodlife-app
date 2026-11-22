@@ -2,6 +2,7 @@ import { pageTitle } from "@/i18n/metadata";
 import { getTranslations } from "next-intl/server";
 import { CopyPreviousHabits } from "@/components/features/plan/CopyPreviousHabits";
 import { CurrentState } from "@/components/features/plan/CurrentState";
+import { DesiredState } from "@/components/features/plan/DesiredState";
 import { FocusAreaList } from "@/components/features/plan/FocusAreaList";
 import { HabitsByArea } from "@/components/features/plan/HabitsByArea";
 import { LastUpdated } from "@/components/features/plan/LastUpdated";
@@ -25,7 +26,7 @@ export default async function PlanPage() {
       </main>
     );
   }
-  const isEmpty = !data.plan.current_state && data.areas.length === 0;
+  const isEmpty = !data.plan.current_state && !data.plan.desired_state && data.areas.length === 0;
   return (
     <main id="main" className="mx-auto flex max-w-lg flex-col gap-5 px-5 pt-6">
       <header className="flex flex-col gap-1">
@@ -35,6 +36,7 @@ export default async function PlanPage() {
       </header>
       {isEmpty && <EmptyState title={t("emptyTitle")} body={t("emptyBody")} />}
       {data.habits.length === 0 && data.previousHabitCount > 0 && <CopyPreviousHabits count={data.previousHabitCount} />}
+      <DesiredState value={data.plan.desired_state} />
       <CurrentState value={data.plan.current_state} />
       <FocusAreaList areas={data.areas} />
       <HabitsByArea areas={data.areas} habits={data.habits} />

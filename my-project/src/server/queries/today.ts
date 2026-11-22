@@ -4,7 +4,27 @@ import { createClient } from "@/lib/supabase/server";
 
 export type TodayHabit = { id: string; name: string; done: boolean; icon?: string | null; description?: string | null; week_done?: number; current_streak?: number };
 export type TodayChallenge = { id: string; text: string; done: boolean };
-export type TodayActivity = { id: string; title: string; starts_at: string; ends_at: string | null; location: string | null };
+export type TodayActivity = {
+  id: string;
+  title: string;
+  starts_at: string;
+  ends_at: string | null;
+  location: string | null;
+  mode?: "in_person" | "online";
+  registration_open?: boolean;
+};
+/** A registered activity with a session still ahead (spec 003 research §9). */
+export type RegisteredActivity = {
+  id: string;
+  title: string;
+  mode: "in_person" | "online";
+  next_starts_at: string;
+  next_ends_at: string | null;
+  next_local_date: string;
+  session_count: number;
+  cancelled: boolean;
+  dismissed_on: string | null;
+};
 export type JourneyStatus = "none" | "not_started" | "active" | "ended";
 
 export type TodayData = {
@@ -19,6 +39,9 @@ export type TodayData = {
   own_challenge?: TodayChallenge | null;
   day?: { intention: string | null; reflection: string | null; closed_at: string | null } | null;
   activities?: TodayActivity[];
+  registered_activities?: RegisteredActivity[];
+  /** «حالي المنشود» from the plan (spec 003). */
+  desired_state?: string | null;
   /** First day of the month to review, when the review prompt should show (FR-030). */
   review_prompt?: string | null;
 };

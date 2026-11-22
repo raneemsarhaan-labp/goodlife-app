@@ -3,11 +3,13 @@
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { pending, replay, send, type Mutation, type Sender, type SendOutcome } from "@/lib/offline/outbox";
+import { saveReflection } from "@/server/actions/reflections";
 import { setChallengeDone, setHabitDone } from "@/server/actions/today";
 
 /** Online: today/yesterday rule. Replay: sends the tap time so the 7-day rule applies. */
 const sender: Sender = (m, { replay: isReplay }) => {
   const recordedAt = isReplay ? m.recordedAt : undefined;
+  if (m.kind === "reflection") return saveReflection({ ...m.payload, clientMutationId: m.clientMutationId });
   const input = { ...m.payload, clientMutationId: m.clientMutationId, recordedAt };
   return m.kind === "habit" ? setHabitDone(input) : setChallengeDone(input);
 };
@@ -24,7 +26,7 @@ export function useOutbox({ onDropped }: { onDropped?: () => void } = {}) {
 
   const refreshPending = useCallback(async () => {
     const items = await pending().catch(() => []);
-    setPendingIds(new Set(items.map((m) => String(m.payload.habitId ?? m.payload.kind))));
+    setPendingIds(new Set(items.map((m) => String(m.payload.habitId ?? m.payload.kind ?? m.kind))));
   }, []);
 
   const flush = useCallback(async () => {

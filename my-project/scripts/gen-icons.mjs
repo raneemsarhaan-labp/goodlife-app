@@ -5,7 +5,7 @@ import { readFileSync, writeFileSync } from "node:fs";
 const HABIT_ICONS = ["wb_sunny", "menu_book", "auto_stories", "bedtime", "nightlight", "family_restroom", "self_improvement",
   "directions_walk", "fitness_center", "water_drop", "restaurant", "no_food", "block", "favorite", "volunteer_activism",
   "psychology", "spa", "edit_note", "school", "work", "phone_disabled", "mosque", "eco", "schedule"];
-const APP_ICONS = ["check_box", "star", "bar_chart", "groups", "more_horiz", "add", "close", "settings", "keyboard_arrow_down",
+const APP_ICONS = ["repeat", "videocam", "location_on", "delete", "check_box", "star", "bar_chart", "groups", "more_horiz", "add", "close", "settings", "keyboard_arrow_down",
   "keyboard_arrow_up", "check", "check_circle", "format_quote", "autorenew", "north_east", "chevron_left", "local_fire_department",
   "event", "edit", "flag", "bolt", "palette", "visibility", "today"];
 
