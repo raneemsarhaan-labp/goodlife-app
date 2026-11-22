@@ -109,3 +109,12 @@ body::before {
 .gl-surface-strong :is(ion-list, ion-accordion, ion-accordion-group) {
   background: transparent;
 }
+
+/* The «يومك» quick-actions button floats above the bottom bar (Ionic's scoped styles would place it
+   inside its container; unlayered so it wins over them). */
+ion-fab.gl-fab {
+  position: fixed;
+  bottom: calc(5.5rem + env(safe-area-inset-bottom, 0px));
+  inset-inline-start: max(1rem, env(safe-area-inset-left, 0px));
+  z-index: 30;
+}

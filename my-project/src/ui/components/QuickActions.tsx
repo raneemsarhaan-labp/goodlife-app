@@ -15,7 +15,7 @@ export function QuickActions({ closed }: { closed: boolean }) {
     ...(closed ? [] : [{ key: "startDay" as const, href: "/day/start", icon: "wb_sunny" as IconName }, { key: "closeDay" as const, href: "/day/close", icon: "nightlight" as IconName }]),
   ];
   return (
-    <IonFab slot="fixed" vertical="bottom" horizontal="start" className="fixed bottom-24 start-4 z-30">
+    <IonFab slot="fixed" vertical="bottom" horizontal="start" className="gl-fab">
       <IonFabButton color="tertiary" aria-label={t("open")}>
         <IonIcon icon={icon("add")} />
       </IonFabButton>

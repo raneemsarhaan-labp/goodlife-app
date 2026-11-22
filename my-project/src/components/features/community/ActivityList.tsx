@@ -4,18 +4,22 @@ import { RegistrationButton } from "@/components/features/activities/Registratio
 import { formatDateTime, formatNumber } from "@/lib/format";
 import { createClient } from "@/lib/supabase/server";
 
-type Item = {
+export type CommunityItem = {
   id: string; title: string; description: string | null; mode: "in_person" | "online"; presenter: string | null; location: string | null;
   next_starts_at: string; session_count: number; registration_open: boolean; registered: boolean; places_left: number | null;
   window_open: boolean; is_new: boolean;
 };
 
-/** «أنشطة قادمة» (spec 007 US3): every upcoming activity, with badges and inline registration. */
+/** «أنشطة قادمة» (spec 007 US3): every upcoming activity the member may see. */
 export async function ActivityList({ timeZone }: { timeZone: string }) {
-  const [t, tr] = await Promise.all([getTranslations("communityList"), getTranslations("activityRegistration")]);
   const supabase = await createClient();
   const { data } = await supabase.rpc("community_activities");
-  const items = (data ?? []) as unknown as Item[];
+  return <ActivityListView items={(data ?? []) as unknown as CommunityItem[]} timeZone={timeZone} />;
+}
+
+/** The list itself, with badges and inline registration; props only. */
+export async function ActivityListView({ items, timeZone }: { items: CommunityItem[]; timeZone: string }) {
+  const [t, tr] = await Promise.all([getTranslations("communityList"), getTranslations("activityRegistration")]);
   return (
     <section aria-labelledby="activities-list" className="flex flex-col gap-3">
       <div className="flex items-center justify-between">

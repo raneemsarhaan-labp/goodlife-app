@@ -46,8 +46,10 @@
 }
 
 /* Ionic theme from the same tokens (contracts/ui-themes.md › Ionic). Ionic's default secondary
-   text is #999 (2.8:1 on white): every text step used for copy maps to ink-500 (≥ 4.5:1). */
-:root {
+   text is #999 (2.8:1 on white): every text step used for copy maps to ink-500 (≥ 4.5:1).
+   `html:root` outranks Ionic's own `:root` palette in core.css, which loads later with the first
+   Ionic view and would otherwise reset these to Ionic's blue/purple defaults. */
+html:root {
   --ion-font-family: "Cairo", system-ui, sans-serif;
   --ion-text-color: var(--ink-900);
   --ion-text-color-rgb: 27, 43, 34;
@@ -64,6 +66,12 @@
   --ion-color-secondary-contrast-rgb: 255, 255, 255;
   --ion-color-secondary-shade: #284136;
   --ion-color-secondary-tint: #435c50;
+  --ion-color-tertiary: var(--green-700);
+  --ion-color-tertiary-rgb: 31, 51, 41;
+  --ion-color-tertiary-contrast: #ffffff;
+  --ion-color-tertiary-contrast-rgb: 255, 255, 255;
+  --ion-color-tertiary-shade: #1b2d24;
+  --ion-color-tertiary-tint: #35473e;
   --ion-color-light: var(--ink-50);
   --ion-color-light-rgb: 240, 239, 232;
   --ion-color-light-contrast: var(--ink-900);
