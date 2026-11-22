@@ -15,11 +15,14 @@ export default async function AdminActivitiesPage({ searchParams }: { searchPara
   const { edit } = await searchParams;
   const t = await getTranslations("admin.activities");
   const supabase = await createClient();
-  const [{ data: groups }, { data: cohorts }, activities] = await Promise.all([
+  const [{ data: groups }, { data: cohorts }, activities, { data: registrations }] = await Promise.all([
     supabase.from("groups").select("id, name, cohorts(name)").order("name"),
     supabase.from("cohorts").select("id, name").order("start_date", { ascending: false }),
     listActivities(),
+    supabase.from("activity_registrations").select("activity_id").is("cancelled_at", null),
   ]);
+  const registered = new Map<string, number>();
+  for (const r of registrations ?? []) registered.set(r.activity_id, (registered.get(r.activity_id) ?? 0) + 1);
   const editing = edit ? activities.find((a) => a.id === edit) : undefined;
   const now = nowMs();
   const rows = activities.map((a) => {
@@ -27,6 +30,7 @@ export default async function AdminActivitiesPage({ searchParams }: { searchPara
     return {
       ...a,
       editable: true,
+      registered: registered.get(a.id) ?? 0,
       audience: cohort
         ? t("forCohort", { name: cohort.cohorts?.name ?? "" })
         : t("forGroups", { names: a.activity_audiences.map((au) => au.groups?.name).filter(Boolean).join("، ") }),
@@ -52,11 +56,11 @@ export default async function AdminActivitiesPage({ searchParams }: { searchPara
       </Card>
       <section aria-labelledby="upcoming-activities" className="flex flex-col gap-3">
         <h2 id="upcoming-activities" className="text-xl font-semibold">{t("upcoming")}</h2>
-        <ActivityList rows={upcoming} timeZone={user.timeZone} editHref={(id) => `/admin/activities?edit=${id}`} />
+        <ActivityList rows={upcoming} timeZone={user.timeZone} editHref={(id) => `/admin/activities?edit=${id}`} registrationsHref={(id) => `/admin/activities/${id}`} />
       </section>
       <section aria-labelledby="past-activities" className="flex flex-col gap-3">
         <h2 id="past-activities" className="text-xl font-semibold">{t("past")}</h2>
-        <ActivityList rows={past.slice(0, 30)} timeZone={user.timeZone} editHref={(id) => `/admin/activities?edit=${id}`} />
+        <ActivityList rows={past.slice(0, 30)} timeZone={user.timeZone} editHref={(id) => `/admin/activities?edit=${id}`} registrationsHref={(id) => `/admin/activities/${id}`} />
       </section>
     </>
   );

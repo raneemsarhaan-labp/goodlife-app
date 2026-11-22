@@ -85,18 +85,18 @@ link only after registering, facilitator scope).
 
 ### Tests for User Story 2
 
-- [ ] T016 [P] [US2] Unit tests for the card visibility rule (research §9: dismissed today, next session day, cancelled-today) and session validation in `tests/unit/activity-card.test.ts`
-- [ ] T017 [P] [US2] e2e in `tests/e2e/us-activity-registration.spec.ts`: member registers from upcoming activities → link shown → «يومك» card «نشاط سجّلت فيه · أونلاين» → close hides it; second member fills capacity; third sees «مكتمل العدد»; cancel frees a place; admin list shows 2; facilitator sees only own members; cancelled activity shows as cancelled; axe on `/activities/[id]` and `/admin/activities/[id]`
+- [X] T016 [P] [US2] Unit tests for the card visibility rule (research §9: dismissed today, next session day, cancelled-today) and session validation in `tests/unit/activity-card.test.ts`
+- [X] T017 [P] [US2] e2e in `tests/e2e/us-activity-registration.spec.ts`: member registers from upcoming activities → link shown → «يومك» card «نشاط سجّلت فيه · أونلاين» → close hides it; second member fills capacity; third sees «مكتمل العدد»; cancel frees a place; admin list shows 2; facilitator sees only own members; cancelled activity shows as cancelled; axe on `/activities/[id]` and `/admin/activities/[id]`
 
 ### Implementation for User Story 2
 
-- [ ] T018 [P] [US2] Zod schemas for activity settings and sessions (data-model.md `activities.registration_open`, `activities.capacity`, `activities.mode`, `activity_sessions.starts_at`, `activity_sessions.ends_at`, `activity_links.meeting_url`) in `src/lib/validation/activities.ts`; extend the existing activity schema in `src/lib/validation/admin.ts`
-- [ ] T019 [US2] Extend the admin/facilitator activity form `src/components/features/admin/ActivityForm.tsx` and its action (`saveActivity` in `src/server/actions/admin/*`): sessions editor (add/remove, 1–52), registration toggle, capacity, mode, meeting link; `ActivityList.tsx` shows registered count
-- [ ] T020 [US2] `registerForActivity`, `cancelRegistration`, `dismissActivityCard` in `src/server/actions/activities.ts` (contracts/server-actions.md, errors mapped to Arabic messages)
-- [ ] T021 [US2] Activity details route `src/app/(member)/activities/[id]/page.tsx` via `activity_details` (sessions with past ones marked, place or link, places left) with `src/components/features/activities/RegistrationButton.tsx`; upcoming-activity items on «يومك» (`src/ui/components/ActivitiesCard.tsx`) link to it
-- [ ] T022 [US2] `src/components/features/today/RegisteredActivityCard.tsx` (closable, cancelled state) and `registered_activities` in `src/server/queries/today.ts`; render under the «حالي المنشود» card in `src/app/(member)/page.tsx`
-- [ ] T023 [P] [US2] Admin registrations route `src/app/admin/activities/[id]/page.tsx` via `activity_registrations` (solid surfaces, FR-007 of spec 002)
-- [ ] T024 [P] [US2] Facilitator view: in `src/app/(member)/groups/[id]/page.tsx`, the group's activities with which of its members registered (via `activity_registrations`)
+- [X] T018 [P] [US2] Zod schemas for activity settings and sessions (data-model.md `activities.registration_open`, `activities.capacity`, `activities.mode`, `activity_sessions.starts_at`, `activity_sessions.ends_at`, `activity_links.meeting_url`) in `src/lib/validation/activities.ts`; extend the existing activity schema in `src/lib/validation/admin.ts`
+- [X] T019 [US2] Extend the admin/facilitator activity form `src/components/features/admin/ActivityForm.tsx` and its action (`saveActivity` in `src/server/actions/admin/*`): sessions editor (add/remove, 1–52), registration toggle, capacity, mode, meeting link; `ActivityList.tsx` shows registered count
+- [X] T020 [US2] `registerForActivity`, `cancelRegistration`, `dismissActivityCard` in `src/server/actions/activities.ts` (contracts/server-actions.md, errors mapped to Arabic messages)
+- [X] T021 [US2] Activity details route `src/app/(member)/activities/[id]/page.tsx` via `activity_details` (sessions with past ones marked, place or link, places left) with `src/components/features/activities/RegistrationButton.tsx`; upcoming-activity items on «يومك» (`src/ui/components/ActivitiesCard.tsx`) link to it
+- [X] T022 [US2] `src/components/features/today/RegisteredActivityCard.tsx` (closable, cancelled state) and `registered_activities` in `src/server/queries/today.ts`; render under the «حالي المنشود» card in `src/app/(member)/page.tsx`
+- [X] T023 [P] [US2] Admin registrations route `src/app/admin/activities/[id]/page.tsx` via `activity_registrations` (solid surfaces, FR-007 of spec 002)
+- [X] T024 [P] [US2] Facilitator view: in `src/app/(member)/groups/[id]/page.tsx`, the group's activities with which of its members registered (via `activity_registrations`)
 
 **Checkpoint**: US1 and US2 work independently.
 

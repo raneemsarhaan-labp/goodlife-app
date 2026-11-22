@@ -8,6 +8,8 @@ import { JourneyEnded } from "@/components/features/today/JourneyEnded";
 import { ReviewPrompt } from "@/components/features/today/ReviewPrompt";
 import { DayRollover } from "@/components/features/today/useDayRollover";
 import { DesiredStateCard } from "@/components/features/today/DesiredStateCard";
+import { RegisteredActivityCard } from "@/components/features/today/RegisteredActivityCard";
+import { isActivityCardVisible } from "@/lib/activity-card";
 import { buttonClass } from "@/components/ui/Button";
 import { Card, CardTitle } from "@/components/ui/Card";
 import { RoleSwitcher } from "@/components/ui/RoleSwitcher";
@@ -57,6 +59,10 @@ export default async function TodayPage({ searchParams }: { searchParams: Promis
       {!user.uiChosenAt && <ChooseLookCard />}
       <Greeting name={user.fullName} timeZone={data.time_zone} localDate={data.local_date} journeyDay={data.journey_status === "active" ? data.journey_day : undefined} />
       {isToday && <DesiredStateCard text={data.desired_state ?? ""} localDate={data.local_date} />}
+      {isToday &&
+        (data.registered_activities ?? [])
+          .filter((a) => isActivityCardVisible(a, data.local_date))
+          .map((a) => <RegisteredActivityCard key={a.id} activity={a} timeZone={data.time_zone} />)}
 
       {data.journey_status === "ended" && <JourneyEnded />}
       {data.journey_status === "not_started" && data.cohort && (

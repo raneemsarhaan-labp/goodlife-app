@@ -36,6 +36,17 @@ export default async function GroupPage({ params, searchParams }: { params: Prom
     supabase.from("group_memberships").select("group_id, groups(name)").eq("user_id", user.id).eq("role", "facilitator").is("ended_on", null),
   ]);
   const ta = await getTranslations("admin.activities");
+  // Which of the facilitator's members registered (spec 003 FR-017; scoped in SQL).
+  const registered = new Map<string, number>(
+    await Promise.all(
+      activities
+        .filter((a) => a.registration_open && !a.cancelled_at)
+        .map(async (a) => {
+          const { data } = await supabase.rpc("activity_registrations", { p_activity: a.id });
+          return [a.id, data?.length ?? 0] as const;
+        }),
+    ),
+  );
   const editing = edit ? activities.find((a) => a.id === edit && a.created_by === user.id) : undefined;
   const ledGroups = (led ?? []).map((g) => ({ id: g.group_id, label: g.groups?.name ?? "" }));
   const groupOptions = ledGroups.length ? ledGroups : [{ id, label: group.name }];
@@ -77,9 +88,10 @@ export default async function GroupPage({ params, searchParams }: { params: Prom
       <Card aria-labelledby="group-activities" className="flex flex-col gap-4">
         <CardTitle id="group-activities">{t("activitiesTitle")}</CardTitle>
         <ActivityList
-          rows={activities.map((a) => ({ ...a, editable: a.created_by === user.id, audience: "" }))}
+          rows={activities.map((a) => ({ ...a, editable: a.created_by === user.id, audience: "", registered: registered.get(a.id) ?? 0 }))}
           timeZone={user.timeZone}
           editHref={(aid) => `/groups/${id}?edit=${aid}`}
+          registrationsHref={(aid) => `/activities/${aid}`}
         />
         <h3 className="font-medium">{editing ? ta("edit") : t("newActivity")}</h3>
         <ActivityForm

@@ -13,9 +13,22 @@ export type ActivityRow = {
   cancelled_at: string | null;
   audience: string;
   editable: boolean;
+  registration_open?: boolean;
+  /** Active registrations visible to the viewer (spec 003 FR-017). */
+  registered?: number;
 };
 
-export async function ActivityList({ rows, timeZone, editHref }: { rows: ActivityRow[]; timeZone: string; editHref: (id: string) => string }) {
+export async function ActivityList({
+  rows,
+  timeZone,
+  editHref,
+  registrationsHref,
+}: {
+  rows: ActivityRow[];
+  timeZone: string;
+  editHref: (id: string) => string;
+  registrationsHref?: (id: string) => string;
+}) {
   const t = await getTranslations("admin.activities");
   if (rows.length === 0) return <EmptyState title={t("none")} />;
   return (
@@ -27,7 +40,12 @@ export async function ActivityList({ rows, timeZone, editHref }: { rows: Activit
           </p>
           <p className="text-sm text-ink-700">{formatDateTime(a.starts_at, timeZone)}</p>
           {a.location && <p className="text-sm text-ink-500">{a.location}</p>}
-          <p className="text-sm text-ink-500">{a.audience}</p>
+          {a.audience && <p className="text-sm text-ink-500">{a.audience}</p>}
+          {a.registration_open && registrationsHref && (
+            <Link href={registrationsHref(a.id)} className="self-start text-sm text-sage-700 underline underline-offset-4">
+              {t("registeredCount", { count: a.registered ?? 0 })}
+            </Link>
+          )}
           {a.editable && !a.cancelled_at && (
             <div className="flex gap-2">
               <Link href={editHref(a.id)} className="inline-flex min-h-11 items-center text-sage-700 underline underline-offset-4">

@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { registrationSettingsSchema, sessionsSchema } from "./activities";
 import { emptyToUndefined, localDateSchema, uuidSchema } from "./common";
 import { emailSchema } from "./onboarding";
 
@@ -29,22 +30,22 @@ export const invitationsSchema = z.object({
   expiresInDays: z.coerce.number().int().min(1).max(365),
 });
 
-// data-model.md activities.title, activities.description, activities.starts_at, activities.ends_at,
-// activities.location, activity_audiences.cohort_id, activity_audiences.group_id
+// data-model.md activities.title, activities.description, activities.location,
+// activity_audiences.cohort_id, activity_audiences.group_id; sessions and registration settings
+// from src/lib/validation/activities.ts (spec 003).
 export const activitySchema = z
   .object({
     id: z.preprocess(emptyToUndefined, uuidSchema.optional()),
     title: z.string().trim().min(2).max(120),
     description: z.preprocess(emptyToUndefined, z.string().trim().max(2000).optional()),
-    startsAt: z.string().regex(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}/),
-    endsAt: z.preprocess(emptyToUndefined, z.string().regex(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}/).optional()),
+    sessions: sessionsSchema,
     location: z.preprocess(emptyToUndefined, z.string().trim().max(300).optional()),
     audience: z.enum(["groups", "cohort"]),
     groupIds: z.array(uuidSchema).default([]),
     cohortId: z.preprocess(emptyToUndefined, uuidSchema.optional()),
+    ...registrationSettingsSchema.shape,
   })
-  .refine((a) => (a.audience === "groups" ? a.groupIds.length > 0 : Boolean(a.cohortId)), { path: ["audience"] })
-  .refine((a) => !a.endsAt || a.endsAt > a.startsAt, { path: ["endsAt"] });
+  .refine((a) => (a.audience === "groups" ? a.groupIds.length > 0 : Boolean(a.cohortId)), { path: ["audience"] });
 
 // data-model.md journey_challenges.journey_day, journey_challenges.text (empty text removes the day's challenge)
 export const journeyChallengeSchema = z.object({
