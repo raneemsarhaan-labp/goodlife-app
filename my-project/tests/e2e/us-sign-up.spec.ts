@@ -17,7 +17,7 @@ test("a mobile registers once, then signs in with its password", async ({ page, 
   await context.clearCookies();
   await page.goto("/sign-in");
   await page.getByLabel("رقم الجوال").fill(phone);
-  await page.getByLabel("كلمة المرور").fill("wrong-password");
+  await page.getByLabel("كلمة المرور", { exact: true }).fill("wrong-password");
   await page.getByRole("button", { name: "دخول" }).click();
   await expect(page.getByText("رقم الجوال أو كلمة المرور غير صحيحة.")).toBeVisible();
   await signIn(page, phone);

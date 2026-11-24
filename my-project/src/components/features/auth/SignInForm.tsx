@@ -3,7 +3,8 @@
 import { useTranslations } from "next-intl";
 import { useActionState } from "react";
 import { Button } from "@/components/ui/Button";
-import { Field } from "@/components/ui/Field";
+import { PasswordField } from "@/components/ui/PasswordField";
+import { PhoneField } from "@/components/ui/PhoneField";
 import { useKeepValuesSubmit } from "@/components/ui/useKeepValuesSubmit";
 import { signIn } from "@/server/actions/onboarding";
 import { useErrorText } from "./useErrorText";
@@ -18,17 +19,8 @@ export function SignInForm() {
   return (
     <form onSubmit={onSubmit} className="flex flex-col gap-5" noValidate>
       <h1 className="text-2xl font-semibold">{t("title")}</h1>
-      <Field
-        name="phone"
-        type="tel"
-        inputMode="tel"
-        label={t("phone")}
-        autoComplete="tel"
-        dir="ltr"
-        error={failed?.field === "phone" ? t("phoneInvalid") : undefined}
-        required
-      />
-      <Field name="password" type="password" label={t("password")} autoComplete="current-password" required />
+      <PhoneField label={t("phone")} error={failed?.field === "phone" ? t("phoneInvalid") : undefined} />
+      <PasswordField name="password" label={t("password")} autoComplete="current-password" required />
       {failed && failed.field !== "phone" && (
         <p role="alert" className="text-dawn-700">
           {failed.field === "password" ? t("wrongCredentials") : errorText(failed.error)}

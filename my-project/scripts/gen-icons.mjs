@@ -7,7 +7,7 @@ const HABIT_ICONS = ["wb_sunny", "menu_book", "auto_stories", "bedtime", "nightl
   "psychology", "spa", "edit_note", "school", "work", "phone_disabled", "mosque", "eco", "schedule"];
 const APP_ICONS = ["repeat", "videocam", "location_on", "delete", "check_box", "star", "bar_chart", "groups", "more_horiz", "add", "close", "settings", "keyboard_arrow_down",
   "keyboard_arrow_up", "check", "check_circle", "format_quote", "autorenew", "north_east", "chevron_left", "local_fire_department",
-  "event", "edit", "flag", "bolt", "palette", "visibility", "today"];
+  "event", "edit", "flag", "bolt", "palette", "visibility", "visibility_off", "today"];
 
 // Raw markup (not URL-encoded): IonIcon parses `;utf8,<svg…>` data URLs with DOMParser, as ionicons/icons does.
 const toDataUrl = (svg) => `data:image/svg+xml;utf8,${svg.replace(/\s+/g, " ").replace(/"/g, "'").trim()}`;

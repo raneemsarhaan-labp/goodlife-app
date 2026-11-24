@@ -4,6 +4,8 @@ import { useTranslations } from "next-intl";
 import { useActionState } from "react";
 import { Button } from "@/components/ui/Button";
 import { Field } from "@/components/ui/Field";
+import { PasswordField } from "@/components/ui/PasswordField";
+import { PhoneField } from "@/components/ui/PhoneField";
 import { useKeepValuesSubmit } from "@/components/ui/useKeepValuesSubmit";
 import { signUp } from "@/server/actions/onboarding";
 import { useErrorText } from "./useErrorText";
@@ -28,9 +30,9 @@ export function SignUpForm() {
   return (
     <form onSubmit={onSubmit} className="flex flex-col gap-5" noValidate>
       <Field name="fullName" label={t("fullName")} autoComplete="name" error={fieldError("fullName")} required minLength={2} maxLength={80} />
-      <Field name="phone" type="tel" inputMode="tel" label={t("phone")} hint={t("phoneHint")} autoComplete="tel" dir="ltr" error={fieldError("phone")} required />
-      <Field name="password" type="password" label={t("password")} hint={t("passwordHint")} autoComplete="new-password" error={fieldError("password")} required minLength={8} />
-      <Field name="confirmPassword" type="password" label={t("confirmPassword")} autoComplete="new-password" error={fieldError("confirmPassword")} required />
+      <PhoneField label={t("phone")} hint={t("phoneHint")} error={fieldError("phone")} />
+      <PasswordField name="password" label={t("password")} hint={t("passwordHint")} autoComplete="new-password" error={fieldError("password")} required minLength={8} />
+      <PasswordField name="confirmPassword" label={t("confirmPassword")} autoComplete="new-password" error={fieldError("confirmPassword")} required />
       {formError && (
         <p role="alert" className="text-dawn-700">
           {formError}

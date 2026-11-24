@@ -47,6 +47,22 @@ export function normalizePhone(raw: string): string {
   const withCode = COUNTRY_CODES.some((c) => v.startsWith(c)) && v.length >= 10 && v.length <= 15;
   return withCode ? `+${v}` : v;
 }
+/**
+ * The number from the mobile field: a country picked from the list plus the number typed. A number
+ * typed with its own "+"/"00" wins; a typed country code (with or without a leading 0) is not doubled.
+ */
+export function composePhone(country: string | null | undefined, raw: string): string {
+  const v = toAsciiDigits(raw).replace(/[\s\-().\u200e\u200f]/g, "");
+  const code = (country ?? "").replace(/\D/g, "");
+  if (!code || v.startsWith("+") || v.startsWith("00")) return normalizePhone(v);
+  let national = v.replace(/^0+/, "");
+  if (national.startsWith(code) && national.length - code.length >= 8) national = national.slice(code.length);
+  // Mobile shapes we know: a Saudi number typed with Egypt picked (or the reverse) is caught here.
+  if (code === "966" && !/^5\d{8}$/.test(national)) return v;
+  if (code === "20" && !/^1\d{9}$/.test(national)) return v;
+  return `+${code}${national}`;
+}
+
 export const PHONE = /^\+[1-9][0-9]{7,14}$/;
 export const phoneSchema = z.string().transform(normalizePhone).pipe(z.string().regex(PHONE));
 export const passwordSchema = z.string().min(8).max(72);

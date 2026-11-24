@@ -4,11 +4,14 @@ import { redirect } from "next/navigation";
 import { log } from "@/lib/log";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { createClient } from "@/lib/supabase/server";
-import { loginEmailFor, signInSchema, signUpSchema } from "@/lib/validation/onboarding";
+import { composePhone, loginEmailFor, signInSchema, signUpSchema } from "@/lib/validation/onboarding";
 import { runSignUp } from "@/server/join";
 import { fail, fromDbError, type Result } from "./result";
 
 export type FormState<T = unknown> = Result<T> | null;
+
+/** The mobile field: picked country + typed number (see composePhone). */
+const phoneFrom = (formData: FormData) => composePhone(formData.get("country") as string | null, String(formData.get("phone") ?? ""));
 
 const field = (error: { issues: { path: PropertyKey[] }[] }) => String(error.issues[0]?.path[0] ?? "");
 
@@ -27,7 +30,7 @@ async function loginEmailForPhone(phone: string): Promise<string> {
 export async function signUp(_prev: FormState, formData: FormData): Promise<FormState> {
   const parsed = signUpSchema.safeParse({
     fullName: formData.get("fullName") ?? "",
-    phone: formData.get("phone") ?? "",
+    phone: phoneFrom(formData),
     password: formData.get("password") ?? "",
     confirmPassword: formData.get("confirmPassword") ?? "",
     timeZone: formData.get("timeZone") || undefined,
@@ -75,7 +78,7 @@ export async function signUp(_prev: FormState, formData: FormData): Promise<Form
 
 /** Sign in with mobile + password. One message for every failure, so it never reveals which numbers exist. */
 export async function signIn(_prev: FormState, formData: FormData): Promise<FormState> {
-  const parsed = signInSchema.safeParse({ phone: formData.get("phone") ?? "", password: formData.get("password") ?? "" });
+  const parsed = signInSchema.safeParse({ phone: phoneFrom(formData), password: formData.get("password") ?? "" });
   if (!parsed.success) return fail("invalid_input", field(parsed.error));
   const supabase = await createClient();
   const { error } = await supabase.auth.signInWithPassword({

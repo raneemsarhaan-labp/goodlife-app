@@ -13,7 +13,7 @@ export const SEED_PASSWORD = "goodlife123";
 export async function signIn(page: Page, who: string, password = SEED_PASSWORD) {
   await page.goto("/sign-in");
   await page.getByLabel("رقم الجوال").fill(SEED_PHONES[who] ?? who);
-  await page.getByLabel("كلمة المرور").fill(password);
+  await page.getByLabel("كلمة المرور", { exact: true }).fill(password);
   await page.getByRole("button", { name: "دخول" }).click();
   // Each role lands on its own home: «يومك», «مجموعاتي», or the admin panel.
   await expect(page).not.toHaveURL(/\/sign-in/);

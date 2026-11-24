@@ -1,5 +1,6 @@
 import { describe, expect, it, vi } from "vitest";
-import { loginEmailFor, normalizePhone, signUpSchema } from "@/lib/validation/onboarding";
+import { composePhone, loginEmailFor, normalizePhone, signUpSchema } from "@/lib/validation/onboarding";
+import { countryForZone } from "@/lib/countries";
 import { runSignUp, type SignUpDeps } from "@/server/join";
 
 const input = { fullName: "عضو جديد", phone: "+966500000101", password: "secret123", confirmPassword: "secret123", timeZone: "Asia/Riyadh" };
@@ -76,6 +77,32 @@ describe("mobile numbers", () => {
     const mismatch = signUpSchema.safeParse({ ...input, confirmPassword: "different1" });
     expect(mismatch.success).toBe(false);
     expect(mismatch.error?.issues[0]?.path).toEqual(["confirmPassword"]);
+  });
+
+  it.each([
+    ["20", "01270600400", "+201270600400"],
+    ["20", "1270600400", "+201270600400"],
+    ["20", "0201270600400", "+201270600400"],
+    ["20", "201270600400", "+201270600400"],
+    ["966", "0500000101", "+966500000101"],
+    ["966", "٠٥٠٠٠٠٠١٠١", "+966500000101"],
+    ["966", "+201270600400", "+201270600400"],
+    ["20", "00966500000101", "+966500000101"],
+    ["971", "0501234567", "+971501234567"],
+  ])("country %s + %s → %s", (country, typed, expected) => {
+    expect(normalizePhone(composePhone(country, typed))).toBe(expected);
+  });
+
+  it("does not attach the wrong country to a Saudi or Egyptian number", () => {
+    expect(normalizePhone(composePhone("966", "01270600400"))).toBe("+201270600400");
+    expect(normalizePhone(composePhone("20", "0500000101"))).toBe("+966500000101");
+    expect(signUpSchema.safeParse({ ...input, phone: composePhone("966", "12345") }).success).toBe(false);
+  });
+
+  it("preselects the country from the device time zone", () => {
+    expect(countryForZone("Africa/Cairo")).toBe("20");
+    expect(countryForZone("Asia/Riyadh")).toBe("966");
+    expect(countryForZone("Pacific/Auckland")).toBe("966");
   });
 
   it("maps a mobile to its mail-less login", () => {
