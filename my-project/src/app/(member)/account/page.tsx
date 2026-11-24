@@ -4,10 +4,13 @@ import { getTranslations } from "next-intl/server";
 import { DeleteRequest } from "@/components/features/account/DeleteRequest";
 import { ExportButton } from "@/components/features/account/ExportButton";
 import { ProfileEditForm } from "@/components/features/account/ProfileEditForm";
+import { ActionForm } from "@/components/ui/ActionForm";
 import { Button } from "@/components/ui/Button";
+import { PasswordField } from "@/components/ui/PasswordField";
 import { Card, CardTitle } from "@/components/ui/Card";
 import { RoleSwitcher } from "@/components/ui/RoleSwitcher";
 import { createClient } from "@/lib/supabase/server";
+import { setOwnPassword } from "@/server/actions/account";
 import { signOut } from "@/server/actions/onboarding";
 import { requireUser } from "@/server/auth";
 
@@ -52,6 +55,20 @@ export default async function AccountPage() {
           <ProfileEditForm profile={profile} zones={Intl.supportedValuesOf("timeZone")} />
         </Card>
       )}
+      <Card aria-labelledby="password" className="flex flex-col gap-3">
+        <CardTitle id="password">{t("passwordTitle")}</CardTitle>
+        <p className="text-sm text-ink-700">{t("passwordIntro")}</p>
+        <ActionForm
+          action={setOwnPassword}
+          submitLabel={t("passwordSave")}
+          resetOnSuccess
+          successText={t("passwordSaved")}
+          fieldErrors={{ "password:invalid_input": t("passwordShort"), "confirmPassword:invalid_input": t("passwordMismatch") }}
+        >
+          <PasswordField name="password" label={t("passwordNew")} hint={t("passwordHint")} autoComplete="new-password" required minLength={8} />
+          <PasswordField name="confirmPassword" label={t("passwordConfirm")} autoComplete="new-password" required />
+        </ActionForm>
+      </Card>
       <Card aria-labelledby="privacy" className="flex flex-col gap-3">
         <CardTitle id="privacy">{t("privacyTitle")}</CardTitle>
         <p className="text-sm text-ink-700">{t("exportHint")}</p>

@@ -6,6 +6,7 @@ import { log } from "@/lib/log";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { createClient } from "@/lib/supabase/server";
 import { profileUpdateSchema, roleSchema } from "@/lib/validation/account";
+import { passwordSchema } from "@/lib/validation/onboarding";
 import { uuidSchema } from "@/lib/validation/common";
 import { getCurrentUser } from "@/server/auth";
 import { currentAdmin, firstIssuePath, formObject } from "./admin/guard";
@@ -26,6 +27,27 @@ export async function updateProfile(_prev: State, formData: FormData): Promise<S
     .eq("id", user.id);
   if (error) return fromDbError(error);
   revalidatePath("/", "layout");
+  return ok(null);
+}
+
+/**
+ * «اختر كلمة مرور»: sets or changes the signed-in member's password, so they can sign in without
+ * waiting for an emailed code.
+ */
+export async function setOwnPassword(_prev: State, formData: FormData): Promise<State> {
+  const user = await getCurrentUser();
+  if (!user) return fail("unauthenticated");
+  const password = passwordSchema.safeParse(formData.get("password") ?? "");
+  if (!password.success) return fail("invalid_input", "password");
+  if (formData.get("password") !== formData.get("confirmPassword")) return fail("invalid_input", "confirmPassword");
+  const supabase = await createClient();
+  const { error } = await supabase.auth.updateUser({ password: password.data });
+  if (error) {
+    log.warn("account: setting the password failed", { code: error.code });
+    if (error.code === "same_password") return ok(null);
+    if (error.code === "weak_password") return fail("invalid_input", "password");
+    return { ...fail("generic"), detail: error.code ?? String(error.status) };
+  }
   return ok(null);
 }
 

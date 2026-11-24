@@ -48,6 +48,7 @@ export function ActionForm<T>({
       {error && (
         <p role="alert" className="text-sm text-dawn-700">
           {error}
+          {state && !state.ok && state.detail && <span dir="ltr" className="ms-2 text-xs text-ink-500">({state.detail})</span>}
         </p>
       )}
       {state?.ok && (renderSuccess?.(state.data) ?? (successText && <p role="status" className="text-sm text-sage-700">{successText}</p>))}
