@@ -4,7 +4,7 @@
 begin;
 
 -- ── Accounts ────────────────────────────────────────────────────────────────
--- Sign in with the email; the 6-digit code arrives in the local mail viewer.
+-- Sign in with the mobile number and the password goodlife123.
 with seed_users(id, email) as (
   values
     ('00000000-0000-4000-8000-000000000001'::uuid, 'admin@example.test'),
@@ -17,7 +17,8 @@ insert into auth.users (
   raw_app_meta_data, raw_user_meta_data, confirmation_token, recovery_token,
   email_change_token_new, email_change, created_at, updated_at
 )
-select '00000000-0000-0000-0000-000000000000', id, 'authenticated', 'authenticated', email, '',
+select '00000000-0000-0000-0000-000000000000', id, 'authenticated', 'authenticated', email,
+       extensions.crypt('goodlife123', extensions.gen_salt('bf')),
        now(), '{"provider":"email","providers":["email"]}', '{}', '', '', '', '', now(), now()
 from seed_users;
 
@@ -26,11 +27,11 @@ select gen_random_uuid(), id, id::text, jsonb_build_object('sub', id::text, 'ema
        'email', now(), now(), now()
 from auth.users where email like '%@example.test';
 
-insert into public.users (id, full_name, email, time_zone, active_role) values
-  ('00000000-0000-4000-8000-000000000001', 'مدير البرنامج', 'admin@example.test', 'Asia/Riyadh', 'admin'),
-  ('00000000-0000-4000-8000-000000000002', 'سارة الميسّرة', 'facilitator@example.test', 'Asia/Riyadh', 'facilitator'),
-  ('00000000-0000-4000-8000-000000000003', 'أحمد المشارك', 'member1@example.test', 'Asia/Riyadh', 'member'),
-  ('00000000-0000-4000-8000-000000000004', 'مريم المشاركة', 'member2@example.test', 'Asia/Riyadh', 'member');
+insert into public.users (id, full_name, email, phone, time_zone, active_role) values
+  ('00000000-0000-4000-8000-000000000001', 'مدير البرنامج', 'admin@example.test', '+966500000001', 'Asia/Riyadh', 'admin'),
+  ('00000000-0000-4000-8000-000000000002', 'سارة الميسّرة', 'facilitator@example.test', '+966500000002', 'Asia/Riyadh', 'facilitator'),
+  ('00000000-0000-4000-8000-000000000003', 'أحمد المشارك', 'member1@example.test', '+966500000003', 'Asia/Riyadh', 'member'),
+  ('00000000-0000-4000-8000-000000000004', 'مريم المشاركة', 'member2@example.test', '+966500000004', 'Asia/Riyadh', 'member');
 
 insert into public.user_roles (user_id, role) values
   ('00000000-0000-4000-8000-000000000001', 'admin'),
@@ -45,9 +46,9 @@ insert into public.user_roles (user_id, role) values
 insert into public.cohorts (id, name, start_date) values
   ('00000000-0000-4000-8000-0000000000c1', 'الدفعة التجريبية', current_date - 11);
 
-insert into public.groups (id, cohort_id, name) values
-  ('00000000-0000-4000-8000-0000000000a1', '00000000-0000-4000-8000-0000000000c1', 'مجموعة النور'),
-  ('00000000-0000-4000-8000-0000000000a2', '00000000-0000-4000-8000-0000000000c1', 'مجموعة الأمل');
+insert into public.groups (id, cohort_id, name, is_default) values
+  ('00000000-0000-4000-8000-0000000000a1', '00000000-0000-4000-8000-0000000000c1', 'مجموعة النور', true),
+  ('00000000-0000-4000-8000-0000000000a2', '00000000-0000-4000-8000-0000000000c1', 'مجموعة الأمل', false);
 
 insert into public.group_memberships (group_id, user_id, role, started_on) values
   ('00000000-0000-4000-8000-0000000000a1', '00000000-0000-4000-8000-000000000002', 'facilitator', current_date - 11),

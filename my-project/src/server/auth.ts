@@ -9,7 +9,8 @@ export type AppRole = Database["public"]["Enums"]["app_role"];
 export type CurrentUser = {
   id: string;
   fullName: string;
-  email: string;
+  email: string | null;
+  phone: string | null;
   timeZone: string;
   activeRole: AppRole;
   roles: AppRole[];
@@ -33,7 +34,7 @@ export const getCurrentUser = cache(async (): Promise<CurrentUser | null> => {
   const [{ data: profile }, { data: roles }] = await Promise.all([
     supabase
       .from("users")
-      .select("id, full_name, email, time_zone, active_role, ui_version, ui_ritual, ui_reduce_transparency, ui_chosen_at")
+      .select("id, full_name, email, phone, time_zone, active_role, ui_version, ui_ritual, ui_reduce_transparency, ui_chosen_at")
       .eq("id", userId)
       .maybeSingle(),
     supabase.from("user_roles").select("role").eq("user_id", userId),
@@ -44,6 +45,7 @@ export const getCurrentUser = cache(async (): Promise<CurrentUser | null> => {
     id: profile.id,
     fullName: profile.full_name,
     email: profile.email,
+    phone: profile.phone,
     timeZone: profile.time_zone,
     activeRole: profile.active_role,
     roles: (roles ?? []).map((r) => r.role),

@@ -2,7 +2,6 @@ import { z } from "zod";
 import { HABIT_ICON_NAMES } from "@/ui/icons.generated";
 import { registrationSettingsSchema, sessionsSchema } from "./activities";
 import { emptyToUndefined, localDateSchema, uuidSchema } from "./common";
-import { emailSchema } from "./onboarding";
 
 const name = z.string().trim().min(2).max(80);
 
@@ -20,7 +19,8 @@ export const groupSchema = z.object({
   name,
 });
 
-export const personInGroupSchema = z.object({ email: emailSchema, groupId: uuidSchema });
+export const personInGroupSchema = z.object({ person: z.string().trim().min(3).max(254), groupId: uuidSchema });
+export const resetPasswordSchema = z.object({ person: z.string().trim().min(3).max(254), password: z.string().min(8).max(72) });
 export const userInGroupSchema = z.object({ userId: uuidSchema, groupId: uuidSchema });
 
 // data-model.md invitation_codes.max_uses, invitation_codes.expires_at (expiry given in days)

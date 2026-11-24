@@ -1,55 +1,37 @@
 import { expect, type Page } from "@playwright/test";
 
-/** Local Supabase mail viewer (Mailpit) started by `supabase start`. */
-const MAILPIT_URL = process.env.MAILPIT_URL ?? "http://127.0.0.1:54324";
+/** Seed accounts (supabase/seed.sql): mobile numbers; every seed password is goodlife123. */
+const SEED_PHONES: Record<string, string> = {
+  "admin@example.test": "0500000001",
+  "facilitator@example.test": "0500000002",
+  "member1@example.test": "0500000003",
+  "member2@example.test": "0500000004",
+};
+export const SEED_PASSWORD = "goodlife123";
 
-type MailSummary = { ID: string; To: { Address: string }[]; Created: string };
-
-/** Waits for the newest sign-in email to `email` sent after `since`, and returns its 6-digit code. */
-export async function latestSignInCode(email: string, since: Date): Promise<string> {
-  for (let attempt = 0; attempt < 30; attempt++) {
-    const res = await fetch(`${MAILPIT_URL}/api/v1/search?query=${encodeURIComponent(`to:${email}`)}`);
-    const { messages } = (await res.json()) as { messages: MailSummary[] };
-    const fresh = messages.find((m) => new Date(m.Created) >= since);
-    if (fresh) {
-      const body = (await (await fetch(`${MAILPIT_URL}/api/v1/message/${fresh.ID}`)).json()) as { Text: string; HTML: string };
-      const code = `${body.Text} ${body.HTML}`.match(/\b(\d{6})\b/)?.[1];
-      if (code) return code;
-    }
-    await new Promise((r) => setTimeout(r, 500));
-  }
-  throw new Error(`No sign-in code arrived for ${email}`);
-}
-
-/** Signs in through the real UI (email → 6-digit code). */
-export async function signIn(page: Page, email: string) {
+/** Signs in through the real UI (mobile + password). Takes a seed account's name or a mobile number. */
+export async function signIn(page: Page, who: string, password = SEED_PASSWORD) {
   await page.goto("/sign-in");
-  const since = new Date(Date.now() - 1000);
-  await page.getByLabel("البريد الإلكتروني").fill(email);
-  await page.getByRole("button", { name: "أرسل الرمز" }).click();
-  const code = await latestSignInCode(email, since);
-  await page.getByLabel("رمز الدخول").fill(code);
+  await page.getByLabel("رقم الجوال").fill(SEED_PHONES[who] ?? who);
+  await page.getByLabel("كلمة المرور").fill(password);
   await page.getByRole("button", { name: "دخول" }).click();
   // Each role lands on its own home: «يومك», «مجموعاتي», or the admin panel.
   await expect(page).not.toHaveURL(/\/sign-in/);
 }
 
-/** Joins with the seeded invitation code as a brand-new member and stops on /welcome. */
-export async function joinNewMember(page: Page, email = `e2e-${Date.now()}-${Math.random().toString(36).slice(2, 6)}@example.test`) {
+/** A mobile number no seed account uses. */
+export const newPhone = () => `05${String(Date.now()).slice(-7)}${Math.floor(Math.random() * 10)}`;
+
+/** Signs up as a brand-new member (joins the default group) and stops on /welcome. Returns the mobile. */
+export async function joinNewMember(page: Page, phone = newPhone()) {
   await page.goto("/join");
-  await page.getByLabel("رمز الدعوة").fill("taybah26");
-  await page.getByRole("button", { name: "تحقّق من الرمز" }).click();
-  await expect(page).toHaveURL("/join/profile");
   await page.getByLabel("الاسم الكامل").fill("مشارك الاختبار");
-  await page.getByLabel("البريد الإلكتروني").fill(email);
-  // The membership is created only after the code emailed to that address is entered.
-  const since = new Date(Date.now() - 1000);
+  await page.getByLabel("رقم الجوال").fill(phone);
+  await page.getByLabel("كلمة المرور", { exact: true }).fill(SEED_PASSWORD);
+  await page.getByLabel("أعد كتابة كلمة المرور").fill(SEED_PASSWORD);
   await page.getByRole("button", { name: "أنشئ حسابي" }).click();
-  const code = await latestSignInCode(email, since);
-  await page.getByLabel("رمز الدخول").fill(code);
-  await page.getByRole("button", { name: "دخول" }).click();
   await expect(page).toHaveURL("/welcome");
-  return email;
+  return phone;
 }
 
 /** Signs in in a fresh context with no `gl_ui` cookie, so only the account decides the version. */

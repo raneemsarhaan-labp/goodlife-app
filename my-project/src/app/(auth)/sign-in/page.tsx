@@ -5,16 +5,10 @@ import { SignInForm } from "@/components/features/auth/SignInForm";
 
 export const generateMetadata = pageTitle("signIn");
 
-export default async function SignInPage({ searchParams }: { searchParams: Promise<{ link?: string }> }) {
+export default async function SignInPage() {
   const t = await getTranslations("signIn");
-  const { link } = await searchParams;
   return (
     <main id="main" className="flex flex-col gap-6">
-      {(link === "expired" || link === "join_failed") && (
-        <p role="alert" className="rounded-2xl bg-dawn-50 p-4 text-ink-900">
-          {t(link === "expired" ? "linkExpired" : "joinFailed")}
-        </p>
-      )}
       <SignInForm />
       <p className="text-center text-ink-700">
         {t("noAccount")}{" "}

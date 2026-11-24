@@ -1,39 +1,41 @@
 # Deploying to Vercel with Supabase
 
 The build applies database migrations itself (`scripts/migrate.mjs`, run by `npm run build`), so a new
-environment needs only a Supabase database connected to the Vercel project and one setting for the
-first admin.
+environment needs only a Supabase database connected to the Vercel project. No email is ever sent:
+members sign up and sign in with their mobile number and a password.
 
 ## 1. Create the database (Vercel → Storage)
 
 Vercel project **goodlife-app** → **Storage** → **Create Database** → **Supabase** → connect it to the
-project for Production and Preview. The integration adds `NEXT_PUBLIC_SUPABASE_URL`,
-`NEXT_PUBLIC_SUPABASE_ANON_KEY`, `SUPABASE_SERVICE_ROLE_KEY` and `POSTGRES_URL_NON_POOLING`.
+project for Production (and Preview if you want preview builds to work). The integration adds
+`NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`, `SUPABASE_SERVICE_ROLE_KEY` and
+`POSTGRES_URL_NON_POOLING`.
 
-## 2. Name the first admin
+## 2. Supabase settings
 
-Vercel → Settings → Environment Variables → `BOOTSTRAP_ADMIN_EMAIL` = your email (Production).
-Optional: `NEXT_PUBLIC_SITE_URL` (defaults to the project's production domain).
+Supabase dashboard → Authentication → Sign In / Providers:
 
-## 3. Supabase sign-in by code
+- **Email**: enabled (the app keeps a mail-less login behind each mobile number).
+- **Allow new users to sign up**: off. The app creates accounts itself on the server.
 
-Supabase dashboard → Authentication:
+## 3. Deploy, sign up, become admin
 
-- **Sign In / Providers → Email**: enabled; OTP length 6. ("Confirm email" can stay on: the app
-  creates members' accounts already confirmed.)
-- **Emails → Magic Link** template: paste `supabase/templates/sign-in-code.html` (it shows `{{ .Token }}`).
-- **URL Configuration**: Site URL = the Vercel production URL; add it to Redirect URLs.
+1. Deploy. The build log shows `[migrate] …` lines; on a fresh database it also creates
+   «الدفعة الأولى» / «المجموعة الأولى», the group new sign-ups join.
+2. Open the app → «أنشئ حسابًا» → name, mobile, password.
+3. Vercel → Settings → Environment Variables → `BOOTSTRAP_ADMIN_PHONE` = that mobile (Production),
+   then redeploy. The log shows `[migrate] +9665… is now admin.` You can remove the variable afterwards.
 
-## 4. Deploy
+## Running the program
 
-Redeploy in Vercel. The build log shows `[migrate] …` lines: 22 files applied on the first deploy (21
-migrations and the starter content), then the first-admin invitation code. Open `/join`, enter that
-code and the `BOOTSTRAP_ADMIN_EMAIL` address: that account becomes admin, and joining signs you in
-straight away (no email needed). Later deploys apply only new migrations.
+- **Which group new members join**: admin → the cohort → «اجعلها مجموعة التسجيل» on a group. Without a
+  choice, it is the first open group of the newest cohort. Closing a group stops sign-ups to it.
+- **Forgotten passwords**: admin home → «إعادة تعيين كلمة المرور» (mobile + new password), then tell the
+  member.
+- **Facilitators, admins, adding someone to a group**: by mobile number.
 
 ## Notes
 
 - Demo people and cohorts (`supabase/seed.sql`) are local only; production gets `supabase/content.sql`.
-- Signing in again later uses a 6-digit code by email. Supabase's built-in sender only delivers to
-  members of the Supabase organization's team and only a few emails an hour, so set up custom SMTP
-  (Authentication → SMTP, e.g. Resend) before inviting a cohort.
+  Seed accounts sign in with 0500000001…0500000004 and the password `goodlife123`.
+- Anyone with the app link can sign up; each mobile number registers only once.

@@ -9,7 +9,9 @@ export type ErrorCode =
   | "code_expired"
   | "code_used_up"
   | "limit_reached"
-  | "conflict";
+  | "conflict"
+  | "signup_closed"
+  | "generic";
 
 export type Result<T> = { ok: true; data: T } | { ok: false; error: ErrorCode; field?: string };
 

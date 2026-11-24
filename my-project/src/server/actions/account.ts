@@ -22,7 +22,7 @@ export async function updateProfile(_prev: State, formData: FormData): Promise<S
   const supabase = await createClient();
   const { error } = await supabase
     .from("users")
-    .update({ full_name: p.fullName, phone: p.phone ?? null, gender: p.gender ?? null, city: p.city ?? null, time_zone: p.timeZone })
+    .update({ full_name: p.fullName, gender: p.gender ?? null, city: p.city ?? null, time_zone: p.timeZone })
     .eq("id", user.id);
   if (error) return fromDbError(error);
   revalidatePath("/", "layout");

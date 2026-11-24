@@ -5,14 +5,14 @@ import { ActionForm } from "@/components/ui/ActionForm";
 import { Field } from "@/components/ui/Field";
 import { updateProfile } from "@/server/actions/account";
 
-export function ProfileEditForm({ profile, zones }: { zones: string[]; profile: { full_name: string; email: string; phone: string | null; gender: "male" | "female" | null; city: string | null; time_zone: string } }) {
+export function ProfileEditForm({ profile, zones }: { zones: string[]; profile: { full_name: string; email: string | null; phone: string | null; gender: "male" | "female" | null; city: string | null; time_zone: string } }) {
   const t = useTranslations("account");
   const tj = useTranslations("join");
   return (
     <ActionForm action={updateProfile} submitLabel={t("save")} successText={t("saved")}>
       <Field name="fullName" label={tj("fullName")} defaultValue={profile.full_name} required minLength={2} maxLength={80} />
-      <Field name="email" label={tj("email")} defaultValue={profile.email} dir="ltr" readOnly disabled />
-      <Field name="phone" type="tel" dir="ltr" label={tj("phone")} hint={tj("phoneHint")} defaultValue={profile.phone ?? ""} />
+      <Field name="phone" type="tel" dir="ltr" label={tj("phone")} hint={tj("phoneLocked")} defaultValue={profile.phone ?? ""} readOnly disabled />
+      {profile.email && <Field name="email" label={tj("email")} defaultValue={profile.email} dir="ltr" readOnly disabled />}
       <fieldset className="flex flex-col gap-2">
         <legend className="mb-1.5 font-medium">{tj("gender")}</legend>
         {(["", "female", "male"] as const).map((value) => (

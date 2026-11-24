@@ -7,7 +7,7 @@ import { Field } from "@/components/ui/Field";
 import { formatNumber } from "@/lib/format";
 import { createClient } from "@/lib/supabase/server";
 import { processAccountDeletion } from "@/server/actions/account";
-import { grantAdmin, revokeAdmin } from "@/server/actions/admin/structure";
+import { grantAdmin, resetPassword, revokeAdmin } from "@/server/actions/admin/structure";
 import { formatDate as fmtDate } from "@/lib/format";
 import { localDate } from "@/lib/journey";
 import { requireRole } from "@/server/auth";
@@ -24,9 +24,9 @@ export default async function AdminHome() {
     count(supabase.from("group_memberships").select("*", { count: "exact", head: true }).eq("role", "member").is("ended_on", null)),
     count(supabase.from("group_memberships").select("*", { count: "exact", head: true }).eq("role", "facilitator").is("ended_on", null)),
   ]);
-  const { data: admins } = await supabase.from("user_roles").select("user_id, users(full_name, email)").eq("role", "admin");
+  const { data: admins } = await supabase.from("user_roles").select("user_id, users(full_name, email, phone)").eq("role", "admin");
   const me = await requireRole("admin");
-  const { data: deletions } = await supabase.from("users").select("id, full_name, email, deletion_requested_at").not("deletion_requested_at", "is", null).order("deletion_requested_at");
+  const { data: deletions } = await supabase.from("users").select("id, full_name, email, phone, deletion_requested_at").not("deletion_requested_at", "is", null).order("deletion_requested_at");
 
   return (
     <>
@@ -51,7 +51,7 @@ export default async function AdminHome() {
           {(admins ?? []).map((a) => (
             <li key={a.user_id} className="flex items-center justify-between gap-3">
               <span>
-                {a.users?.full_name} <span className="text-sm text-ink-500" dir="ltr">{a.users?.email}</span>
+                {a.users?.full_name} <span className="text-sm text-ink-500" dir="ltr">{a.users?.phone ?? a.users?.email}</span>
               </span>
               <form action={revokeAdmin}>
                 <input type="hidden" name="userId" value={a.user_id} />
@@ -60,8 +60,16 @@ export default async function AdminHome() {
             </li>
           ))}
         </ul>
-        <ActionForm action={grantAdmin} submitLabel={t("home.grant")} resetOnSuccess successText={t("saved")}>
-          <Field name="email" type="email" dir="ltr" label={t("home.grantAdmin")} required />
+        <ActionForm action={grantAdmin} submitLabel={t("home.grant")} resetOnSuccess successText={t("saved")} fieldErrors={{ "person:not_found": t("groups.notFound") }}>
+          <Field name="person" type="tel" dir="ltr" label={t("home.grantAdmin")} required />
+        </ActionForm>
+      </Card>
+      <Card aria-labelledby="reset-password" className="flex flex-col gap-3">
+        <CardTitle id="reset-password">{t("home.resetTitle")}</CardTitle>
+        <p className="text-sm text-ink-700">{t("home.resetIntro")}</p>
+        <ActionForm action={resetPassword} submitLabel={t("home.resetSubmit")} resetOnSuccess successText={t("saved")} fieldErrors={{ "person:not_found": t("groups.notFound"), "password:invalid_input": t("home.resetShort") }}>
+          <Field name="person" type="tel" dir="ltr" label={t("home.resetPhone")} required />
+          <Field name="password" type="text" dir="ltr" label={t("home.resetPassword")} autoComplete="off" required minLength={8} />
         </ActionForm>
       </Card>
       <Card aria-labelledby="deletions" className="flex flex-col gap-3">
@@ -71,7 +79,7 @@ export default async function AdminHome() {
           {(deletions ?? []).map((d) => (
             <li key={d.id} className="flex flex-wrap items-center justify-between gap-2">
               <span>
-                {d.full_name} <span dir="ltr" className="text-sm text-ink-500">{d.email}</span>
+                {d.full_name} <span dir="ltr" className="text-sm text-ink-500">{d.phone ?? d.email}</span>
                 <span className="block text-sm text-ink-500">
                   {t("home.requestedOn", { date: fmtDate(localDate(me.timeZone, new Date(d.deletion_requested_at!)), { withYear: true }) })}
                 </span>

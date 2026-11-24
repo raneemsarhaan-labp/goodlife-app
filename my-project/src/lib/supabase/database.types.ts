@@ -149,6 +149,20 @@ isOneToOne: false
       referencedColumns: ["id"]
     }
                   ]
+                },"app_bootstrap": {
+                  Row: {
+                    "admin_email": string,"created_at": string,"id": boolean
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "admin_email": string,"created_at"?: string,"id"?: boolean
+                  }
+                  Update: {
+                    "admin_email"?: string,"created_at"?: string,"id"?: boolean
+                  }
+                  Relationships: [
+                    
+                  ]
                 },"challenge_completions": {
                   Row: {
                     "client_mutation_id": string,"cohort_id": string,"created_at": string,"id": string,"journey_challenge_id": string | null,"kind": Database["public"]['Enums']["challenge_kind"],"library_challenge_id": string | null,"local_date": string,"own_challenge_id": string | null,"recorded_at": string | null,"user_id": string
@@ -463,14 +477,14 @@ isOneToOne: false
                   ]
                 },"groups": {
                   Row: {
-                    "cohort_id": string,"created_at": string,"features": NonNullable<Json>,"id": string,"name": string,"status": Database["public"]['Enums']["group_status"],"updated_at": string
+                    "cohort_id": string,"created_at": string,"features": NonNullable<Json>,"id": string,"is_default": boolean,"name": string,"status": Database["public"]['Enums']["group_status"],"updated_at": string
                   }
                   ComputedFields: never
                   Insert: {
-                    "cohort_id": string,"created_at"?: string,"features"?: NonNullable<Json>,"id"?: string,"name": string,"status"?: Database["public"]['Enums']["group_status"],"updated_at"?: string
+                    "cohort_id": string,"created_at"?: string,"features"?: NonNullable<Json>,"id"?: string,"is_default"?: boolean,"name": string,"status"?: Database["public"]['Enums']["group_status"],"updated_at"?: string
                   }
                   Update: {
-                    "cohort_id"?: string,"created_at"?: string,"features"?: NonNullable<Json>,"id"?: string,"name"?: string,"status"?: Database["public"]['Enums']["group_status"],"updated_at"?: string
+                    "cohort_id"?: string,"created_at"?: string,"features"?: NonNullable<Json>,"id"?: string,"is_default"?: boolean,"name"?: string,"status"?: Database["public"]['Enums']["group_status"],"updated_at"?: string
                   }
                   Relationships: [
                     {
@@ -885,14 +899,14 @@ isOneToOne: false
                   ]
                 },"users": {
                   Row: {
-                    "active_role": Database["public"]['Enums']["app_role"],"city": string | null,"created_at": string,"deletion_requested_at": string | null,"email": string,"full_name": string,"gender": Database["public"]['Enums']["gender"] | null,"id": string,"notification_prefs": NonNullable<Json>,"phone": string | null,"time_zone": string,"ui_chosen_at": string | null,"ui_reduce_transparency": boolean,"ui_ritual": boolean,"ui_version": Database["public"]['Enums']["ui_version"],"updated_at": string
+                    "active_role": Database["public"]['Enums']["app_role"],"city": string | null,"created_at": string,"deletion_requested_at": string | null,"email": string | null,"full_name": string,"gender": Database["public"]['Enums']["gender"] | null,"id": string,"notification_prefs": NonNullable<Json>,"phone": string | null,"time_zone": string,"ui_chosen_at": string | null,"ui_reduce_transparency": boolean,"ui_ritual": boolean,"ui_version": Database["public"]['Enums']["ui_version"],"updated_at": string
                   }
                   ComputedFields: never
                   Insert: {
-                    "active_role"?: Database["public"]['Enums']["app_role"],"city"?: string | null,"created_at"?: string,"deletion_requested_at"?: string | null,"email": string,"full_name": string,"gender"?: Database["public"]['Enums']["gender"] | null,"id": string,"notification_prefs"?: NonNullable<Json>,"phone"?: string | null,"time_zone"?: string,"ui_chosen_at"?: string | null,"ui_reduce_transparency"?: boolean,"ui_ritual"?: boolean,"ui_version"?: Database["public"]['Enums']["ui_version"],"updated_at"?: string
+                    "active_role"?: Database["public"]['Enums']["app_role"],"city"?: string | null,"created_at"?: string,"deletion_requested_at"?: string | null,"email"?: string | null,"full_name": string,"gender"?: Database["public"]['Enums']["gender"] | null,"id": string,"notification_prefs"?: NonNullable<Json>,"phone"?: string | null,"time_zone"?: string,"ui_chosen_at"?: string | null,"ui_reduce_transparency"?: boolean,"ui_ritual"?: boolean,"ui_version"?: Database["public"]['Enums']["ui_version"],"updated_at"?: string
                   }
                   Update: {
-                    "active_role"?: Database["public"]['Enums']["app_role"],"city"?: string | null,"created_at"?: string,"deletion_requested_at"?: string | null,"email"?: string,"full_name"?: string,"gender"?: Database["public"]['Enums']["gender"] | null,"id"?: string,"notification_prefs"?: NonNullable<Json>,"phone"?: string | null,"time_zone"?: string,"ui_chosen_at"?: string | null,"ui_reduce_transparency"?: boolean,"ui_ritual"?: boolean,"ui_version"?: Database["public"]['Enums']["ui_version"],"updated_at"?: string
+                    "active_role"?: Database["public"]['Enums']["app_role"],"city"?: string | null,"created_at"?: string,"deletion_requested_at"?: string | null,"email"?: string | null,"full_name"?: string,"gender"?: Database["public"]['Enums']["gender"] | null,"id"?: string,"notification_prefs"?: NonNullable<Json>,"phone"?: string | null,"time_zone"?: string,"ui_chosen_at"?: string | null,"ui_reduce_transparency"?: boolean,"ui_ritual"?: boolean,"ui_version"?: Database["public"]['Enums']["ui_version"],"updated_at"?: string
                   }
                   Relationships: [
                     
@@ -943,6 +957,9 @@ isOneToOne: false
 "assign_facilitator":
 { Args: { "p_group": string,"p_user": string }; Returns: undefined
                            },
+"bootstrap_admin":
+{ Args: { "p_user": string }; Returns: boolean
+                           },
 "can_manage_activity":
 { Args: { "p_activity": string }; Returns: boolean
                            },
@@ -986,6 +1003,9 @@ isOneToOne: false
 { Args: { "p_user": string }; Returns: string
                            },
 "current_plan_id":
+{ Args: Record<PropertyKey, never>; Returns: string
+                           },
+"default_signup_group":
 { Args: Record<PropertyKey, never>; Returns: string
                            },
 "dismiss_activity_card":
@@ -1158,6 +1178,9 @@ isOneToOne: false
 "register_for_activity":
 { Args: { "p_activity": string }; Returns: undefined
                            },
+"register_member":
+{ Args: { "p_auth_user": string,"p_full_name": string,"p_phone": string,"p_time_zone": string }; Returns: string
+                           },
 "remove_facilitator":
 { Args: { "p_group": string,"p_user": string }; Returns: undefined
                            },
@@ -1202,6 +1225,9 @@ isOneToOne: false
                            },
 "set_challenge_done":
 { Args: { "p_client_mutation_id": string,"p_done": boolean,"p_kind": Database["public"]['Enums']["challenge_kind"],"p_local_date": string,"p_recorded_at"?: string }; Returns: undefined
+                           },
+"set_default_group":
+{ Args: { "p_group": string }; Returns: undefined
                            },
 "set_habit_done":
 { Args: { "p_client_mutation_id": string,"p_done": boolean,"p_habit": string,"p_local_date": string,"p_recorded_at"?: string }; Returns: Json

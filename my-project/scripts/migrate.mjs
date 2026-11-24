@@ -8,11 +8,9 @@
 // 1. Each file in supabase/migrations is applied once, in order, inside a transaction, and recorded in
 //    public.goodlife_migrations.
 // 2. supabase/content.sql (starter content) is applied once, recorded as "content.sql".
-// 3. With BOOTSTRAP_ADMIN_EMAIL set and no admin yet: that email is stored for 0021_bootstrap, and a
-//    starter cohort, group and invitation code are created. The code is printed in the build log.
-//    Whoever joins with that email becomes the first admin.
+// 3. Makes sure there is an open group for sign-ups (creates a first cohort and group if none).
+// 4. With BOOTSTRAP_ADMIN_PHONE set: the account with that mobile is made admin.
 import { readdirSync, readFileSync } from "node:fs";
-import { randomInt } from "node:crypto";
 import path from "node:path";
 import postgres from "postgres";
 
@@ -30,9 +28,6 @@ for (const key of [...clean.searchParams.keys()]) if (key !== "sslmode") clean.s
 const ssl = clean.searchParams.get("sslmode") === "disable" ? false : "require";
 clean.searchParams.delete("sslmode");
 const sql = postgres(clean.toString(), { ssl, max: 1, onnotice: () => {}, connect_timeout: 30 });
-
-const ALPHABET = "ABCDEFGHJKMNPQRSTUVWXYZ23456789"; // matches invitation_codes.code (no 0/O, 1/I/L)
-const newCode = () => Array.from({ length: 8 }, () => ALPHABET[randomInt(ALPHABET.length)]).join("");
 
 async function apply(name, body) {
   const [done] = await sql`select 1 from public.goodlife_migrations where name = ${name}`;
@@ -57,42 +52,34 @@ try {
   if (await apply("content.sql", readFileSync(path.join(root, "supabase", "content.sql"), "utf8"))) applied++;
   console.log(`[migrate] ${applied} applied, ${files.length + 1 - applied} already in place.`);
 
-  // Accounts created before joining confirmed the address up front were left unconfirmed, and
-  // Supabase answers a sign-in request for those with a "confirm your signup" link, not the code.
-  // Every app member joined with an invitation code, so their addresses are confirmed here.
-  try {
-    const fixed = await sql`update auth.users set email_confirmed_at = now()
-                            where email_confirmed_at is null and id in (select id from public.users)`;
-    if (fixed.count) console.log(`[migrate] confirmed ${fixed.count} member email(s).`);
-  } catch (error) {
-    console.warn("[migrate] could not confirm member emails:", error.message);
+  // Sign-up needs an open group to join (0022 register_member). On a fresh project, create one.
+  const [{ groups }] = await sql`select count(*)::int as groups from public.groups where status = 'open'`;
+  if (groups === 0) {
+    const [cohort] = await sql`insert into public.cohorts (name, start_date)
+                               values ('الدفعة الأولى', (now() at time zone 'Asia/Riyadh')::date)
+                               on conflict (name) do update set name = excluded.name returning id`;
+    await sql`insert into public.groups (cohort_id, name, is_default) values (${cohort.id}, 'المجموعة الأولى', true)
+              on conflict (cohort_id, name) do update set status = 'open', is_default = true`;
+    console.log("[migrate] Created «الدفعة الأولى» / «المجموعة الأولى» for new sign-ups.");
   }
 
-  const email = process.env.BOOTSTRAP_ADMIN_EMAIL?.trim().toLowerCase();
-  const [{ admins }] = await sql`select count(*)::int as admins from public.user_roles where role = 'admin'`;
-  if (email && admins === 0) {
-    await sql`insert into public.app_bootstrap (admin_email) values (${email})
-              on conflict (id) do update set admin_email = excluded.admin_email`;
-    // Already joined with that email? Grant now.
-    const [user] = await sql`select id from public.users where lower(email) = ${email}`;
-    if (user) {
-      await sql`select public.bootstrap_admin(${user.id}::uuid)`;
-      console.log(`[migrate] ${email} is now admin.`);
+  // The owner's account becomes admin: sign up in the app first, then set BOOTSTRAP_ADMIN_PHONE to
+  // that mobile and redeploy.
+  const rawPhone = process.env.BOOTSTRAP_ADMIN_PHONE?.trim();
+  if (rawPhone) {
+    let phone = rawPhone.replace(/[\s\-().]/g, "");
+    if (phone.startsWith("00")) phone = `+${phone.slice(2)}`;
+    if (/^05\d{8}$/.test(phone)) phone = `+966${phone.slice(1)}`;
+    const [user] = await sql`select id from public.users where phone = ${phone}`;
+    if (!user) {
+      console.log(`[migrate] BOOTSTRAP_ADMIN_PHONE: no account with ${phone} yet. Sign up with it, then redeploy.`);
     } else {
-      let [invite] = await sql`select code from public.invitation_codes where revoked_at is null and expires_at > now() and uses < max_uses order by created_at limit 1`;
-      if (!invite) {
-        const [cohort] = await sql`insert into public.cohorts (name, start_date)
-                                   values ('الدفعة الأولى', (now() at time zone 'Asia/Riyadh')::date)
-                                   on conflict (name) do update set name = excluded.name returning id`;
-        const [group] = await sql`insert into public.groups (cohort_id, name) values (${cohort.id}, 'المجموعة الأولى')
-                                  on conflict (cohort_id, name) do update set name = excluded.name returning id`;
-        [invite] = await sql`insert into public.invitation_codes (code, cohort_id, group_id, expires_at, max_uses)
-                             values (${newCode()}, ${cohort.id}, ${group.id}, now() + interval '30 days', 20) returning code`;
-      }
-      console.log(`[migrate] First admin: join at /join with invitation code ${invite.code} using ${email}.`);
+      const granted = await sql`insert into public.user_roles (user_id, role) values (${user.id}, 'admin') on conflict do nothing`;
+      console.log(granted.count ? `[migrate] ${phone} is now admin.` : `[migrate] ${phone} is already admin.`);
     }
-  } else if (admins === 0) {
-    console.log("[migrate] No admin yet. Set BOOTSTRAP_ADMIN_EMAIL and redeploy to create the first one.");
+  } else {
+    const [{ admins }] = await sql`select count(*)::int as admins from public.user_roles where role = 'admin'`;
+    if (admins === 0) console.log("[migrate] No admin yet. Sign up in the app, set BOOTSTRAP_ADMIN_PHONE to that mobile and redeploy.");
   }
 } catch (error) {
   console.error("[migrate] failed:", error.message);

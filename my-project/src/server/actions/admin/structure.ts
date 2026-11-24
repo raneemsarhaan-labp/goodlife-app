@@ -2,8 +2,10 @@
 
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
-import { cohortSchema, groupSchema, personInGroupSchema, userInGroupSchema, groupSettingsSchema } from "@/lib/validation/admin";
-import { emailSchema } from "@/lib/validation/onboarding";
+import { cohortSchema, groupSchema, personInGroupSchema, resetPasswordSchema, userInGroupSchema, groupSettingsSchema } from "@/lib/validation/admin";
+import { emailSchema, normalizePhone, PHONE } from "@/lib/validation/onboarding";
+import { createAdminClient } from "@/lib/supabase/admin";
+import { log } from "@/lib/log";
 import { uuidSchema } from "@/lib/validation/common";
 import { fail, fromDbError, ok, type Result } from "../result";
 import { currentAdmin, firstIssuePath, formObject } from "./guard";
@@ -37,9 +39,17 @@ export async function upsertGroup(_prev: State, formData: FormData): Promise<Sta
   return ok(null);
 }
 
-async function userIdByEmail(email: string): Promise<string | null> {
+/** Finds an account by mobile number (any common format) or by email. */
+async function userIdByContact(value: string): Promise<string | null> {
   const supabase = await createClient();
-  const { data } = await supabase.from("users").select("id").eq("email", email).maybeSingle();
+  const phone = normalizePhone(value);
+  if (PHONE.test(phone)) {
+    const { data } = await supabase.from("users").select("id").eq("phone", phone).maybeSingle();
+    return data?.id ?? null;
+  }
+  const email = emailSchema.safeParse(value);
+  if (!email.success) return null;
+  const { data } = await supabase.from("users").select("id").eq("email", email.data).maybeSingle();
   return data?.id ?? null;
 }
 
@@ -47,9 +57,9 @@ async function userIdByEmail(email: string): Promise<string | null> {
 export async function assignFacilitator(_prev: State, formData: FormData): Promise<State> {
   if (!(await currentAdmin())) return fail("forbidden");
   const parsed = personInGroupSchema.safeParse(formObject(formData));
-  if (!parsed.success) return fail("invalid_input", "email");
-  const userId = await userIdByEmail(parsed.data.email);
-  if (!userId) return fail("not_found", "email");
+  if (!parsed.success) return fail("invalid_input", "person");
+  const userId = await userIdByContact(parsed.data.person);
+  if (!userId) return fail("not_found", "person");
   const supabase = await createClient();
   const { error } = await supabase.rpc("assign_facilitator", { p_user: userId, p_group: parsed.data.groupId });
   if (error) return fromDbError(error);
@@ -61,12 +71,12 @@ export async function assignFacilitator(_prev: State, formData: FormData): Promi
 export async function addMember(_prev: State, formData: FormData): Promise<State> {
   if (!(await currentAdmin())) return fail("forbidden");
   const parsed = personInGroupSchema.safeParse(formObject(formData));
-  if (!parsed.success) return fail("invalid_input", "email");
-  const userId = await userIdByEmail(parsed.data.email);
-  if (!userId) return fail("not_found", "email");
+  if (!parsed.success) return fail("invalid_input", "person");
+  const userId = await userIdByContact(parsed.data.person);
+  if (!userId) return fail("not_found", "person");
   const supabase = await createClient();
   const { error } = await supabase.rpc("add_member", { p_user: userId, p_group: parsed.data.groupId });
-  if (error) return error.message.startsWith("conflict") ? fail("conflict", "email") : fromDbError(error);
+  if (error) return error.message.startsWith("conflict") ? fail("conflict", "person") : fromDbError(error);
   revalidatePath("/admin", "layout");
   return ok(null);
 }
@@ -91,10 +101,9 @@ export async function moveMember(formData: FormData): Promise<void> {
 
 export async function grantAdmin(_prev: State, formData: FormData): Promise<State> {
   if (!(await currentAdmin())) return fail("forbidden");
-  const email = emailSchema.safeParse(formData.get("email") ?? "");
-  if (!email.success) return fail("invalid_input", "email");
-  const userId = await userIdByEmail(email.data);
-  if (!userId) return fail("not_found", "email");
+  const person = String(formData.get("person") ?? "").trim();
+  const userId = person ? await userIdByContact(person) : null;
+  if (!userId) return fail("not_found", "person");
   const supabase = await createClient();
   const { error } = await supabase.rpc("grant_admin", { p_user: userId });
   if (error) return fromDbError(error);
@@ -124,4 +133,29 @@ export async function saveGroupSettings(_prev: State, formData: FormData): Promi
   revalidatePath("/community");
   revalidatePath("/stats", "layout");
   return ok(null);
+}
+
+/** Sets a new password for a member who forgot theirs (there is no email reset). */
+export async function resetPassword(_prev: State, formData: FormData): Promise<State> {
+  if (!(await currentAdmin())) return fail("forbidden");
+  const parsed = resetPasswordSchema.safeParse(formObject(formData));
+  if (!parsed.success) return fail("invalid_input", firstIssuePath(parsed.error));
+  const userId = await userIdByContact(parsed.data.person);
+  if (!userId) return fail("not_found", "person");
+  const { error } = await createAdminClient().auth.admin.updateUserById(userId, { password: parsed.data.password });
+  if (error) {
+    log.error("admin: password reset failed", { code: error.code });
+    return fail("invalid_input");
+  }
+  return ok(null);
+}
+
+/** The group new sign-ups join. */
+export async function setDefaultGroup(formData: FormData): Promise<void> {
+  if (!(await currentAdmin())) return;
+  const groupId = uuidSchema.safeParse(formData.get("groupId"));
+  if (!groupId.success) return;
+  const supabase = await createClient();
+  await supabase.rpc("set_default_group", { p_group: groupId.data });
+  revalidatePath("/admin", "layout");
 }

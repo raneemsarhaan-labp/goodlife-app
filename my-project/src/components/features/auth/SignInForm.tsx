@@ -1,40 +1,43 @@
 "use client";
 
 import { useTranslations } from "next-intl";
-import { useActionState, useState } from "react";
+import { useActionState } from "react";
 import { Button } from "@/components/ui/Button";
 import { Field } from "@/components/ui/Field";
 import { useKeepValuesSubmit } from "@/components/ui/useKeepValuesSubmit";
-import { requestSignInCode } from "@/server/actions/onboarding";
-import { OtpForm } from "./OtpForm";
+import { signIn } from "@/server/actions/onboarding";
 import { useErrorText } from "./useErrorText";
 
+/** Mobile + password. */
 export function SignInForm() {
   const t = useTranslations("signIn");
   const errorText = useErrorText();
-  const [state, action, pending] = useActionState(requestSignInCode, null);
-  const [restart, setRestart] = useState(0);
-  const onSubmit = useKeepValuesSubmit(action, () => setRestart(0));
-
-  if (state?.ok && restart === 0) {
-    return <OtpForm email={state.data.email} onBack={() => setRestart((n) => n + 1)} />;
-  }
+  const [state, action, pending] = useActionState(signIn, null);
+  const onSubmit = useKeepValuesSubmit(action);
+  const failed = state && !state.ok ? state : null;
   return (
-    <form onSubmit={onSubmit} className="flex flex-col gap-5">
+    <form onSubmit={onSubmit} className="flex flex-col gap-5" noValidate>
       <h1 className="text-2xl font-semibold">{t("title")}</h1>
-      <p className="text-ink-700">{t("intro")}</p>
       <Field
-        name="email"
-        type="email"
-        label={t("email")}
-        autoComplete="email"
+        name="phone"
+        type="tel"
+        inputMode="tel"
+        label={t("phone")}
+        autoComplete="tel"
         dir="ltr"
-        error={state && !state.ok ? errorText(state.error) : undefined}
+        error={failed?.field === "phone" ? t("phoneInvalid") : undefined}
         required
       />
+      <Field name="password" type="password" label={t("password")} autoComplete="current-password" required />
+      {failed && failed.field !== "phone" && (
+        <p role="alert" className="text-dawn-700">
+          {failed.field === "password" ? t("wrongCredentials") : errorText(failed.error)}
+        </p>
+      )}
       <Button type="submit" disabled={pending}>
-        {t("sendCode")}
+        {t("submit")}
       </Button>
+      <p className="text-center text-sm text-ink-700">{t("forgot")}</p>
     </form>
   );
 }

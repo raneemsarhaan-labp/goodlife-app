@@ -26,3 +26,35 @@ export const otpSchema = z
   .string()
   .transform((v) => toAsciiDigits(v).replace(/\s/g, ""))
   .pipe(z.string().regex(/^\d{6}$/));
+
+/**
+ * A mobile number in international form (+9665…). Accepts what people type: Arabic-Indic digits,
+ * spaces and dashes, a leading 00, and Saudi local numbers (05xxxxxxxx or 5xxxxxxxx).
+ */
+export function normalizePhone(raw: string): string {
+  let v = toAsciiDigits(raw).replace(/[\s\-().]/g, "");
+  if (v.startsWith("00")) v = `+${v.slice(2)}`;
+  if (/^05\d{8}$/.test(v)) v = `+966${v.slice(1)}`;
+  else if (/^5\d{8}$/.test(v)) v = `+966${v}`;
+  return v;
+}
+export const PHONE = /^\+[1-9][0-9]{7,14}$/;
+export const phoneSchema = z.string().transform(normalizePhone).pipe(z.string().regex(PHONE));
+export const passwordSchema = z.string().min(8).max(72);
+
+// data-model.md users.full_name, users.phone, users.time_zone
+export const signUpSchema = z
+  .object({
+    fullName: z.string().trim().min(2).max(80),
+    phone: phoneSchema,
+    password: passwordSchema,
+    confirmPassword: z.string(),
+    timeZone: z.string().refine(isValidTimeZone).default("Asia/Riyadh"),
+  })
+  .refine((v) => v.password === v.confirmPassword, { path: ["confirmPassword"], message: "mismatch" });
+export type SignUpInput = z.infer<typeof signUpSchema>;
+
+export const signInSchema = z.object({ phone: phoneSchema, password: z.string().min(1).max(72) });
+
+/** The login a mobile-only account uses behind the scenes. Never receives mail (.invalid is reserved). */
+export const loginEmailFor = (phone: string) => `p${phone.replace(/\D/g, "")}@phone.goodlife.invalid`;

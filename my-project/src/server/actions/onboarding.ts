@@ -1,123 +1,92 @@
 "use server";
 
-import { cookies, headers } from "next/headers";
 import { redirect } from "next/navigation";
-import { publicEnv } from "@/lib/env";
 import { log } from "@/lib/log";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { createClient } from "@/lib/supabase/server";
-import { emailSchema, invitationCodeSchema, otpSchema, profileSchema } from "@/lib/validation/onboarding";
-import { runCompleteJoin } from "@/server/join";
-import { finishPendingJoin, savePendingJoin } from "@/server/join-session";
-import { fail, fromDbError, ok, type Result } from "./result";
-
-const JOIN_COOKIE = "gl_join_code";
+import { loginEmailFor, signInSchema, signUpSchema } from "@/lib/validation/onboarding";
+import { runSignUp } from "@/server/join";
+import { fail, fromDbError, type Result } from "./result";
 
 export type FormState<T = unknown> = Result<T> | null;
 
-/** Step 1 of joining: validate the invitation code, remember it, and go to the profile step. */
-export async function checkInvitation(_prev: FormState, formData: FormData): Promise<FormState> {
-  const parsed = invitationCodeSchema.safeParse(formData.get("code") ?? "");
-  if (!parsed.success) return fail("code_invalid", "code");
-  const supabase = await createClient();
-  const { error } = await supabase.rpc("check_invitation", { p_code: parsed.data });
-  if (error) return fromDbError(error);
-  (await cookies()).set(JOIN_COOKIE, parsed.data, {
-    httpOnly: true,
-    sameSite: "lax",
-    secure: process.env.NODE_ENV === "production",
-    maxAge: 60 * 30,
-    path: "/join",
-  });
-  redirect("/join/profile");
+const field = (error: { issues: { path: PropertyKey[] }[] }) => String(error.issues[0]?.path[0] ?? "");
+
+/** The login email behind a mobile: the account's own email if it has one, else the mobile login. */
+async function loginEmailForPhone(phone: string): Promise<string> {
+  const admin = createAdminClient();
+  const { data } = await admin.from("users").select("id").eq("phone", phone).maybeSingle();
+  if (data) {
+    const { data: auth } = await admin.auth.admin.getUserById(data.id);
+    if (auth.user?.email) return auth.user.email;
+  }
+  return loginEmailFor(phone);
 }
 
-/** The code remembered from step 1, if any. */
-export async function pendingJoinCode(): Promise<string | null> {
-  return (await cookies()).get(JOIN_COOKIE)?.value ?? null;
-}
-
-/**
- * Step 2 (contracts/server-actions.md › completeJoin): check everything and email the 6-digit code.
- * Membership is created only after that code is entered (verifySignInCode → finishPendingJoin), so
- * joining proves the email belongs to the person joining.
- */
-export async function completeJoin(_prev: FormState<{ email: string }>, formData: FormData): Promise<FormState<{ email: string }>> {
-  const code = await pendingJoinCode();
-  if (!code) return fail("code_invalid");
-  const parsed = profileSchema.safeParse({
-    fullName: formData.get("fullName"),
-    email: formData.get("email"),
+/** New account: name, mobile, password. Joins the default group and opens the welcome screen. */
+export async function signUp(_prev: FormState, formData: FormData): Promise<FormState> {
+  const parsed = signUpSchema.safeParse({
+    fullName: formData.get("fullName") ?? "",
     phone: formData.get("phone") ?? "",
-    gender: formData.get("gender") ?? "",
-    city: formData.get("city") ?? "",
+    password: formData.get("password") ?? "",
+    confirmPassword: formData.get("confirmPassword") ?? "",
     timeZone: formData.get("timeZone") || undefined,
   });
-  if (!parsed.success) return fail("invalid_input", String(parsed.error.issues[0]?.path[0] ?? ""));
+  if (!parsed.success) return fail("invalid_input", field(parsed.error));
 
-  const supabase = await createClient();
   const admin = createAdminClient();
-  return runCompleteJoin(
+  const supabase = await createClient();
+  const result = await runSignUp(
     {
-      checkCode: async (c) => supabase.rpc("check_invitation", { p_code: c }),
-      memberExists: async (email) => {
-        const { data } = await admin.from("users").select("id").eq("email", email.toLowerCase()).maybeSingle();
+      phoneTaken: async (phone) => {
+        const { data } = await admin.from("users").select("id").eq("phone", phone).maybeSingle();
         return Boolean(data);
       },
-      // A login with no membership yet. Confirmed at creation, because Supabase answers an
-      // unconfirmed address with its "confirm your signup" link instead of the sign-in code; the
-      // address is proven when the code is entered, before any membership exists.
-      createAuthUser: async (email) => {
-        const { data, error } = await admin.auth.admin.createUser({ email, email_confirm: true });
-        if (error || !data.user) return { error: error?.code === "email_exists" || error?.status === 422 ? "exists" : "other" };
+      createAuthUser: async (phone, password) => {
+        const { data, error } = await admin.auth.admin.createUser({
+          email: loginEmailFor(phone),
+          password,
+          email_confirm: true,
+          user_metadata: { phone },
+        });
+        if (error || !data.user) {
+          if (error?.code === "email_exists" || error?.status === 422) return { error: "exists" };
+          log.error("sign-up: could not create the login", { code: error?.code, status: error?.status });
+          return { error: "other" };
+        }
         return { id: data.user.id };
       },
-      savePending: savePendingJoin,
-      sendSignInCode: async (email) => {
-        const { error } = await supabase.auth.signInWithOtp({ email, options: { shouldCreateUser: false, emailRedirectTo: await confirmUrl() } });
-        if (error) log.warn("join: sending sign-in code failed", { code: error.code });
+      register: async (id, input) =>
+        admin.rpc("register_member", { p_auth_user: id, p_full_name: input.fullName, p_phone: input.phone, p_time_zone: input.timeZone }),
+      deleteAuthUser: async (id) => {
+        const { error } = await admin.auth.admin.deleteUser(id);
+        if (error) log.error("sign-up: failed to delete orphaned login", { code: error.code });
+      },
+      signIn: async (phone, password) => {
+        const { error } = await supabase.auth.signInWithPassword({ email: loginEmailFor(phone), password });
+        return !error;
       },
     },
-    code,
     parsed.data,
   );
+  if (!result.ok) return result;
+  redirect(result.data.signedIn ? "/welcome" : "/sign-in");
 }
 
-/** Where the email's sign-in link should land (when the email template carries a link, not the code). */
-async function confirmUrl(): Promise<string> {
-  const origin = (await headers()).get("origin") ?? publicEnv.NEXT_PUBLIC_SITE_URL;
-  return `${origin}/auth/confirm`;
-}
-
-/** Sign-in step 1: always reports success, so the form never reveals whether an email exists. */
-export async function requestSignInCode(_prev: FormState<{ email: string }>, formData: FormData): Promise<FormState<{ email: string }>> {
-  const parsed = emailSchema.safeParse(formData.get("email") ?? "");
-  if (!parsed.success) return fail("invalid_input", "email");
+/** Sign in with mobile + password. One message for every failure, so it never reveals which numbers exist. */
+export async function signIn(_prev: FormState, formData: FormData): Promise<FormState> {
+  const parsed = signInSchema.safeParse({ phone: formData.get("phone") ?? "", password: formData.get("password") ?? "" });
+  if (!parsed.success) return fail("invalid_input", field(parsed.error));
   const supabase = await createClient();
-  const { error } = await supabase.auth.signInWithOtp({
-    email: parsed.data,
-    options: { shouldCreateUser: false, emailRedirectTo: await confirmUrl() },
+  const { error } = await supabase.auth.signInWithPassword({
+    email: await loginEmailForPhone(parsed.data.phone),
+    password: parsed.data.password,
   });
-  if (error && error.code !== "otp_disabled" && error.code !== "user_not_found") {
-    log.warn("sign-in: request code failed", { code: error.code });
+  if (error) {
+    if (error.code !== "invalid_credentials") log.warn("sign-in failed", { code: error.code });
+    return error.code === "invalid_credentials" ? fail("invalid_input", "password") : fromDbError({ message: error.message });
   }
-  return ok({ email: parsed.data });
-}
-
-/** Sign-in step 2: verify the 6-digit code and open the app (or the welcome screen after joining). */
-export async function verifySignInCode(_prev: FormState, formData: FormData): Promise<FormState> {
-  const email = emailSchema.safeParse(formData.get("email") ?? "");
-  const token = otpSchema.safeParse(formData.get("token") ?? "");
-  if (!email.success || !token.success) return fail("invalid_input", "token");
-  const supabase = await createClient();
-  const { error } = await supabase.auth.verifyOtp({ email: email.data, token: token.data, type: "email" });
-  if (error) return fail("invalid_input", "token");
-  const joined = await finishPendingJoin();
-  if (!joined.ok) {
-    await supabase.auth.signOut();
-    return joined;
-  }
-  redirect(joined.data === "joined" || formData.get("next") === "welcome" ? "/welcome" : "/");
+  redirect("/");
 }
 
 export async function signOut(): Promise<void> {
