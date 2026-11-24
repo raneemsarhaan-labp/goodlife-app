@@ -7,8 +7,8 @@ import { Field } from "@/components/ui/Field";
 import { resendEmailCode, verifyEmailCode } from "@/server/actions/onboarding";
 import { useErrorText } from "./useErrorText";
 
-/** The 6-digit code emailed to confirm the address. Accepts Arabic-Indic digits. */
-export function EmailCodeForm({ email, onBack }: { email: string; onBack?: () => void }) {
+/** The 6-digit code from the email (sign-up and sign-in). Accepts Arabic-Indic digits. */
+export function EmailCodeForm({ identifier, isEmail, title, onBack }: { identifier: string; isEmail: boolean; title?: string; onBack?: () => void }) {
   const t = useTranslations("emailCode");
   const errorText = useErrorText();
   const [state, action, pending] = useActionState(verifyEmailCode, null);
@@ -17,9 +17,9 @@ export function EmailCodeForm({ email, onBack }: { email: string; onBack?: () =>
   return (
     <div className="flex flex-col gap-5">
       <form action={action} className="flex flex-col gap-5">
-        <h1 className="text-2xl font-semibold">{t("title")}</h1>
-        <p className="text-ink-700">{t("intro", { email })}</p>
-        <input type="hidden" name="email" value={email} />
+        <h1 className="text-2xl font-semibold">{title ?? t("title")}</h1>
+        <p className="text-ink-700">{isEmail ? t("intro", { email: identifier }) : t("introPhone")}</p>
+        <input type="hidden" name="identifier" value={identifier} />
         <Field
           name="token"
           label={t("code")}
@@ -36,7 +36,7 @@ export function EmailCodeForm({ email, onBack }: { email: string; onBack?: () =>
         </Button>
       </form>
       <form action={resend} className="flex flex-col items-center gap-2 text-center">
-        <input type="hidden" name="email" value={email} />
+        <input type="hidden" name="identifier" value={identifier} />
         <p className="text-sm text-ink-700">{t("missing")}</p>
         <Button type="submit" variant="quiet" disabled={resending}>
           {t("resend")}

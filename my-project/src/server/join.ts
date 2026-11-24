@@ -10,7 +10,7 @@ export type SignUpDeps = {
   /** A login already using the email: confirmed or not, with or without a member profile. */
   existingLogin(email: string): Promise<{ id: string; hasProfile: boolean } | null>;
   deleteAuthUser(id: string): Promise<void>;
-  /** Creates the unconfirmed login, keeping name/mobile/time zone until the code is verified. */
+  /** Creates the unconfirmed login (no password), keeping name/mobile/time zone until the code is verified. */
   createLogin(input: SignUpInput): Promise<{ id: string } | { error: "exists" | "other"; detail?: string }>;
   sendCode(email: string): Promise<{ error?: string }>;
 };

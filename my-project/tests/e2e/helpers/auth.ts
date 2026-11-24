@@ -29,9 +29,21 @@ export async function latestEmailCode(email: string, since: Date): Promise<strin
   throw new Error(`No code arrived for ${email}`);
 }
 
-/** Signs in through the real UI (email or mobile + password). Takes a seed account's email or a mobile. */
+/** Signs in with the emailed code. */
+export async function signInWithCode(page: Page, email: string) {
+  await page.goto("/sign-in");
+  const since = new Date(Date.now() - 1000);
+  await page.getByLabel("البريد الإلكتروني أو رقم الجوال").fill(email);
+  await page.getByRole("button", { name: "أرسل الرمز" }).click();
+  await page.getByLabel("رمز الدخول").fill(await latestEmailCode(email, since));
+  await page.getByRole("button", { name: "دخول" }).click();
+  await expect(page).not.toHaveURL(/\/sign-in/);
+}
+
+/** Signs in through the real UI with a password (seed accounts have one). Takes a seed account's email or a mobile. */
 export async function signIn(page: Page, who: string, password = SEED_PASSWORD) {
   await page.goto("/sign-in");
+  await page.getByRole("button", { name: "الدخول بكلمة المرور" }).click();
   await page.getByLabel("البريد الإلكتروني أو رقم الجوال").fill(SEED_PHONES[who] ?? who);
   await page.getByLabel("كلمة المرور", { exact: true }).fill(password);
   await page.getByRole("button", { name: "دخول" }).click();
@@ -48,8 +60,6 @@ export async function fillSignUp(page: Page, { email, phone, name = "مشارك 
   await page.getByLabel("الاسم الكامل").fill(name);
   await page.getByLabel("البريد الإلكتروني").fill(email);
   await page.getByLabel("رقم الجوال").fill(phone);
-  await page.getByLabel("كلمة المرور", { exact: true }).fill(SEED_PASSWORD);
-  await page.getByLabel("أعد كتابة كلمة المرور").fill(SEED_PASSWORD);
   await page.getByRole("button", { name: "أنشئ حسابي" }).click();
 }
 
@@ -58,8 +68,8 @@ export async function joinNewMember(page: Page, email = `e2e-${Date.now()}-${Mat
   const since = new Date(Date.now() - 1000);
   await fillSignUp(page, { email, phone: newPhone() });
   const code = await latestEmailCode(email, since);
-  await page.getByLabel("رمز التأكيد").fill(code);
-  await page.getByRole("button", { name: "تأكيد" }).click();
+  await page.getByLabel("رمز الدخول").fill(code);
+  await page.getByRole("button", { name: "دخول" }).click();
   await expect(page).toHaveURL("/welcome");
   return email;
 }

@@ -68,28 +68,24 @@ export const phoneSchema = z.string().transform(normalizePhone).pipe(z.string().
 export const passwordSchema = z.string().min(8).max(72);
 
 // data-model.md users.full_name, users.phone, users.time_zone
-export const signUpSchema = z
-  .object({
-    fullName: z.string().trim().min(2).max(80),
-    email: emailSchema,
-    phone: phoneSchema,
-    password: passwordSchema,
-    confirmPassword: z.string(),
-    timeZone: z.string().refine(isValidTimeZone).default("Asia/Riyadh"),
-  })
-  .refine((v) => v.password === v.confirmPassword, { path: ["confirmPassword"], message: "mismatch" });
+export const signUpSchema = z.object({
+  fullName: z.string().trim().min(2).max(80),
+  email: emailSchema,
+  phone: phoneSchema,
+  timeZone: z.string().refine(isValidTimeZone).default("Asia/Riyadh"),
+});
 export type SignUpInput = z.infer<typeof signUpSchema>;
 
-/** Sign in with the email or the mobile number, and the password. */
-export const signInSchema = z.object({
-  identifier: z
+/** The email or the mobile number typed to sign in. */
+export const identifierSchema = z
     .string()
     .trim()
     .min(3)
     .transform((v) => (v.includes("@") ? v.toLowerCase() : normalizePhone(v)))
-    .refine((v) => (v.includes("@") ? z.email().safeParse(v).success : PHONE.test(v))),
-  password: z.string().min(1).max(72),
-});
+    .refine((v) => (v.includes("@") ? z.email().safeParse(v).success : PHONE.test(v)));
+
+/** Sign in with the email or the mobile number, and the password (for accounts that have one). */
+export const signInSchema = z.object({ identifier: identifierSchema, password: z.string().min(1).max(72) });
 
 /**
  * The login a mobile-only account uses behind the scenes; no mail is ever sent to it. The first

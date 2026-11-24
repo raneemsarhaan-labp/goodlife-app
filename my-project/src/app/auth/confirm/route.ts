@@ -17,9 +17,9 @@ export async function GET(request: NextRequest) {
     : tokenHash
       ? await supabase.auth.verifyOtp({ token_hash: tokenHash, type: (params.get("type") as EmailOtpType) ?? "signup" })
       : { error: new Error("missing token") };
-  const registered = error ? null : await finishRegistration();
   const target = request.nextUrl.clone();
   target.search = "";
+  const registered = error ? null : await finishRegistration();
   if (error || !registered?.ok) {
     target.pathname = "/sign-in";
     target.searchParams.set("link", "expired");

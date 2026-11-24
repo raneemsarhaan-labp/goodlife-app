@@ -1,5 +1,5 @@
 import { describe, expect, it, vi } from "vitest";
-import { composePhone, loginEmailFor, normalizePhone, signInSchema, signUpSchema } from "@/lib/validation/onboarding";
+import { composePhone, identifierSchema, loginEmailFor, normalizePhone, signUpSchema } from "@/lib/validation/onboarding";
 import { countryForZone } from "@/lib/countries";
 import { pendingFromMetadata, registerError, runSignUp, type SignUpDeps } from "@/server/join";
 
@@ -7,8 +7,6 @@ const input = {
   fullName: "عضو جديد",
   email: "new@example.test",
   phone: "+966500000101",
-  password: "secret123",
-  confirmPassword: "secret123",
   timeZone: "Asia/Riyadh",
 };
 
@@ -97,13 +95,10 @@ describe("mobile numbers", () => {
     expect(normalizePhone(raw)).toBe(expected);
   });
 
-  it("validates sign-up: mobile format, password length and match", () => {
+  it("validates sign-up: email and mobile", () => {
     expect(signUpSchema.safeParse({ ...input, phone: "0500000101" }).success).toBe(true);
     expect(signUpSchema.safeParse({ ...input, phone: "12345" }).success).toBe(false);
-    expect(signUpSchema.safeParse({ ...input, password: "short", confirmPassword: "short" }).success).toBe(false);
-    const mismatch = signUpSchema.safeParse({ ...input, confirmPassword: "different1" });
-    expect(mismatch.success).toBe(false);
-    expect(mismatch.error?.issues[0]?.path).toEqual(["confirmPassword"]);
+    expect(signUpSchema.safeParse({ ...input, email: "not-an-email" }).success).toBe(false);
   });
 
   it.each([
@@ -133,9 +128,9 @@ describe("mobile numbers", () => {
   });
 
   it("signs in with an email or a mobile number", () => {
-    expect(signInSchema.parse({ identifier: " Me@Example.test ", password: "x" }).identifier).toBe("me@example.test");
-    expect(signInSchema.parse({ identifier: "01270600400", password: "x" }).identifier).toBe("+201270600400");
-    expect(signInSchema.safeParse({ identifier: "not-an-email", password: "x" }).success).toBe(false);
+    expect(identifierSchema.parse(" Me@Example.test ")).toBe("me@example.test");
+    expect(identifierSchema.parse("01270600400")).toBe("+201270600400");
+    expect(identifierSchema.safeParse("not-an-email").success).toBe(false);
   });
 
   it("maps a mobile to its mail-less login", () => {
