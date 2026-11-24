@@ -27,16 +27,25 @@ export const otpSchema = z
   .transform((v) => toAsciiDigits(v).replace(/\s/g, ""))
   .pipe(z.string().regex(/^\d{6}$/));
 
+/** Country codes recognised when a number is typed without "+" (Arab countries first). Keep in sync with scripts/migrate.mjs. */
+const COUNTRY_CODES = ["966", "20", "971", "965", "974", "973", "968", "962", "961", "963", "964", "970", "967", "249", "218", "212", "213", "216", "222", "90", "44", "1"];
+
 /**
- * A mobile number in international form (+9665…). Accepts what people type: Arabic-Indic digits,
- * spaces and dashes, a leading 00, and Saudi local numbers (05xxxxxxxx or 5xxxxxxxx).
+ * A mobile number in international form (+9665…, +201…). Accepts what people type: Arabic-Indic
+ * digits, spaces and dashes, "00" or "+" before the country code, the country code with a stray
+ * leading 0 (0201…), the country code without "+" (2010…, 9665…), and local numbers for Saudi
+ * Arabia (05xxxxxxxx, 5xxxxxxxx) and Egypt (01xxxxxxxxx).
  */
 export function normalizePhone(raw: string): string {
-  let v = toAsciiDigits(raw).replace(/[\s\-().]/g, "");
-  if (v.startsWith("00")) v = `+${v.slice(2)}`;
-  if (/^05\d{8}$/.test(v)) v = `+966${v.slice(1)}`;
-  else if (/^5\d{8}$/.test(v)) v = `+966${v}`;
-  return v;
+  let v = toAsciiDigits(raw).replace(/[\s\-().\u200e\u200f]/g, "");
+  if (v.startsWith("+")) return v;
+  if (v.startsWith("00")) return `+${v.slice(2)}`;
+  if (/^05\d{8}$/.test(v)) return `+966${v.slice(1)}`;
+  if (/^5\d{8}$/.test(v)) return `+966${v}`;
+  if (/^01[0125]\d{8}$/.test(v)) return `+20${v.slice(1)}`;
+  if (v.startsWith("0")) v = v.slice(1);
+  const withCode = COUNTRY_CODES.some((c) => v.startsWith(c)) && v.length >= 10 && v.length <= 15;
+  return withCode ? `+${v}` : v;
 }
 export const PHONE = /^\+[1-9][0-9]{7,14}$/;
 export const phoneSchema = z.string().transform(normalizePhone).pipe(z.string().regex(PHONE));

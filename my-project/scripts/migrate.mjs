@@ -27,6 +27,19 @@ for (const key of [...clean.searchParams.keys()]) if (key !== "sslmode") clean.s
 // TLS always, except an explicit sslmode=disable (local testing against a plain PostgreSQL).
 const ssl = clean.searchParams.get("sslmode") === "disable" ? false : "require";
 clean.searchParams.delete("sslmode");
+// Same rules as normalizePhone in src/lib/validation/onboarding.ts.
+const COUNTRY_CODES = ["966", "20", "971", "965", "974", "973", "968", "962", "961", "963", "964", "970", "967", "249", "218", "212", "213", "216", "222", "90", "44", "1"];
+function normalizePhone(raw) {
+  let v = raw.replace(/[\u0660-\u0669]/g, (d) => String(d.charCodeAt(0) - 0x660)).replace(/[\s\-().\u200e\u200f]/g, "");
+  if (v.startsWith("+")) return v;
+  if (v.startsWith("00")) return `+${v.slice(2)}`;
+  if (/^05\d{8}$/.test(v)) return `+966${v.slice(1)}`;
+  if (/^5\d{8}$/.test(v)) return `+966${v}`;
+  if (/^01[0125]\d{8}$/.test(v)) return `+20${v.slice(1)}`;
+  if (v.startsWith("0")) v = v.slice(1);
+  return COUNTRY_CODES.some((c) => v.startsWith(c)) && v.length >= 10 && v.length <= 15 ? `+${v}` : v;
+}
+
 const sql = postgres(clean.toString(), { ssl, max: 1, onnotice: () => {}, connect_timeout: 30 });
 
 async function apply(name, body) {
@@ -67,9 +80,7 @@ try {
   // that mobile and redeploy.
   const rawPhone = process.env.BOOTSTRAP_ADMIN_PHONE?.trim();
   if (rawPhone) {
-    let phone = rawPhone.replace(/[\s\-().]/g, "");
-    if (phone.startsWith("00")) phone = `+${phone.slice(2)}`;
-    if (/^05\d{8}$/.test(phone)) phone = `+966${phone.slice(1)}`;
+    const phone = normalizePhone(rawPhone);
     const [user] = await sql`select id from public.users where phone = ${phone}`;
     if (!user) {
       console.log(`[migrate] BOOTSTRAP_ADMIN_PHONE: no account with ${phone} yet. Sign up with it, then redeploy.`);
