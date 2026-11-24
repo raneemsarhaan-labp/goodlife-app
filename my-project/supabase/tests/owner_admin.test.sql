@@ -4,6 +4,8 @@ begin;
 select plan(4);
 
 insert into owner_phones (phone_sha256) values (encode(sha256(convert_to('+966511112222', 'UTF8')), 'hex'));
+insert into cohorts (id, name, start_date) values ('00000000-0000-4000-8000-00000000ec01', 'دفعة المالك', current_date);
+insert into groups (cohort_id, name) values ('00000000-0000-4000-8000-00000000ec01', 'مجموعة المالك');
 create temp table k (name text primary key, id uuid) on commit drop;
 insert into k values ('owner', gen_random_uuid()), ('other', gen_random_uuid());
 insert into auth.users (id, email) select id, name || '@phone.goodlife.invalid' from k;
