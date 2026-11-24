@@ -8,7 +8,7 @@ const input = { fullName: "عضو جديد", phone: "+966500000101", password: "
 function deps(overrides: Partial<SignUpDeps> = {}): SignUpDeps {
   return {
     phoneTaken: vi.fn().mockResolvedValue(false),
-    createAuthUser: vi.fn().mockResolvedValue({ id: "auth-1" }),
+    createAuthUser: vi.fn().mockResolvedValue({ id: "auth-1", email: "p966500000101@phone.goodlife.invalid" }),
     register: vi.fn().mockResolvedValue({ error: null }),
     deleteAuthUser: vi.fn().mockResolvedValue(undefined),
     signIn: vi.fn().mockResolvedValue(true),
@@ -22,7 +22,7 @@ describe("runSignUp", () => {
     expect(await runSignUp(d, input)).toEqual({ ok: true, data: { signedIn: true } });
     expect(d.createAuthUser).toHaveBeenCalledWith(input.phone, input.password);
     expect(d.register).toHaveBeenCalledWith("auth-1", input);
-    expect(d.signIn).toHaveBeenCalledWith(input.phone, input.password);
+    expect(d.signIn).toHaveBeenCalledWith("p966500000101@phone.goodlife.invalid", input.password);
   });
 
   it("says the mobile is already registered, before creating anything", async () => {
@@ -34,6 +34,11 @@ describe("runSignUp", () => {
   it("treats an existing login for the mobile as already registered", async () => {
     const d = deps({ createAuthUser: vi.fn().mockResolvedValue({ error: "exists" }) });
     expect(await runSignUp(d, input)).toEqual({ ok: false, error: "conflict", field: "phone" });
+  });
+
+  it("passes on why the login could not be created", async () => {
+    const d = deps({ createAuthUser: vi.fn().mockResolvedValue({ error: "other", detail: "email_address_invalid" }) });
+    expect(await runSignUp(d, input)).toMatchObject({ ok: false, error: "generic", detail: "email_address_invalid" });
   });
 
   it("removes the login when the member cannot be created", async () => {

@@ -13,7 +13,8 @@ export type ErrorCode =
   | "signup_closed"
   | "generic";
 
-export type Result<T> = { ok: true; data: T } | { ok: false; error: ErrorCode; field?: string };
+/** `detail` is a short technical code shown in small print for unexpected failures (never a message from the database). */
+export type Result<T> = { ok: true; data: T } | { ok: false; error: ErrorCode; field?: string; detail?: string };
 
 export const ok = <T>(data: T): Result<T> => ({ ok: true, data });
 export const fail = (error: ErrorCode, field?: string): { ok: false; error: ErrorCode; field?: string } => ({

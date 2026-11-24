@@ -7,10 +7,10 @@ type DbError = { code?: string; message?: string } | null;
 export type SignUpDeps = {
   /** Whether an account already uses this mobile. */
   phoneTaken(phone: string): Promise<boolean>;
-  createAuthUser(phone: string, password: string): Promise<{ id: string } | { error: "exists" | "other" }>;
+  createAuthUser(phone: string, password: string): Promise<{ id: string; email: string } | { error: "exists" | "other"; detail?: string }>;
   register(authUserId: string, input: SignUpInput): Promise<{ error: DbError }>;
   deleteAuthUser(id: string): Promise<void>;
-  signIn(phone: string, password: string): Promise<boolean>;
+  signIn(loginEmail: string, password: string): Promise<boolean>;
 };
 
 /**
@@ -21,7 +21,9 @@ export async function runSignUp(deps: SignUpDeps, input: SignUpInput): Promise<R
   if (await deps.phoneTaken(input.phone)) return fail("conflict", "phone");
 
   const created = await deps.createAuthUser(input.phone, input.password);
-  if ("error" in created) return created.error === "exists" ? fail("conflict", "phone") : fail("generic");
+  if ("error" in created) {
+    return created.error === "exists" ? fail("conflict", "phone") : { ...fail("generic"), detail: created.detail };
+  }
 
   const registered = await deps.register(created.id, input);
   if (registered.error) {
@@ -31,5 +33,5 @@ export async function runSignUp(deps: SignUpDeps, input: SignUpInput): Promise<R
     if (message.startsWith("not_found: group")) return fail("signup_closed");
     return fromDbError(registered.error);
   }
-  return ok({ signedIn: await deps.signIn(input.phone, input.password) });
+  return ok({ signedIn: await deps.signIn(created.email, input.password) });
 }

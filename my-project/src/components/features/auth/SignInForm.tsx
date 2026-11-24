@@ -24,6 +24,7 @@ export function SignInForm() {
       {failed && failed.field !== "phone" && (
         <p role="alert" className="text-dawn-700">
           {failed.field === "password" ? t("wrongCredentials") : errorText(failed.error)}
+          {failed.detail && <span dir="ltr" className="ms-2 text-xs text-ink-500">({failed.detail})</span>}
         </p>
       )}
       <Button type="submit" disabled={pending}>

@@ -36,6 +36,7 @@ export function SignUpForm() {
       {formError && (
         <p role="alert" className="text-dawn-700">
           {formError}
+          {failed?.detail && <span dir="ltr" className="ms-2 text-xs text-ink-500">({failed.detail})</span>}
         </p>
       )}
       <Button type="submit" disabled={pending}>

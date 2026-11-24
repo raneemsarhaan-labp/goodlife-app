@@ -81,5 +81,9 @@ export type SignUpInput = z.infer<typeof signUpSchema>;
 
 export const signInSchema = z.object({ phone: phoneSchema, password: z.string().min(1).max(72) });
 
-/** The login a mobile-only account uses behind the scenes. Never receives mail (.invalid is reserved). */
-export const loginEmailFor = (phone: string) => `p${phone.replace(/\D/g, "")}@phone.goodlife.invalid`;
+/**
+ * The login a mobile-only account uses behind the scenes; no mail is ever sent to it. The first
+ * domain is reserved (.invalid); the others are tried in turn if Supabase refuses an address.
+ * Sign-in looks the login up from the account, so any of them works later.
+ */
+export const loginEmailFor = (phone: string, domain = "phone.goodlife.invalid") => `p${phone.replace(/\D/g, "")}@${domain}`;
