@@ -2,7 +2,7 @@ import { NextResponse, type NextRequest } from "next/server";
 import { updateSession } from "@/lib/supabase/proxy";
 
 /** Public routes; everything else requires a signed-in user (contracts/routes.md). */
-const PUBLIC_PATHS = ["/join", "/sign-in", ...(process.env.NODE_ENV === "development" ? ["/dev"] : [])];
+const PUBLIC_PATHS = ["/join", "/sign-in", "/auth/confirm", ...(process.env.NODE_ENV === "development" ? ["/dev"] : [])];
 
 function isPublic(pathname: string) {
   return PUBLIC_PATHS.some((p) => pathname === p || pathname.startsWith(`${p}/`));
@@ -11,6 +11,13 @@ function isPublic(pathname: string) {
 // Next.js 16: Middleware is called Proxy (src/proxy.ts). Optimistic check only;
 // every page and action re-checks the user on the server (src/server/auth.ts).
 export async function proxy(request: NextRequest) {
+  // A confirmation link that landed on the Site URL instead of /auth/confirm: finish there.
+  const { pathname, searchParams } = request.nextUrl;
+  if (pathname !== "/auth/confirm" && (searchParams.has("code") || searchParams.has("token_hash"))) {
+    const url = request.nextUrl.clone();
+    url.pathname = "/auth/confirm";
+    return NextResponse.redirect(url);
+  }
   const { response, signedIn } = await updateSession(request);
   if (!signedIn && !isPublic(request.nextUrl.pathname)) {
     const url = request.nextUrl.clone();

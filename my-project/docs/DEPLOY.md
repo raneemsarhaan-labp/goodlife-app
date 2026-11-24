@@ -1,8 +1,9 @@
 # Deploying to Vercel with Supabase
 
 The build applies database migrations itself (`scripts/migrate.mjs`, run by `npm run build`), so a new
-environment needs only a Supabase database connected to the Vercel project. No email is ever sent:
-members sign up and sign in with their mobile number and a password.
+environment needs a Supabase database connected to the Vercel project and an email sender. Members
+sign up with name, email, mobile and a password, confirm the email with a 6-digit code, and sign in
+with their email or mobile and the password.
 
 ## 1. Create the database (Vercel → Storage)
 
@@ -13,16 +14,24 @@ project for Production (and Preview if you want preview builds to work). The int
 
 ## 2. Supabase settings
 
-Supabase dashboard → Authentication → Sign In / Providers:
+Supabase dashboard → Authentication:
 
-- **Email**: enabled (the app keeps a mail-less login behind each mobile number).
-- **Allow new users to sign up**: off. The app creates accounts itself on the server.
+- **Sign In / Providers → Email**: enabled; **Confirm email** on; OTP length 6. **Allow new users to
+  sign up**: off (the app creates accounts itself on the server).
+- **Emails → Confirm signup** template: subject «رمز تأكيد بريدك في «الحياة الطيبة»», body
+  `supabase/templates/confirm-signup-code.html` (it shows `{{ .Token }}`, the 6-digit code).
+- **Emails → SMTP Settings**: custom SMTP. Supabase's built-in sender only reaches your own team's
+  addresses, a few per hour. Without a domain, Gmail works: host `smtp.gmail.com`, port 465, user =
+  your Gmail address, password = a Google *app password* (Google account → Security → 2-Step
+  Verification → App passwords). Then raise Authentication → Rate Limits → emails per hour.
+- **URL Configuration**: Site URL = the production address; add `https://<that address>/**` to
+  Redirect URLs (used if the email carries a link instead of the code).
 
 ## 3. Deploy, sign up, become admin
 
 1. Deploy. The build log shows `[migrate] …` lines; on a fresh database it also creates
    «الدفعة الأولى» / «المجموعة الأولى», the group new sign-ups join.
-2. Open the app → «أنشئ حسابًا» → name, mobile, password.
+2. Open the app → «أنشئ حسابًا» → name, email, mobile, password → the code from the email.
 3. Vercel → Settings → Environment Variables → `BOOTSTRAP_ADMIN_PHONE` = that mobile (Production),
    then redeploy. The log shows `[migrate] +9665… is now admin.` You can remove the variable afterwards.
 
@@ -38,4 +47,5 @@ Supabase dashboard → Authentication → Sign In / Providers:
 
 - Demo people and cohorts (`supabase/seed.sql`) are local only; production gets `supabase/content.sql`.
   Seed accounts sign in with 0500000001…0500000004 and the password `goodlife123`.
-- Anyone with the app link can sign up; each mobile number registers only once.
+- Anyone with the app link can sign up; each email and each mobile number registers only once.
+- Owner mobiles in `owner_phones` (migration 0023, stored as SHA-256) become admin on sign-up.

@@ -1,41 +1,42 @@
 "use server";
 
+import { headers } from "next/headers";
 import { redirect } from "next/navigation";
+import { publicEnv } from "@/lib/env";
 import { log } from "@/lib/log";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { createClient } from "@/lib/supabase/server";
-import { composePhone, loginEmailFor, signInSchema, signUpSchema } from "@/lib/validation/onboarding";
+import { composePhone, emailSchema, loginEmailFor, otpSchema, signInSchema, signUpSchema } from "@/lib/validation/onboarding";
+import { finishRegistration } from "@/server/registration";
 import { runSignUp } from "@/server/join";
-import { fail, type Result } from "./result";
+import { fail, ok, type Result } from "./result";
 
 export type FormState<T = unknown> = Result<T> | null;
+
+const field = (error: { issues: { path: PropertyKey[] }[] }) => String(error.issues[0]?.path[0] ?? "");
 
 /** The mobile field: picked country + typed number (see composePhone). */
 const phoneFrom = (formData: FormData) => composePhone(formData.get("country") as string | null, String(formData.get("phone") ?? ""));
 
-const field = (error: { issues: { path: PropertyKey[] }[] }) => String(error.issues[0]?.path[0] ?? "");
-
-/** Domains for the hidden logins, in order; the production host is a fallback Supabase accepts as a normal domain. */
-function loginDomains(): string[] {
-  const host = process.env.VERCEL_PROJECT_PRODUCTION_URL || process.env.NEXT_PUBLIC_VERCEL_PROJECT_PRODUCTION_URL;
-  return ["phone.goodlife.invalid", ...(host ? [`phone.${host}`] : [])];
+/** Where a link in the email lands (if the email template carries a link instead of the code). */
+async function confirmUrl(): Promise<string> {
+  const origin = (await headers()).get("origin") ?? publicEnv.NEXT_PUBLIC_SITE_URL;
+  return `${origin}/auth/confirm`;
 }
 
-/** The login email behind a mobile: the account's own email if it has one, else the mobile login. */
-async function loginEmailForPhone(phone: string): Promise<string> {
-  const admin = createAdminClient();
-  const { data } = await admin.from("users").select("id").eq("phone", phone).maybeSingle();
-  if (data) {
-    const { data: auth } = await admin.auth.admin.getUserById(data.id);
-    if (auth.user?.email) return auth.user.email;
-  }
-  return loginEmailFor(phone);
+/** Emails the 6-digit code for an unconfirmed login ("Confirm signup" email). */
+async function sendSignUpCode(email: string): Promise<{ error?: string }> {
+  const supabase = await createClient();
+  const { error } = await supabase.auth.resend({ type: "signup", email, options: { emailRedirectTo: await confirmUrl() } });
+  if (error) log.warn("sign-up: sending the code failed", { code: error.code, status: error.status });
+  return error ? { error: error.code ?? String(error.status) } : {};
 }
 
-/** New account: name, mobile, password. Joins the default group and opens the welcome screen. */
-export async function signUp(_prev: FormState, formData: FormData): Promise<FormState> {
+/** Sign up, step 1: name, email, mobile, password → the code is emailed. */
+export async function signUp(_prev: FormState<{ email: string }>, formData: FormData): Promise<FormState<{ email: string }>> {
   const parsed = signUpSchema.safeParse({
     fullName: formData.get("fullName") ?? "",
+    email: formData.get("email") ?? "",
     phone: phoneFrom(formData),
     password: formData.get("password") ?? "",
     confirmPassword: formData.get("confirmPassword") ?? "",
@@ -44,59 +45,97 @@ export async function signUp(_prev: FormState, formData: FormData): Promise<Form
   if (!parsed.success) return fail("invalid_input", field(parsed.error));
 
   const admin = createAdminClient();
-  const supabase = await createClient();
-  const result = await runSignUp(
+  return runSignUp(
     {
-      phoneTaken: async (phone) => {
-        const { data } = await admin.from("users").select("id").eq("phone", phone).maybeSingle();
-        return Boolean(data);
+      taken: async (input) => {
+        const [byEmail, byPhone] = await Promise.all([
+          admin.from("users").select("id").eq("email", input.email).maybeSingle(),
+          admin.from("users").select("id").eq("phone", input.phone).maybeSingle(),
+        ]);
+        return { email: Boolean(byEmail.data), phone: Boolean(byPhone.data) };
       },
-      createAuthUser: async (phone, password) => {
-        let detail: string | undefined;
-        for (const domain of loginDomains()) {
-          const email = loginEmailFor(phone, domain);
-          const { data, error } = await admin.auth.admin.createUser({ email, password, email_confirm: true, user_metadata: { phone } });
-          if (data.user && !error) return { id: data.user.id, email };
-          if (error?.code === "email_exists" || error?.code === "user_already_exists") return { error: "exists" };
-          detail = error?.code ?? String(error?.status ?? "unknown");
-          log.error("sign-up: could not create the login", { code: error?.code, status: error?.status, domain });
-          // Only a refused address is worth another domain.
-          if (!/email|validation/i.test(detail)) break;
-        }
-        return { error: "other", detail };
+      existingLogin: async (email) => {
+        const { data } = await admin.rpc("auth_login_by_email", { p_email: email });
+        const row = Array.isArray(data) ? data[0] : data;
+        return row ? { id: row.id, hasProfile: row.has_profile } : null;
       },
-      register: async (id, input) =>
-        admin.rpc("register_member", { p_auth_user: id, p_full_name: input.fullName, p_phone: input.phone, p_time_zone: input.timeZone }),
       deleteAuthUser: async (id) => {
         const { error } = await admin.auth.admin.deleteUser(id);
-        if (error) log.error("sign-up: failed to delete orphaned login", { code: error.code });
+        if (error) log.error("sign-up: could not clear a leftover login", { code: error.code });
       },
-      signIn: async (email, password) => {
-        const { error } = await supabase.auth.signInWithPassword({ email, password });
-        if (error) log.warn("sign-up: signing in right after failed", { code: error.code });
-        return !error;
+      createLogin: async (input) => {
+        const { data, error } = await admin.auth.admin.createUser({
+          email: input.email,
+          password: input.password,
+          email_confirm: false,
+          user_metadata: { full_name: input.fullName, phone: input.phone, time_zone: input.timeZone },
+        });
+        if (data.user && !error) return { id: data.user.id };
+        if (error?.code === "email_exists" || error?.code === "user_already_exists") return { error: "exists" };
+        log.error("sign-up: could not create the login", { code: error?.code, status: error?.status });
+        return { error: "other", detail: error?.code ?? String(error?.status ?? "unknown") };
       },
+      sendCode: sendSignUpCode,
     },
     parsed.data,
   );
-  if (!result.ok) return result;
-  redirect(result.data.signedIn ? "/welcome" : "/sign-in");
 }
 
-/** Sign in with mobile + password. One message for every failure, so it never reveals which numbers exist. */
-export async function signIn(_prev: FormState, formData: FormData): Promise<FormState> {
-  const parsed = signInSchema.safeParse({ phone: phoneFrom(formData), password: formData.get("password") ?? "" });
-  if (!parsed.success) return fail("invalid_input", field(parsed.error));
+/** Sign up, step 2 (and an unconfirmed sign-in): verify the emailed code, register, open the app. */
+export async function verifyEmailCode(_prev: FormState, formData: FormData): Promise<FormState> {
+  const email = emailSchema.safeParse(formData.get("email") ?? "");
+  const token = otpSchema.safeParse(formData.get("token") ?? "");
+  if (!email.success || !token.success) return fail("invalid_input", "token");
   const supabase = await createClient();
-  const { error } = await supabase.auth.signInWithPassword({
-    email: await loginEmailForPhone(parsed.data.phone),
-    password: parsed.data.password,
-  });
+  let { error } = await supabase.auth.verifyOtp({ email: email.data, token: token.data, type: "signup" });
+  if (error) ({ error } = await supabase.auth.verifyOtp({ email: email.data, token: token.data, type: "email" }));
+  if (error) return fail("invalid_input", "token");
+  const registered = await finishRegistration();
+  if (!registered.ok) return registered;
+  redirect(registered.data === "registered" ? "/welcome" : "/");
+}
+
+/** Sends the code again. */
+export async function resendEmailCode(_prev: FormState, formData: FormData): Promise<FormState> {
+  const email = emailSchema.safeParse(formData.get("email") ?? "");
+  if (!email.success) return fail("invalid_input", "email");
+  const sent = await sendSignUpCode(email.data);
+  return sent.error ? { ...fail("generic"), detail: sent.error } : ok(null);
+}
+
+/** The login email for what was typed: the email itself, or the login behind a mobile number. */
+async function loginEmail(identifier: string): Promise<string> {
+  if (identifier.includes("@")) return identifier;
+  const admin = createAdminClient();
+  const { data } = await admin.from("users").select("id").eq("phone", identifier).maybeSingle();
+  if (data) {
+    const { data: auth } = await admin.auth.admin.getUserById(data.id);
+    if (auth.user?.email) return auth.user.email;
+  }
+  return loginEmailFor(identifier);
+}
+
+/**
+ * Sign in with email or mobile + password. One message for wrong details, so it never reveals which
+ * accounts exist. An email not yet confirmed gets a fresh code instead.
+ */
+export async function signIn(_prev: FormState<{ confirmEmail: string }>, formData: FormData): Promise<FormState<{ confirmEmail: string }>> {
+  const parsed = signInSchema.safeParse({ identifier: formData.get("identifier") ?? "", password: formData.get("password") ?? "" });
+  if (!parsed.success) return fail("invalid_input", field(parsed.error));
+  const email = await loginEmail(parsed.data.identifier);
+  const supabase = await createClient();
+  const { error } = await supabase.auth.signInWithPassword({ email, password: parsed.data.password });
+  if (error?.code === "email_not_confirmed") {
+    const sent = await sendSignUpCode(email);
+    return sent.error ? { ...fail("generic"), detail: sent.error } : ok({ confirmEmail: email });
+  }
   if (error) {
     if (error.code !== "invalid_credentials") log.warn("sign-in failed", { code: error.code });
     return error.code === "invalid_credentials" ? fail("invalid_input", "password") : { ...fail("generic"), detail: error.code ?? String(error.status) };
   }
-  redirect("/");
+  const registered = await finishRegistration();
+  if (!registered.ok) return registered;
+  redirect(registered.data === "registered" ? "/welcome" : "/");
 }
 
 export async function signOut(): Promise<void> {

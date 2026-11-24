@@ -9,10 +9,30 @@ const SEED_PHONES: Record<string, string> = {
 };
 export const SEED_PASSWORD = "goodlife123";
 
-/** Signs in through the real UI (mobile + password). Takes a seed account's name or a mobile number. */
+/** Local Supabase mail viewer (Mailpit) started by `supabase start`. */
+const MAILPIT_URL = process.env.MAILPIT_URL ?? "http://127.0.0.1:54324";
+type MailSummary = { ID: string; Created: string };
+
+/** Waits for the newest email to `email` sent after `since`, and returns its 6-digit code. */
+export async function latestEmailCode(email: string, since: Date): Promise<string> {
+  for (let attempt = 0; attempt < 30; attempt++) {
+    const res = await fetch(`${MAILPIT_URL}/api/v1/search?query=${encodeURIComponent(`to:${email}`)}`);
+    const { messages } = (await res.json()) as { messages: MailSummary[] };
+    const fresh = messages.find((m) => new Date(m.Created) >= since);
+    if (fresh) {
+      const body = (await (await fetch(`${MAILPIT_URL}/api/v1/message/${fresh.ID}`)).json()) as { Text: string; HTML: string };
+      const code = `${body.Text} ${body.HTML}`.match(/\b(\d{6})\b/)?.[1];
+      if (code) return code;
+    }
+    await new Promise((r) => setTimeout(r, 500));
+  }
+  throw new Error(`No code arrived for ${email}`);
+}
+
+/** Signs in through the real UI (email or mobile + password). Takes a seed account's email or a mobile. */
 export async function signIn(page: Page, who: string, password = SEED_PASSWORD) {
   await page.goto("/sign-in");
-  await page.getByLabel("رقم الجوال").fill(SEED_PHONES[who] ?? who);
+  await page.getByLabel("البريد الإلكتروني أو رقم الجوال").fill(SEED_PHONES[who] ?? who);
   await page.getByLabel("كلمة المرور", { exact: true }).fill(password);
   await page.getByRole("button", { name: "دخول" }).click();
   // Each role lands on its own home: «يومك», «مجموعاتي», or the admin panel.
@@ -22,16 +42,26 @@ export async function signIn(page: Page, who: string, password = SEED_PASSWORD) 
 /** A mobile number no seed account uses. */
 export const newPhone = () => `05${String(Date.now()).slice(-7)}${Math.floor(Math.random() * 10)}`;
 
-/** Signs up as a brand-new member (joins the default group) and stops on /welcome. Returns the mobile. */
-export async function joinNewMember(page: Page, phone = newPhone()) {
+/** Fills the sign-up form (Saudi Arabia preselected) and submits it. */
+export async function fillSignUp(page: Page, { email, phone, name = "مشارك الاختبار" }: { email: string; phone: string; name?: string }) {
   await page.goto("/join");
-  await page.getByLabel("الاسم الكامل").fill("مشارك الاختبار");
+  await page.getByLabel("الاسم الكامل").fill(name);
+  await page.getByLabel("البريد الإلكتروني").fill(email);
   await page.getByLabel("رقم الجوال").fill(phone);
   await page.getByLabel("كلمة المرور", { exact: true }).fill(SEED_PASSWORD);
   await page.getByLabel("أعد كتابة كلمة المرور").fill(SEED_PASSWORD);
   await page.getByRole("button", { name: "أنشئ حسابي" }).click();
+}
+
+/** Signs up as a brand-new member (default group), confirms the emailed code and stops on /welcome. Returns the email. */
+export async function joinNewMember(page: Page, email = `e2e-${Date.now()}-${Math.random().toString(36).slice(2, 6)}@example.test`) {
+  const since = new Date(Date.now() - 1000);
+  await fillSignUp(page, { email, phone: newPhone() });
+  const code = await latestEmailCode(email, since);
+  await page.getByLabel("رمز التأكيد").fill(code);
+  await page.getByRole("button", { name: "تأكيد" }).click();
   await expect(page).toHaveURL("/welcome");
-  return phone;
+  return email;
 }
 
 /** Signs in in a fresh context with no `gl_ui` cookie, so only the account decides the version. */

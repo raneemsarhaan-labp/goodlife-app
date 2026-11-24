@@ -1,57 +1,79 @@
 import { describe, expect, it, vi } from "vitest";
-import { composePhone, loginEmailFor, normalizePhone, signUpSchema } from "@/lib/validation/onboarding";
+import { composePhone, loginEmailFor, normalizePhone, signInSchema, signUpSchema } from "@/lib/validation/onboarding";
 import { countryForZone } from "@/lib/countries";
-import { runSignUp, type SignUpDeps } from "@/server/join";
+import { pendingFromMetadata, registerError, runSignUp, type SignUpDeps } from "@/server/join";
 
-const input = { fullName: "عضو جديد", phone: "+966500000101", password: "secret123", confirmPassword: "secret123", timeZone: "Asia/Riyadh" };
+const input = {
+  fullName: "عضو جديد",
+  email: "new@example.test",
+  phone: "+966500000101",
+  password: "secret123",
+  confirmPassword: "secret123",
+  timeZone: "Asia/Riyadh",
+};
 
 function deps(overrides: Partial<SignUpDeps> = {}): SignUpDeps {
   return {
-    phoneTaken: vi.fn().mockResolvedValue(false),
-    createAuthUser: vi.fn().mockResolvedValue({ id: "auth-1", email: "p966500000101@phone.goodlife.invalid" }),
-    register: vi.fn().mockResolvedValue({ error: null }),
+    taken: vi.fn().mockResolvedValue({ email: false, phone: false }),
+    existingLogin: vi.fn().mockResolvedValue(null),
     deleteAuthUser: vi.fn().mockResolvedValue(undefined),
-    signIn: vi.fn().mockResolvedValue(true),
+    createLogin: vi.fn().mockResolvedValue({ id: "auth-1" }),
+    sendCode: vi.fn().mockResolvedValue({}),
     ...overrides,
   };
 }
 
 describe("runSignUp", () => {
-  it("creates the login and the member, then signs in", async () => {
+  it("creates the unconfirmed login and emails the code", async () => {
     const d = deps();
-    expect(await runSignUp(d, input)).toEqual({ ok: true, data: { signedIn: true } });
-    expect(d.createAuthUser).toHaveBeenCalledWith(input.phone, input.password);
-    expect(d.register).toHaveBeenCalledWith("auth-1", input);
-    expect(d.signIn).toHaveBeenCalledWith("p966500000101@phone.goodlife.invalid", input.password);
+    expect(await runSignUp(d, input)).toEqual({ ok: true, data: { email: input.email } });
+    expect(d.createLogin).toHaveBeenCalledWith(input);
+    expect(d.sendCode).toHaveBeenCalledWith(input.email);
   });
 
-  it("says the mobile is already registered, before creating anything", async () => {
-    const d = deps({ phoneTaken: vi.fn().mockResolvedValue(true) });
-    expect(await runSignUp(d, input)).toEqual({ ok: false, error: "conflict", field: "phone" });
-    expect(d.createAuthUser).not.toHaveBeenCalled();
+  it("says the email or the mobile is already registered, before creating anything", async () => {
+    const byEmail = deps({ taken: vi.fn().mockResolvedValue({ email: true, phone: false }) });
+    expect(await runSignUp(byEmail, input)).toEqual({ ok: false, error: "conflict", field: "email" });
+    const byPhone = deps({ taken: vi.fn().mockResolvedValue({ email: false, phone: true }) });
+    expect(await runSignUp(byPhone, input)).toEqual({ ok: false, error: "conflict", field: "phone" });
+    expect(byEmail.createLogin).not.toHaveBeenCalled();
+    expect(byPhone.createLogin).not.toHaveBeenCalled();
   });
 
-  it("treats an existing login for the mobile as already registered", async () => {
-    const d = deps({ createAuthUser: vi.fn().mockResolvedValue({ error: "exists" }) });
-    expect(await runSignUp(d, input)).toEqual({ ok: false, error: "conflict", field: "phone" });
+  it("clears a leftover login that never became a member, then starts again", async () => {
+    const d = deps({ existingLogin: vi.fn().mockResolvedValue({ id: "old", hasProfile: false }) });
+    expect(await runSignUp(d, input)).toMatchObject({ ok: true });
+    expect(d.deleteAuthUser).toHaveBeenCalledWith("old");
   });
 
-  it("passes on why the login could not be created", async () => {
-    const d = deps({ createAuthUser: vi.fn().mockResolvedValue({ error: "other", detail: "email_address_invalid" }) });
-    expect(await runSignUp(d, input)).toMatchObject({ ok: false, error: "generic", detail: "email_address_invalid" });
+  it("refuses an email whose login already belongs to a member", async () => {
+    const d = deps({ existingLogin: vi.fn().mockResolvedValue({ id: "m", hasProfile: true }) });
+    expect(await runSignUp(d, input)).toEqual({ ok: false, error: "conflict", field: "email" });
+    expect(d.deleteAuthUser).not.toHaveBeenCalled();
   });
 
-  it("removes the login when the member cannot be created", async () => {
-    const d = deps({ register: vi.fn().mockResolvedValue({ error: { code: "P0001", message: "not_found: group" } }) });
-    expect(await runSignUp(d, input)).toEqual({ ok: false, error: "signup_closed", field: undefined });
-    expect(d.deleteAuthUser).toHaveBeenCalledWith("auth-1");
-    expect(d.signIn).not.toHaveBeenCalled();
+  it("passes on why the login or the email failed", async () => {
+    const login = deps({ createLogin: vi.fn().mockResolvedValue({ error: "other", detail: "email_address_invalid" }) });
+    expect(await runSignUp(login, input)).toMatchObject({ ok: false, error: "generic", detail: "email_address_invalid" });
+    const mail = deps({ sendCode: vi.fn().mockResolvedValue({ error: "over_email_send_rate_limit" }) });
+    expect(await runSignUp(mail, input)).toMatchObject({ ok: false, error: "generic", detail: "over_email_send_rate_limit" });
+  });
+});
+
+describe("after the code", () => {
+  it("reads the kept details from the login", () => {
+    expect(pendingFromMetadata({ full_name: "عضو", phone: "+966500000101", time_zone: "Africa/Cairo" })).toEqual({
+      fullName: "عضو",
+      phone: "+966500000101",
+      timeZone: "Africa/Cairo",
+    });
+    expect(pendingFromMetadata({})).toBeNull();
   });
 
-  it("reports a race on the same mobile as already registered", async () => {
-    const d = deps({ register: vi.fn().mockResolvedValue({ error: { code: "P0001", message: "conflict: phone" } }) });
-    expect(await runSignUp(d, input)).toEqual({ ok: false, error: "conflict", field: "phone" });
-    expect(d.deleteAuthUser).toHaveBeenCalled();
+  it("maps registration conflicts to the right field", () => {
+    expect(registerError({ code: "P0001", message: "conflict: phone" })).toEqual({ ok: false, error: "conflict", field: "phone" });
+    expect(registerError({ code: "P0001", message: "conflict: email" })).toEqual({ ok: false, error: "conflict", field: "email" });
+    expect(registerError({ code: "P0001", message: "not_found: group" })).toMatchObject({ ok: false, error: "signup_closed" });
   });
 });
 
@@ -108,6 +130,12 @@ describe("mobile numbers", () => {
     expect(countryForZone("Africa/Cairo")).toBe("20");
     expect(countryForZone("Asia/Riyadh")).toBe("966");
     expect(countryForZone("Pacific/Auckland")).toBe("966");
+  });
+
+  it("signs in with an email or a mobile number", () => {
+    expect(signInSchema.parse({ identifier: " Me@Example.test ", password: "x" }).identifier).toBe("me@example.test");
+    expect(signInSchema.parse({ identifier: "01270600400", password: "x" }).identifier).toBe("+201270600400");
+    expect(signInSchema.safeParse({ identifier: "not-an-email", password: "x" }).success).toBe(false);
   });
 
   it("maps a mobile to its mail-less login", () => {

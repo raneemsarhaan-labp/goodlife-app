@@ -725,6 +725,20 @@ isOneToOne: false
       referencedColumns: ["id"]
     }
                   ]
+                },"owner_phones": {
+                  Row: {
+                    "phone_sha256": string
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "phone_sha256": string
+                  }
+                  Update: {
+                    "phone_sha256"?: string
+                  }
+                  Relationships: [
+                    
+                  ]
                 },"plans": {
                   Row: {
                     "cohort_id": string,"created_at": string,"current_state": string,"desired_state": string,"id": string,"identity": string,"last_reviewed_at": string | null,"next_review_on": string | null,"updated_at": string,"user_id": string
@@ -957,6 +971,11 @@ isOneToOne: false
 "assign_facilitator":
 { Args: { "p_group": string,"p_user": string }; Returns: undefined
                            },
+"auth_login_by_email":
+{ Args: { "p_email": string }; Returns: {
+              "confirmed": boolean,"has_profile": boolean,"id": string
+            }[]
+                           },
 "bootstrap_admin":
 { Args: { "p_user": string }; Returns: boolean
                            },
@@ -1179,7 +1198,7 @@ isOneToOne: false
 { Args: { "p_activity": string }; Returns: undefined
                            },
 "register_member":
-{ Args: { "p_auth_user": string,"p_full_name": string,"p_phone": string,"p_time_zone": string }; Returns: string
+{ Args: { "p_auth_user": string,"p_email"?: string,"p_full_name": string,"p_phone": string,"p_time_zone": string }; Returns: string
                            },
 "remove_facilitator":
 { Args: { "p_group": string,"p_user": string }; Returns: undefined

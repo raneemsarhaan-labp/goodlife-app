@@ -1,18 +1,13 @@
 import { expect, test } from "@playwright/test";
 import { checkA11y } from "./helpers/axe";
-import { addOwnHabit, newPhone, SEED_PASSWORD } from "./helpers/auth";
+import { addOwnHabit, joinNewMember } from "./helpers/auth";
 
 // quickstart.md scenario 1 (US1). Requires `supabase start` + `supabase db reset` (seed).
 test("sign up and live a full day on «يومك»", async ({ page }) => {
-  // Sign up: name, mobile, password → welcome (default group «مجموعة النور»).
+  // Sign up: name, email, mobile, password → code from the email → welcome (default group).
   await page.goto("/join");
   await checkA11y(page);
-  await page.getByLabel("الاسم الكامل").fill("مشارك الاختبار");
-  await page.getByLabel("رقم الجوال").fill(newPhone());
-  await page.getByLabel("كلمة المرور", { exact: true }).fill(SEED_PASSWORD);
-  await page.getByLabel("أعد كتابة كلمة المرور").fill(SEED_PASSWORD);
-  await page.getByRole("button", { name: "أنشئ حسابي" }).click();
-  await expect(page).toHaveURL("/welcome");
+  await joinNewMember(page);
   await expect(page.getByText("مجموعة النور")).toBeVisible();
   await checkA11y(page);
   await page.getByRole("link", { name: "ابدأ رحلتك" }).click();

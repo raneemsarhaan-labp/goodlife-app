@@ -71,6 +71,7 @@ export const passwordSchema = z.string().min(8).max(72);
 export const signUpSchema = z
   .object({
     fullName: z.string().trim().min(2).max(80),
+    email: emailSchema,
     phone: phoneSchema,
     password: passwordSchema,
     confirmPassword: z.string(),
@@ -79,7 +80,16 @@ export const signUpSchema = z
   .refine((v) => v.password === v.confirmPassword, { path: ["confirmPassword"], message: "mismatch" });
 export type SignUpInput = z.infer<typeof signUpSchema>;
 
-export const signInSchema = z.object({ phone: phoneSchema, password: z.string().min(1).max(72) });
+/** Sign in with the email or the mobile number, and the password. */
+export const signInSchema = z.object({
+  identifier: z
+    .string()
+    .trim()
+    .min(3)
+    .transform((v) => (v.includes("@") ? v.toLowerCase() : normalizePhone(v)))
+    .refine((v) => (v.includes("@") ? z.email().safeParse(v).success : PHONE.test(v))),
+  password: z.string().min(1).max(72),
+});
 
 /**
  * The login a mobile-only account uses behind the scenes; no mail is ever sent to it. The first
