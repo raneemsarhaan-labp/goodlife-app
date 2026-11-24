@@ -20,7 +20,7 @@ test("sign up and live a full day on «يومك»", async ({ page }) => {
   await expect(page).toHaveURL("/");
 
   // «يومك»: journey day 12 (seed cohort started 11 days ago), no habits yet.
-  await expect(page.getByText("اليوم ١٢ من رحلتك")).toBeVisible();
+  await expect(page.getByText("اليوم ١٢ من الرحلة")).toBeVisible();
   await checkA11y(page);
   for (const name of ["قراءة", "مشي", "نوم مبكر"]) {
     await addOwnHabit(page, name);
@@ -48,8 +48,8 @@ test("sign up and live a full day on «يومك»", async ({ page }) => {
   await expect(own.getByText("أمشي ربع ساعة بعد العصر")).toBeVisible();
   expect(await journey.evaluate((el) => getComputedStyle(el).borderStyle)).toBe("solid");
   expect(await own.evaluate((el) => getComputedStyle(el).borderStyle)).toBe("dashed");
-  await journey.getByRole("button", { name: "لم أنجزه بعد" }).click();
-  await own.getByRole("button", { name: "لم أنجزه بعد" }).click();
+  await journey.getByRole("button", { name: "أنجزت التحدّي" }).click();
+  await own.getByRole("button", { name: "أنجزت التحدّي" }).click();
   await expect(journey.getByRole("button", { pressed: true })).toBeVisible();
   await expect(own.getByRole("button", { pressed: true })).toBeVisible();
 

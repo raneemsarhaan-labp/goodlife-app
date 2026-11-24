@@ -8,7 +8,6 @@ replace with licensed or commissioned art of the same style before release
 |---|---|
 | `bg-glass-*` | «زجاجي» page background (painted botanical) |
 | `bg-full-glass-*` | «زجاج كامل» page background (botanical photo) |
-| `logo` | header mark |
-| `art-quote` | opening quote card corner |
-| `art-progress`, `art-progress-journey` | «تقدمك اليوم» card |
-| `art-challenge` | «تحدّي اليوم» card |
+| `art-progress-journey` | «رحلة يومي» preview in the version picker |
+
+The «يومك» art (logo, card illustrations, quote art) is in `public/design/`.

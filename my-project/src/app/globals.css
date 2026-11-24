@@ -7,6 +7,7 @@
 /* Design tokens from the supplied designs (spec 002); versions and fallbacks are separate files. */
 @import "../ui/theme/tokens.css";
 @import "../ui/theme/versions.css";
+@import "../ui/theme/today.css";
 @import "../ui/theme/fallbacks.css";
 
 /* Tailwind color names mapped onto the designs' palette, so every screen follows it. */

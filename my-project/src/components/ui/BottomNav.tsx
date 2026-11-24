@@ -3,9 +3,10 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useTranslations } from "next-intl";
-import { icon, type IconName } from "@/ui/icons";
+import { navIcon, type NavIconName } from "@/ui/icons";
+import { Icon } from "@/ui/components/Icon";
 
-type Tab = { href: string; key: "today" | "plan" | "stats" | "community" | "more"; icon: IconName };
+type Tab = { href: string; key: "today" | "plan" | "stats" | "community" | "more"; icon: NavIconName };
 
 // RTL order (right → left): يومي · خطتي · الإحصاءات · المجتمع · المزيد (contracts/routes.md).
 // Semantic <nav> with links (page navigation), themed by the chosen version (spec 002).
@@ -25,11 +26,8 @@ export function BottomNav() {
   const pathname = usePathname();
   const t = useTranslations("nav");
   return (
-    <nav
-      aria-label={t("label")}
-      className="gl-nav fixed inset-x-0 bottom-0 z-30 pb-[env(safe-area-inset-bottom)]"
-    >
-      <ul className="mx-auto flex max-w-lg justify-between px-2">
+    <nav aria-label={t("label")} className="gl-nav fixed inset-x-0 bottom-0 z-30 pb-[env(safe-area-inset-bottom)]">
+      <ul className="mx-auto flex max-w-lg px-1.5">
         {TABS.map((tab) => {
           const active = isActive(pathname, tab.href);
           return (
@@ -37,12 +35,11 @@ export function BottomNav() {
               <Link
                 href={tab.href}
                 aria-current={active ? "page" : undefined}
-                className={`flex min-h-14 flex-col items-center justify-center gap-0.5 text-xs ${
-                  active ? "font-semibold text-sage-700" : "text-ink-500"
+                className={`flex min-h-[65px] flex-col items-center gap-1 pb-3.5 pt-2.5 text-[11px] font-bold leading-[15px] ${
+                  active ? "text-sage-700" : "text-ink-500"
                 }`}
               >
-                {/* eslint-disable-next-line @next/next/no-img-element -- inline icon data URL */}
-                <img src={icon(tab.icon)} alt="" aria-hidden="true" width={24} height={24} className={`size-6 ${active ? "" : "opacity-70"}`} />
+                <Icon src={navIcon(tab.icon)} className={`size-[22px] ${active ? "" : "text-[var(--ink-300)]"}`} />
                 {t(tab.key)}
               </Link>
             </li>

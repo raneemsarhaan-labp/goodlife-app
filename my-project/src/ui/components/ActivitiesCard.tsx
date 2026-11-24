@@ -1,41 +1,41 @@
 "use client";
 
-import { IonIcon, IonItem, IonLabel, IonList } from "@ionic/react";
-import { useRouter } from "next/navigation";
+import Link from "next/link";
 import { useTranslations } from "next-intl";
 import { formatDateTime } from "@/lib/format";
 import { icon } from "@/ui/icons";
 import type { TodayActivity } from "@/server/queries/today";
-import { GlassCard } from "./GlassCard";
+import { Icon } from "./Icon";
 
-/** «الأنشطة القادمة» on the Today view (spec 002 US2), as an Ionic list. */
+/** «الأنشطة القادمة» on «يومك» (spec 002 US2), in the designs' card style. */
 export function ActivitiesCard({ activities, timeZone }: { activities: TodayActivity[]; timeZone: string }) {
   const t = useTranslations("today");
-  const router = useRouter();
   return (
-    <GlassCard title={t("upcoming")} titleId="upcoming">
+    <section aria-labelledby="upcoming" className="td-card">
+      <div className="td-card-head" style={{ marginBottom: 8 }}>
+        <h2 id="upcoming" className="td-card-title">{t("upcoming")}</h2>
+      </div>
       {activities.length === 0 ? (
-        <p className="text-ink-700">{t("noUpcoming")}</p>
+        <p className="td-empty-note">{t("noUpcoming")}</p>
       ) : (
-        <IonList lines="inset" className="bg-transparent">
+        <ul className="td-list">
           {activities.map((a) => (
-            <IonItem
-              key={a.id}
-              button
-              detail
-              onClick={() => router.push(`/activities/${a.id}`)}
-              className="[--background:transparent] [--padding-start:0]"
-            >
-              <IonIcon slot="start" icon={icon("event")} aria-hidden="true" />
-              <IonLabel className="whitespace-normal">
-                <h3 className="font-semibold">{a.title}</h3>
-                <p>{formatDateTime(a.starts_at, timeZone)}</p>
-                {a.location && <p>{a.location}</p>}
-              </IonLabel>
-            </IonItem>
+            <li key={a.id}>
+              <Link href={`/activities/${a.id}`}>
+                <span className="td-round td-list-icon">
+                  <Icon src={icon("event")} />
+                </span>
+                <span className="td-list-text">
+                  <span className="td-list-title">{a.title}</span>
+                  <span className="td-list-meta">{formatDateTime(a.starts_at, timeZone)}</span>
+                  {a.location && <span className="td-list-meta">{a.location}</span>}
+                </span>
+                <Icon src={icon("chevron_left")} className="td-chevron" />
+              </Link>
+            </li>
           ))}
-        </IonList>
+        </ul>
       )}
-    </GlassCard>
+    </section>
   );
 }

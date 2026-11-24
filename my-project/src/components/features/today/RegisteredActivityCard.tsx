@@ -7,6 +7,7 @@ import { formatDateTime, formatNumber } from "@/lib/format";
 import type { RegisteredActivity } from "@/server/queries/today";
 import { dismissActivityCard } from "@/server/actions/activities";
 import { icon } from "@/ui/icons";
+import { Icon } from "@/ui/components/Icon";
 
 /** «نشاط سجّلت فيه» on «يومك» (spec 003 FR-015, FR-016, FR-018): closable for the rest of the day. */
 export function RegisteredActivityCard({ activity, timeZone }: { activity: RegisteredActivity; timeZone: string }) {
@@ -16,7 +17,7 @@ export function RegisteredActivityCard({ activity, timeZone }: { activity: Regis
   if (hidden) return null;
   const titleId = `registered-${activity.id}`;
   return (
-    <section aria-labelledby={titleId} className="gl-surface relative flex items-center gap-3 rounded-[var(--radius-card)] p-4">
+    <section aria-labelledby={titleId} className="td-card td-activity">
       <button
         type="button"
         aria-label={t("close")}
@@ -25,26 +26,22 @@ export function RegisteredActivityCard({ activity, timeZone }: { activity: Regis
           setHidden(true);
           start(() => void dismissActivityCard(activity.id));
         }}
-        className="flex size-11 shrink-0 items-center justify-center rounded-full"
+        className="td-round td-hit td-activity-close"
       >
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img src={icon("close")} alt="" aria-hidden="true" width={20} height={20} className="size-5 opacity-70" />
+        <Icon src={icon("close")} />
       </button>
-      <Link href={`/activities/${activity.id}`} className="flex min-w-0 flex-1 items-center gap-3">
-        <span className="flex min-w-0 flex-1 flex-col gap-0.5">
-          <span className="text-xs font-semibold text-sage-700">
-            {t("registeredLabel")} · {activity.mode === "online" ? t("online") : t("inPerson")}
-          </span>
-          <span id={titleId} className="font-semibold text-ink-900">
-            {activity.title}
-            {activity.session_count > 1 && <span className="font-normal text-ink-700"> — {t("sessions", { count: activity.session_count, n: formatNumber(activity.session_count) })}</span>}
-          </span>
-          <span className={`text-sm ${activity.cancelled ? "font-semibold text-dawn-700" : "text-ink-700"}`}>
-            {activity.cancelled ? t("cancelledToday") : t("nextSession", { when: formatDateTime(activity.next_starts_at, timeZone) })}
-          </span>
+      <Link href={`/activities/${activity.id}`}>
+        <span className="td-activity-tag">
+          {t("registeredLabel")} · {activity.mode === "online" ? t("online") : t("inPerson")}
         </span>
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img src={icon("chevron_left")} alt="" aria-hidden="true" width={20} height={20} className="size-5 shrink-0 opacity-70" />
+        <span id={titleId} className="td-activity-title">
+          {activity.title}
+          {activity.session_count > 1 && <> — {t("sessions", { count: activity.session_count, n: formatNumber(activity.session_count) })}</>}
+        </span>
+        <span className={`td-activity-when ${activity.cancelled ? "is-cancelled" : ""}`}>
+          {activity.cancelled ? t("cancelledToday") : t("nextSession", { when: formatDateTime(activity.next_starts_at, timeZone) })}
+        </span>
+        <Icon src={icon("chevron_left")} className="td-activity-more" />
       </Link>
     </section>
   );

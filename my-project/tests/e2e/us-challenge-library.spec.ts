@@ -8,12 +8,12 @@ test("«تحدّي اليوم» from the library: stable, ↻ changes it, done c
   await page.goto("/");
   const slot = page.getByRole("region", { name: /تحدّي اليوم|تحدّي الرحلة/ });
   test.skip((await slot.getByText("تحدّي الرحلة").count()) > 0, "today has a program challenge in the seed");
-  const title = await slot.locator("p.text-lg").textContent();
+  const title = await slot.locator("h3").textContent();
   await page.reload();
-  await expect(slot.locator("p.text-lg")).toHaveText(title!);
+  await expect(slot.locator("h3")).toHaveText(title!);
   await slot.getByRole("button", { name: "تحدٍّ آخر" }).click();
-  await expect(slot.locator("p.text-lg")).not.toHaveText(title!);
-  await slot.getByRole("button", { name: "لم أنجزه بعد" }).click();
+  await expect(slot.locator("h3")).not.toHaveText(title!);
+  await slot.getByRole("button", { name: "أنجزت التحدّي" }).click();
   await expect(slot.getByRole("button", { pressed: true })).toBeVisible();
   await expect(slot.getByRole("button", { name: "تحدٍّ آخر" })).toHaveCount(0);
 });

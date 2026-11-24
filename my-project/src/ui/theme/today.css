@@ -1,0 +1,1629 @@
+/*
+ * «يومك» as the product owner's designs draw it (My Day Journey, Glass Edition, Full Glass;
+ * 2026-11-21). Measurements are the designs' own CSS values. One markup for the three versions:
+ * «رحلة يومي» (journey) and «زجاج كامل» (full-glass) share the roomy layout; «زجاجي» (glass) is the
+ * compact one. Colours that carry text keep WCAG AA (constitution VI), so a few labels use
+ * terracotta-700 (#9c4b2c) and ink-500 where the designs use terracotta-500 or ink-300.
+ * Physical `left` appears only in background positions and centred hit areas (direction-neutral).
+ */
+
+:root,
+[data-ui="journey"] {
+  --td-header-bg: transparent;
+  --td-header-border: transparent;
+  --td-header-bw: 0px;
+  --td-header-blur: 0px;
+  --td-card-bg: var(--surface);
+  --td-card-bw: 0px;
+  --td-card-border: transparent;
+  --td-card-blur: 0px;
+  --td-card-shadow: var(--shadow-sm);
+  --td-detail-bg: var(--surface);
+  --td-intent-bg: var(--terracotta-100);
+  --td-progress-bg: var(--green-100);
+  --td-challenge-bg: var(--green-100);
+  --td-own-bg: var(--terracotta-100);
+  --td-modal-backdrop: rgb(18 32 26);
+  --td-modal-backdrop-opacity: 0.55;
+  --td-modal-bg: #f3f0e7;
+  --td-modal-blur: 0px;
+  --td-modal-border: transparent;
+  /* Secondary text: the designs' ink-500, nudged darker where the surface behind it is tinted or
+     glass over art, so small text stays ≥ 4.5:1 (measured on the rendered page). */
+  --td-muted: var(--ink-500);
+  --td-muted-tint: #506256;
+  --td-accent-text: var(--terracotta-700);
+}
+
+[data-ui="glass"],
+[data-ui="full-glass"] {
+  --td-header-bg: rgb(255 255 255 / 0.28);
+  --td-header-border: rgb(255 255 255 / 0.4);
+  --td-header-bw: 1px;
+  --td-header-blur: 18px;
+  --td-card-bg: rgb(255 255 255 / 0.4);
+  --td-card-bw: 1px;
+  --td-card-border: rgb(255 255 255 / 0.55);
+  --td-card-blur: 16px;
+  --td-detail-bg: rgb(255 255 255 / 0.42);
+  --td-intent-bg: rgb(251 227 214 / 0.55);
+  --td-own-bg: rgb(251 227 214 / 0.55);
+}
+
+/* Alphas are the designs' where text stays ≥ 4.5:1 over the art (measured on the rendered page);
+   raised where the design's own value lets the background darken the text (research §5). */
+[data-ui="glass"] {
+  --td-muted: #4a5c50;
+  --td-muted-tint: #4a5c50;
+  --td-header-bg: rgb(255 255 255 / 0.45);
+  --td-intent-bg: rgb(251 227 214 / 0.7);
+  --td-own-bg: rgb(251 227 214 / 0.7);
+  --td-progress-bg: #f0f2ee;
+  --td-challenge-bg: rgb(255 255 255 / 0.55);
+}
+
+[data-ui="full-glass"] {
+  --td-muted: var(--ink-700);
+  --td-muted-tint: var(--ink-700);
+  --td-accent-text: #803c23;
+  --td-header-bg: rgb(255 255 255 / 0.6);
+  --td-card-bg: rgb(255 255 255 / 0.62);
+  --td-detail-bg: rgb(255 255 255 / 0.62);
+  --td-intent-bg: rgb(251 227 214 / 0.8);
+  --td-own-bg: rgb(251 227 214 / 0.8);
+  --td-progress-bg: rgb(220 230 223 / 0.75);
+  --td-challenge-bg: rgb(220 230 223 / 0.75);
+  --td-modal-backdrop: #ffffff;
+  --td-modal-backdrop-opacity: 0.25;
+  --td-modal-bg: rgb(243 240 231 / 0.7);
+  --td-modal-blur: 20px;
+  --td-modal-border: rgb(255 255 255 / 0.5);
+}
+
+/* ---------- Page ---------- */
+/* «يومك» shows the background art as designed: its header and cards carry their own glass, so the
+   page scrim other screens need is lifted (full-glass keeps a light one for the section labels). */
+[data-ui="glass"] body:has(.td-page) {
+  --page-scrim: rgb(245 241 232 / 0.15);
+}
+[data-ui="full-glass"] body:has(.td-page) {
+  --page-scrim: rgb(233 236 228 / 0.2);
+}
+.td-page {
+  margin-inline: auto;
+  max-width: 32rem;
+  padding-bottom: 24px;
+}
+.td-content {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  padding-inline: 18px;
+}
+
+/* Small helpers */
+.gl-icon {
+  display: inline-block;
+  flex-shrink: 0;
+  background-color: currentColor;
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+  -webkit-mask-position: center;
+  mask-position: center;
+  -webkit-mask-size: contain;
+  mask-size: contain;
+}
+/* A 44×44 touch target around a smaller drawn control (constitution VI). Centred, so direction-neutral. */
+.td-hit {
+  position: relative;
+}
+.td-hit::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: max(100%, 44px);
+  height: max(100%, 44px);
+  transform: translate(-50%, -50%);
+}
+.td-round {
+  display: inline-flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  border-radius: 50%;
+  background: var(--ink-50);
+  color: var(--ink-500);
+}
+
+/* ---------- Header ---------- */
+.td-header {
+  position: relative;
+  margin-bottom: 0;
+  padding: 22px 22px 20px;
+  background: var(--td-header-bg);
+  border-bottom: var(--td-header-bw) solid var(--td-header-border);
+  -webkit-backdrop-filter: blur(var(--td-header-blur));
+  backdrop-filter: blur(var(--td-header-blur));
+}
+.td-greet {
+  width: fit-content;
+  margin: 0 0 8px;
+  color: var(--td-muted);
+  font-size: 13px;
+  line-height: 18px;
+}
+.td-lockup {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+.td-title {
+  margin: 0;
+  color: var(--ink-900);
+  font-size: 30px;
+  font-weight: 600;
+  line-height: 56px;
+}
+.td-logo {
+  width: 52px;
+  height: 52px;
+  overflow: hidden;
+  border: 1.5px solid var(--ink-100);
+  border-radius: 50%;
+  background: var(--surface);
+}
+.td-logo img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.td-date {
+  width: fit-content;
+  margin: 0;
+  color: var(--td-muted);
+  font-size: 12.5px;
+  line-height: 17px;
+}
+
+/* ---------- Cards ---------- */
+.td-card {
+  position: relative;
+  padding: 18px;
+  border: var(--td-card-bw) solid var(--td-card-border);
+  border-radius: 22px;
+  background: var(--td-card-bg);
+  box-shadow: var(--td-card-shadow);
+  color: var(--ink-900);
+  line-height: 1.4;
+  -webkit-backdrop-filter: blur(var(--td-card-blur));
+  backdrop-filter: blur(var(--td-card-blur));
+}
+.td-card-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 16px;
+}
+.td-card-title {
+  margin: 0;
+  font-size: 17px;
+  font-weight: 600;
+  line-height: 32px;
+}
+.td-menu {
+  width: 28px;
+  height: 28px;
+}
+.td-menu .gl-icon {
+  width: 17px;
+  height: 17px;
+}
+.td-label {
+  width: fit-content;
+  margin: 0;
+  color: var(--td-accent-text);
+  font-size: 13px;
+  font-weight: 700;
+  line-height: 18px;
+}
+.td-section-label {
+  width: fit-content;
+  margin: 0 0 12px;
+  color: var(--td-muted);
+  font-size: 13px;
+  font-weight: 700;
+  line-height: 18px;
+}
+.td-text-button {
+  min-height: 44px;
+  border: none;
+  background: none;
+  color: var(--green-700);
+  font-size: 12.5px;
+  font-weight: 700;
+  text-decoration: underline;
+  text-underline-offset: 4px;
+}
+/* Other «يومك» cards (review, install, invitations) take the same surface. */
+.td-content .gl-surface {
+  border: var(--td-card-bw) solid var(--td-card-border);
+  border-radius: 22px;
+  background-color: var(--td-card-bg);
+  box-shadow: var(--td-card-shadow);
+  -webkit-backdrop-filter: blur(var(--td-card-blur));
+  backdrop-filter: blur(var(--td-card-blur));
+}
+
+/* ---------- «حالي المنشود» ---------- */
+.td-intent {
+  overflow: hidden;
+  padding: 20px;
+  background: var(--td-intent-bg);
+}
+.td-intent > * {
+  position: relative;
+}
+.td-intent-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  min-height: 18px;
+  margin-bottom: 14px;
+}
+.td-intent-edit {
+  width: 26px;
+  height: 26px;
+  margin-block: -4px;
+  background: rgb(255 255 255 / 0.55);
+  color: var(--terracotta-700);
+}
+.td-intent-edit .gl-icon {
+  width: 15px;
+  height: 15px;
+}
+.td-intent-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+  margin-bottom: 16px;
+}
+.td-intent-text {
+  flex: 1;
+  min-width: 0;
+}
+.td-intent-lead {
+  margin: 0 0 8px;
+  color: var(--ink-900);
+  font-size: 16.5px;
+  font-weight: 700;
+  line-height: 1.6;
+}
+.td-intent-sub {
+  margin: 0;
+  color: var(--td-muted-tint);
+  font-size: 13px;
+  line-height: 1.75;
+  white-space: pre-line;
+}
+.td-intent-more {
+  min-height: 44px;
+  margin-block: -10px -12px;
+  border: none;
+  background: none;
+  color: var(--terracotta-700);
+  font-size: 12.5px;
+  font-weight: 700;
+}
+.td-intent-photo {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 76px;
+  height: 76px;
+  overflow: hidden;
+  flex-shrink: 0;
+  border: 1.5px solid rgb(168 83 50 / 0.2);
+  border-radius: 50%;
+  background: var(--surface);
+  color: var(--terracotta-500);
+}
+.td-intent-photo img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.td-intent-photo .gl-icon {
+  display: none;
+  width: 28px;
+  height: 28px;
+}
+/* «زجاج كامل» draws a calm figure instead of the illustration. */
+[data-ui="full-glass"] .td-intent-photo img {
+  display: none;
+}
+[data-ui="full-glass"] .td-intent-photo .gl-icon {
+  display: inline-block;
+}
+.td-pill {
+  display: flex;
+  text-decoration: none;
+  align-items: center;
+  gap: 10px;
+  padding-block: 6px;
+  padding-inline: 16px 8px;
+  border-radius: 999px;
+  background: rgb(255 255 255 / 0.55);
+}
+.td-pill input {
+  flex: 1;
+  min-width: 0;
+  min-height: 34px;
+  border: none;
+  background: none;
+  color: var(--ink-900);
+  font: inherit;
+  font-size: 13.5px;
+  outline: none;
+}
+.td-pill:focus-within {
+  outline: 3px solid var(--terracotta-700);
+  outline-offset: 2px;
+}
+.td-pill input::placeholder {
+  color: var(--terracotta-700);
+  opacity: 1;
+}
+.td-pill-text {
+  flex: 1;
+  color: var(--terracotta-700);
+  font-size: 13.5px;
+  font-weight: 700;
+}
+.td-pill-go {
+  width: 34px;
+  height: 34px;
+  background: var(--terracotta-500);
+  color: #fff;
+  cursor: pointer;
+}
+.td-pill-go .gl-icon {
+  width: 17px;
+  height: 17px;
+}
+.td-pill-go:disabled {
+  cursor: default;
+}
+.td-intent-note {
+  margin: 8px 0 0;
+  color: var(--td-accent-text);
+  font-size: 12.5px;
+}
+
+[data-ui="glass"] .td-intent {
+  padding: 14px 16px;
+}
+[data-ui="glass"] .td-intent::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: url("/design/desired-glass.webp") left bottom / 85% no-repeat;
+  opacity: 0.55;
+  pointer-events: none;
+}
+[data-ui="glass"] .td-intent-head {
+  margin-bottom: 8px;
+}
+[data-ui="glass"] .td-intent-row {
+  margin-bottom: 10px;
+}
+[data-ui="glass"] .td-intent-lead {
+  margin-bottom: 5px;
+  font-size: 14.5px;
+  line-height: 1.45;
+}
+[data-ui="glass"] .td-intent-sub {
+  font-size: 12px;
+  line-height: 1.5;
+}
+[data-ui="glass"] .td-intent-photo {
+  display: none;
+}
+[data-ui="glass"] .td-pill {
+  padding-block: 3px;
+  padding-inline: 16px 4px;
+}
+[data-ui="glass"] .td-pill input {
+  min-height: 28px;
+}
+[data-ui="glass"] .td-pill-go {
+  width: 28px;
+  height: 28px;
+}
+
+/* ---------- «نشاط سجّلت فيه» ---------- */
+.td-activity {
+  padding-inline: 26px 52px;
+}
+.td-activity-close {
+  position: absolute;
+  top: 14px;
+  inset-inline-end: 14px;
+  z-index: 1;
+  width: 26px;
+  height: 26px;
+}
+.td-activity-close .gl-icon {
+  width: 15px;
+  height: 15px;
+}
+.td-activity a {
+  display: block;
+  color: inherit;
+  text-decoration: none;
+}
+.td-activity-tag {
+  display: block;
+  width: fit-content;
+  margin-bottom: 6px;
+  color: var(--td-accent-text);
+  font-size: 12px;
+  font-weight: 700;
+  line-height: 16px;
+}
+.td-activity-title {
+  display: block;
+  font-size: 14.5px;
+  font-weight: 700;
+  line-height: 20px;
+}
+.td-activity-when {
+  display: block;
+  margin-top: 4px;
+  color: var(--td-muted);
+  font-size: 12.5px;
+  line-height: 17px;
+}
+.td-activity-when.is-cancelled {
+  color: var(--td-accent-text);
+  font-weight: 700;
+}
+.td-activity-more {
+  display: block;
+  width: 22px;
+  height: 22px;
+  margin-top: 8px;
+  color: var(--ink-500);
+}
+[data-ui="glass"] .td-activity {
+  padding: 12px;
+  padding-inline: 40px 40px;
+}
+[data-ui="glass"] .td-activity-close {
+  top: 12px;
+  inset-inline-end: 12px;
+  width: 22px;
+  height: 22px;
+}
+[data-ui="glass"] .td-activity-tag {
+  margin-bottom: 4px;
+  font-size: 11px;
+  line-height: 15px;
+}
+[data-ui="glass"] .td-activity-title {
+  font-size: 13px;
+  line-height: 18px;
+}
+[data-ui="glass"] .td-activity-when {
+  font-size: 11.5px;
+}
+[data-ui="glass"] .td-activity-more {
+  margin-top: 4px;
+}
+
+/* ---------- «عاداتي اليومية» ---------- */
+.td-habits-row {
+  display: flex;
+  gap: 16px;
+  margin: 0 -4px 14px;
+  padding: 0 4px 4px;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+.td-habits-row::-webkit-scrollbar {
+  display: none;
+}
+.td-hgroup {
+  display: flex;
+  flex-direction: column;
+  flex-shrink: 0;
+}
+.td-hgroup-title {
+  margin: 0 0 6px;
+  color: var(--td-muted);
+  font-size: 10.5px;
+  font-weight: 700;
+  line-height: 14px;
+}
+.td-hgroup ul {
+  display: flex;
+  gap: 16px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.td-avatar {
+  display: flex;
+  flex-direction: column;
+  flex-shrink: 0;
+  align-items: center;
+  gap: 7px;
+  width: 58px;
+  text-align: center;
+}
+.td-circle {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 54px;
+  height: 54px;
+  padding: 0;
+  border: 2px solid transparent;
+  border-radius: 50%;
+  background: var(--tone-bg, var(--green-100));
+  color: var(--tone, oklch(65% 0.18 150));
+  cursor: pointer;
+  transition: border-color 0.2s;
+}
+.td-circle .gl-icon {
+  width: 24px;
+  height: 24px;
+}
+.td-circle[aria-pressed="true"] {
+  border-color: var(--tone, var(--green-700));
+}
+.td-circle-check {
+  position: absolute;
+  bottom: -3px;
+  inset-inline-end: -3px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 19px;
+  height: 19px;
+  border-radius: 50%;
+  background: var(--tone, var(--green-700));
+  color: #fff;
+}
+.td-circle-check .gl-icon {
+  width: 13px;
+  height: 13px;
+}
+.td-circle.is-add {
+  border: 2px dashed var(--ink-200);
+  background: transparent;
+  color: var(--ink-500);
+}
+.td-avatar-label {
+  color: var(--ink-700);
+  font-size: 11px;
+  font-weight: 700;
+  line-height: 1.3;
+}
+.td-circle-flag {
+  position: absolute;
+  top: -3px;
+  inset-inline-start: -3px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 19px;
+  height: 19px;
+  border: 1.5px solid var(--surface);
+  border-radius: 50%;
+  background: var(--terracotta-100);
+  color: var(--terracotta-700);
+}
+.td-circle-flag .gl-icon {
+  width: 11px;
+  height: 11px;
+}
+.td-avatar-pending {
+  color: var(--terracotta-700);
+  font-size: 10px;
+  line-height: 1.3;
+}
+.tone-morning {
+  --tone-bg: var(--gold-100);
+  --tone: oklch(78% 0.18 90);
+}
+.tone-noon,
+.tone-any {
+  --tone-bg: var(--green-100);
+  --tone: oklch(65% 0.18 150);
+}
+.tone-evening {
+  --tone-bg: var(--terracotta-100);
+  --tone: oklch(70% 0.19 45);
+}
+.td-habits-foot {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+.td-frac {
+  width: fit-content;
+  color: var(--td-muted);
+  font-size: 12.5px;
+  font-weight: 700;
+}
+.td-foot-buttons {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.td-icon-btn {
+  width: 30px;
+  height: 30px;
+  cursor: pointer;
+}
+.td-icon-btn .gl-icon {
+  width: 18px;
+  height: 18px;
+  transition: transform 0.25s;
+}
+.td-icon-btn[aria-expanded="true"] .gl-icon {
+  transform: rotate(180deg);
+}
+.td-days-switch {
+  display: inline-flex;
+  gap: 2px;
+  padding: 2px;
+  border-radius: 999px;
+  background: var(--ink-50);
+}
+.td-days-switch a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 26px;
+  padding-inline: 12px;
+  border-radius: 999px;
+  color: var(--ink-500);
+  font-size: 12px;
+  font-weight: 700;
+  text-decoration: none;
+}
+.td-days-switch a[aria-current="page"] {
+  background: var(--surface);
+  box-shadow: var(--shadow-sm);
+  color: var(--ink-900);
+}
+.td-empty-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 16px;
+  margin-bottom: 4px;
+}
+.td-empty-row a {
+  color: inherit;
+  text-decoration: none;
+}
+.td-empty-title {
+  margin: 4px 0 4px;
+  font-size: 14.5px;
+  font-weight: 700;
+  line-height: 1.5;
+}
+.td-empty-body {
+  margin: 0;
+  color: var(--td-muted);
+  font-size: 13px;
+  line-height: 1.75;
+}
+
+/* Habit detail («تفاصيل العادات») */
+.td-details {
+  margin-top: 14px;
+  padding-top: 14px;
+  border-top: 1px solid var(--ink-100);
+}
+.td-detail {
+  position: relative;
+  margin-bottom: 14px;
+  padding: 20px;
+  border: var(--td-card-bw) solid var(--td-card-border);
+  border-radius: 20px;
+  background: var(--td-detail-bg);
+  box-shadow: var(--shadow-sm);
+}
+.td-detail:last-child {
+  margin-bottom: 0;
+}
+.td-detail-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 14px;
+}
+.td-detail-title {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 0;
+  font-size: 16.5px;
+  font-weight: 600;
+  line-height: 1.4;
+}
+.td-detail-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  overflow: hidden;
+  flex-shrink: 0;
+  border-radius: 50%;
+  background: var(--tone-bg);
+  color: var(--tone);
+}
+.td-detail-icon img {
+  width: 40px;
+  height: 40px;
+  object-fit: cover;
+}
+.td-detail-icon .gl-icon {
+  width: 22px;
+  height: 22px;
+}
+.td-detail-desc {
+  margin: 0 0 18px;
+  color: var(--td-muted);
+  font-size: 13px;
+  line-height: 1.75;
+}
+.td-stats {
+  display: flex;
+  margin-bottom: 18px;
+  padding: 16px 18px;
+  border: 1.5px solid var(--ink-100);
+  border-radius: 16px;
+}
+.td-stat {
+  flex: 1;
+  padding-inline: 12px;
+}
+.td-stat:first-child {
+  padding-inline-start: 0;
+  border-inline-end: 1px solid var(--ink-100);
+}
+.td-stat:last-child {
+  padding-inline-end: 0;
+}
+.td-stat-label {
+  margin-bottom: 8px;
+  color: var(--td-muted);
+  font-size: 12px;
+  font-weight: 700;
+}
+.td-stat-value {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 8px;
+  color: var(--ink-900);
+  font-size: 16px;
+  font-weight: 700;
+}
+.td-stat-value .gl-icon {
+  width: 18px;
+  height: 18px;
+  color: var(--terracotta-500);
+}
+.td-bar {
+  height: 6px;
+  overflow: hidden;
+  border-radius: 4px;
+  background: var(--ink-100);
+}
+.td-bar > span {
+  display: block;
+  height: 100%;
+  border-radius: 4px;
+  background: var(--gold-500);
+}
+.td-week {
+  display: flex;
+  justify-content: space-between;
+  gap: 5px;
+  margin: 0 0 16px;
+  padding: 0;
+  list-style: none;
+}
+.td-week li {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+}
+.td-week-dot {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  border: 1.5px solid var(--ink-200);
+  border-radius: 50%;
+  color: #fff;
+}
+.td-week-dot .gl-icon {
+  width: 12px;
+  height: 12px;
+}
+.td-week li.is-done .td-week-dot {
+  border-color: var(--gold-500);
+  background: var(--gold-500);
+}
+.td-week li.is-done[aria-current="date"] .td-week-dot {
+  border-color: oklch(56% 0.15 150);
+  background: oklch(56% 0.15 150);
+}
+.td-week li.is-off .td-week-dot {
+  border-style: dashed;
+  opacity: 0.6;
+}
+.td-week li[aria-current="date"]:not(.is-done) .td-week-dot {
+  border: 2px solid var(--terracotta-500);
+}
+.td-week-label {
+  color: var(--td-muted);
+  font-size: 10.5px;
+  font-weight: 700;
+}
+.td-week li[aria-current="date"] .td-week-label {
+  color: var(--ink-900);
+  font-weight: 700;
+}
+.td-log {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: 100%;
+  min-height: 44px;
+  padding: 12px;
+  border: none;
+  border-radius: 999px;
+  background: var(--gold-100);
+  color: var(--ink-900);
+  font-size: 14.5px;
+  font-weight: 700;
+  cursor: pointer;
+}
+.td-log[aria-pressed="true"] {
+  background: var(--ink-50);
+}
+.td-log .gl-icon {
+  width: 17px;
+  height: 17px;
+}
+
+[data-ui="glass"] .td-habits {
+  padding: 14px;
+}
+[data-ui="glass"] .td-habits .td-card-head {
+  margin-bottom: 10px;
+}
+[data-ui="glass"] .td-habits .td-card-title {
+  font-size: 14.5px;
+  line-height: 27px;
+}
+[data-ui="glass"] .td-menu {
+  width: 24px;
+  height: 24px;
+}
+[data-ui="glass"] .td-habits-row {
+  gap: 10px;
+  margin-bottom: 8px;
+}
+[data-ui="glass"] .td-hgroup ul {
+  gap: 10px;
+}
+[data-ui="glass"] .td-avatar {
+  gap: 5px;
+  width: 46px;
+}
+[data-ui="glass"] .td-circle {
+  width: 42px;
+  height: 42px;
+}
+[data-ui="glass"] .td-circle .gl-icon {
+  width: 18px;
+  height: 18px;
+}
+[data-ui="glass"] .td-circle-check {
+  width: 15px;
+  height: 15px;
+}
+[data-ui="glass"] .td-circle-check .gl-icon {
+  width: 10px;
+  height: 10px;
+}
+[data-ui="glass"] .td-avatar-label {
+  font-size: 9.5px;
+  line-height: 1.2;
+}
+
+/* ---------- «تقدمك اليوم» ---------- */
+.td-progress {
+  min-height: 150px;
+  overflow: hidden;
+  background: var(--td-progress-bg);
+}
+.td-progress-art {
+  position: absolute;
+  inset: 0;
+  background: url("/design/progress-journey.webp") left bottom / 190px auto no-repeat;
+  pointer-events: none;
+}
+.td-progress .td-card-head {
+  position: relative;
+  margin-bottom: 22px;
+}
+.td-progress-title {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 600;
+  line-height: 30px;
+}
+.td-progress-body {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 24px;
+}
+.td-progress-label {
+  margin: 0;
+  color: var(--td-muted-tint);
+  font-size: 13px;
+  line-height: 1.7;
+  white-space: pre-line;
+}
+.td-progress-pct {
+  margin: 0;
+  color: var(--success);
+  font-size: 54px;
+  font-weight: 600;
+  line-height: 74px;
+}
+.td-progress-track {
+  display: none;
+}
+[data-ui="full-glass"] .td-progress-art {
+  display: none;
+}
+[data-ui="glass"] .td-progress {
+  min-height: 98px;
+  padding: 10px 14px;
+}
+[data-ui="glass"] .td-progress-art {
+  background-image: url("/design/plant-glass.webp");
+  background-size: 160px auto;
+}
+[data-ui="glass"] .td-progress .td-card-head {
+  position: absolute;
+  top: 8px;
+  inset-inline-end: 8px;
+  z-index: 1;
+  margin: 0;
+}
+[data-ui="glass"] .td-progress .td-menu {
+  border: 1px solid var(--ink-100);
+  background: var(--surface);
+  box-shadow: var(--shadow-sm);
+}
+[data-ui="glass"] .td-progress-title {
+  font-size: 11px;
+  line-height: 1.2;
+}
+[data-ui="glass"] .td-progress-body {
+  flex-direction: column;
+  align-items: stretch;
+  gap: 0;
+  width: 65%;
+}
+[data-ui="glass"] .td-progress-pct {
+  order: 1;
+}
+[data-ui="glass"] .td-progress-label {
+  order: 2;
+}
+[data-ui="glass"] .td-progress-track {
+  order: 3;
+}
+[data-ui="glass"] .td-progress-pct {
+  margin-bottom: 2px;
+  color: var(--ink-900);
+  font-size: 19px;
+  font-weight: 800;
+  line-height: 1;
+}
+[data-ui="glass"] .td-progress-label {
+  margin-bottom: 4px;
+  font-size: 9px;
+  line-height: 1.2;
+  white-space: normal;
+}
+[data-ui="glass"] .td-progress-track {
+  display: block;
+  height: 4px;
+  overflow: hidden;
+  border-radius: 4px;
+  background: rgb(0 0 0 / 0.08);
+}
+.td-progress-track > span {
+  display: block;
+  height: 100%;
+  border-radius: 5px;
+  background: var(--green-700);
+}
+/* «زجاجي» shows the title inside the body, the others in the card head. */
+.td-progress-title.is-compact,
+[data-ui="glass"] .td-progress-title:not(.is-compact) {
+  display: none;
+}
+[data-ui="glass"] .td-progress-title.is-compact {
+  display: block;
+  margin-bottom: 2px;
+}
+
+/* ---------- «تحدّي اليوم» ---------- */
+.td-challenges {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  margin-top: 12px;
+}
+.td-challenge {
+  overflow: hidden;
+  padding: 22px;
+  border-radius: 24px;
+  background: var(--td-challenge-bg);
+}
+.td-challenge.is-own {
+  background: var(--td-own-bg);
+}
+.td-challenge::before {
+  content: "";
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 170px;
+  height: 170px;
+  background: url("/design/challenge-journey.webp") left bottom / 170px auto no-repeat;
+  transform: scaleX(-1);
+  pointer-events: none;
+}
+.td-challenge.is-own::before,
+[data-ui="full-glass"] .td-challenge::before {
+  display: none;
+}
+.td-challenge > * {
+  position: relative;
+}
+.td-challenge-refresh {
+  position: absolute;
+  top: 22px;
+  inset-inline-end: 22px;
+  z-index: 2;
+  width: 32px;
+  height: 32px;
+  background: var(--surface);
+  box-shadow: var(--shadow-sm);
+  color: var(--green-700);
+  cursor: pointer;
+}
+.td-challenge-refresh .gl-icon {
+  width: 18px;
+  height: 18px;
+}
+.td-challenge-tag {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin: 0 0 10px;
+  color: var(--td-accent-text);
+  font-size: 12.5px;
+  font-weight: 700;
+  line-height: 17px;
+}
+.td-challenge-tag .gl-icon {
+  width: 16px;
+  height: 16px;
+}
+.td-challenge-title {
+  max-width: 78%;
+  margin: 0 0 8px;
+  font-size: 19px;
+  font-weight: 600;
+  line-height: 1.4;
+}
+.td-challenge-body {
+  width: fit-content;
+  max-width: 78%;
+  margin: 0 0 26px;
+  color: var(--td-muted-tint);
+  font-size: 13px;
+  line-height: 1.7;
+}
+.td-challenge-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}
+.td-cc-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 9px 14px;
+  border: none;
+  border-radius: 999px;
+  font-size: 12.5px;
+  font-weight: 700;
+  line-height: 17px;
+  text-decoration: none;
+  white-space: nowrap;
+  cursor: pointer;
+}
+.td-cc-btn .gl-icon {
+  width: 16px;
+  height: 16px;
+}
+.td-cc-done {
+  background: var(--green-100);
+  color: var(--green-700);
+}
+.td-cc-done[aria-pressed="true"] {
+  background: var(--green-700);
+  color: #fff;
+}
+.td-cc-habit,
+.td-cc-quiet {
+  border: 1.5px solid var(--ink-200);
+  background: var(--surface);
+  color: var(--green-700);
+}
+.td-cc-quiet {
+  border-color: transparent;
+  background: transparent;
+  text-decoration: underline;
+  text-underline-offset: 4px;
+}
+.td-challenge-form label {
+  display: block;
+  margin-bottom: 10px;
+  color: var(--ink-700);
+  font-size: 13px;
+}
+[data-ui="full-glass"] .td-challenge-actions {
+  gap: 10px;
+}
+[data-ui="full-glass"] .td-cc-btn {
+  gap: 8px;
+  padding: 13px 20px;
+  font-size: 14px;
+}
+
+[data-ui="glass"] .td-challenge {
+  padding: 14px 16px;
+  border-radius: 20px;
+}
+[data-ui="glass"] .td-challenge::before {
+  left: -10px;
+  width: 90px;
+  height: 90px;
+  background: url("/design/plant-glass.webp") left bottom / 90px auto no-repeat;
+  transform: none;
+}
+[data-ui="glass"] .td-challenge-refresh {
+  top: 12px;
+  inset-inline-end: 12px;
+  width: 26px;
+  height: 26px;
+}
+[data-ui="glass"] .td-challenge-tag {
+  margin-bottom: 4px;
+  color: var(--ink-900);
+  font-size: 12px;
+  line-height: 16px;
+}
+[data-ui="glass"] .td-challenge-title {
+  margin-bottom: 4px;
+  font-size: 15.5px;
+  line-height: 1.3;
+}
+[data-ui="glass"] .td-challenge-body {
+  margin-bottom: 12px;
+  font-size: 11.5px;
+  line-height: 1.4;
+}
+[data-ui="glass"] .td-cc-btn {
+  gap: 5px;
+  padding: 8px 12px;
+  font-size: 12px;
+}
+[data-ui="glass"] .td-cc-done {
+  flex-direction: row-reverse;
+  padding: 4px 2px;
+  background: none;
+}
+.td-cc-ic {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+[data-ui="glass"] .td-cc-ic {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: var(--surface);
+}
+[data-ui="glass"] .td-cc-done .gl-icon {
+  width: 13px;
+  height: 13px;
+}
+[data-ui="glass"] .td-cc-done[aria-pressed="true"] {
+  padding: 4px 10px;
+  background: var(--green-700);
+}
+[data-ui="glass"] .td-cc-done[aria-pressed="true"] .td-cc-ic {
+  background: transparent;
+}
+[data-ui="glass"] .td-cc-habit {
+  border-color: var(--green-700);
+  background: var(--green-700);
+  color: #fff;
+}
+
+/* ---------- Upcoming activities, intention, start/close day ---------- */
+.td-list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.td-list li + li {
+  border-top: 1px solid var(--ink-100);
+}
+.td-list a {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-height: 44px;
+  padding-block: 10px;
+  color: inherit;
+  text-decoration: none;
+}
+.td-list-icon {
+  width: 36px;
+  height: 36px;
+  background: var(--green-100);
+  color: var(--green-700);
+}
+.td-list-icon .gl-icon {
+  width: 20px;
+  height: 20px;
+}
+.td-list-text {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  min-width: 0;
+}
+.td-list-title {
+  font-size: 14.5px;
+  font-weight: 600;
+  line-height: 20px;
+}
+.td-list-meta {
+  color: var(--td-muted);
+  font-size: 12.5px;
+  line-height: 18px;
+}
+.td-chevron {
+  width: 22px;
+  height: 22px;
+  color: var(--ink-500);
+}
+.td-empty-note {
+  margin: 0;
+  color: var(--td-muted);
+  font-size: 13px;
+}
+.td-intention-text {
+  margin: 8px 0 0;
+  font-size: 16.5px;
+  font-weight: 700;
+  line-height: 1.6;
+}
+.td-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  min-height: 50px;
+  padding: 12px 15px;
+  border: none;
+  border-radius: 999px;
+  font-size: 15px;
+  font-weight: 700;
+  line-height: 1.4;
+  text-align: center;
+  text-decoration: none;
+  cursor: pointer;
+}
+.td-btn-primary {
+  background: var(--terracotta-700);
+  color: #fff;
+}
+.td-btn-secondary {
+  border: 1.5px solid var(--ink-200);
+  background: var(--surface);
+  color: var(--green-700);
+}
+.td-btn-hint {
+  font-size: 12.5px;
+  font-weight: 400;
+  opacity: 0.9;
+}
+.td-closed {
+  margin: 0;
+  padding: 16px;
+  border-radius: 22px;
+  background: var(--green-100);
+  color: var(--green-700);
+  font-weight: 700;
+  text-align: center;
+}
+
+/* ---------- «خطوات البداية» ---------- */
+.td-onboarding-bar {
+  height: 6px;
+  margin-bottom: 8px;
+  overflow: hidden;
+  border-radius: 4px;
+  background: var(--ink-100);
+}
+.td-onboarding-bar > span {
+  display: block;
+  height: 100%;
+  border-radius: 4px;
+  background: var(--gold-500);
+}
+.td-steps {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.td-step {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-height: 44px;
+  margin-inline: -8px;
+  padding-inline: 8px;
+  border-radius: 16px;
+  color: var(--ink-900);
+  font-size: 14px;
+  font-weight: 600;
+  text-decoration: none;
+}
+.td-step.is-done {
+  color: var(--ink-500);
+  font-weight: 400;
+  text-decoration: line-through;
+  text-decoration-color: var(--ink-200);
+}
+.td-step.is-next {
+  background: var(--terracotta-100);
+}
+.td-step-go {
+  color: var(--td-accent-text);
+  font-size: 12.5px;
+  font-weight: 700;
+}
+.td-step-mark {
+  width: 24px;
+  height: 24px;
+  border: 1.5px solid var(--ink-200);
+  background: transparent;
+  color: #fff;
+}
+.td-step.is-done .td-step-mark {
+  border-color: var(--gold-500);
+  background: var(--gold-500);
+}
+.td-step-mark .gl-icon {
+  width: 12px;
+  height: 12px;
+}
+
+/* ---------- Floating + button ---------- */
+ion-fab.gl-fab ion-fab-button.td-fab {
+  --background: var(--terracotta-500);
+  --background-activated: var(--terracotta-700);
+  --background-hover: var(--terracotta-700);
+  --box-shadow: var(--shadow-md);
+  --color: #fff;
+  width: 56px;
+  height: 56px;
+}
+ion-fab.gl-fab ion-fab-button.td-fab ion-icon {
+  font-size: 26px;
+}
+
+/* ---------- Opening quote ---------- */
+ion-modal.td-quote-modal {
+  --width: min(calc(100vw - 48px), 342px);
+  --height: auto;
+  --border-radius: 26px;
+  --background: var(--td-modal-bg);
+  --box-shadow: var(--shadow-lg);
+  --backdrop-opacity: var(--td-modal-backdrop-opacity);
+  --ion-backdrop-color: var(--td-modal-backdrop);
+}
+ion-modal.td-quote-modal::part(content) {
+  border: 1px solid var(--td-modal-border);
+  -webkit-backdrop-filter: blur(var(--td-modal-blur));
+  backdrop-filter: blur(var(--td-modal-blur));
+}
+.td-quote {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  min-height: 343px;
+  overflow: hidden;
+  padding: 34px 26px 36px;
+  color: var(--ink-900);
+  text-align: center;
+}
+.td-quote-art {
+  position: absolute;
+  inset-inline: 0;
+  bottom: 0;
+  height: 170px;
+  background: url("/design/quote-art.webp") center bottom / cover no-repeat;
+  pointer-events: none;
+}
+[data-ui="full-glass"] .td-quote-art {
+  display: none;
+}
+.td-quote-close {
+  position: absolute;
+  top: 14px;
+  inset-inline-end: 14px;
+  z-index: 1;
+  width: 30px;
+  height: 30px;
+  background: transparent;
+  cursor: pointer;
+}
+.td-quote-close .gl-icon {
+  width: 18px;
+  height: 18px;
+}
+.td-quote-badge {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 57px;
+  height: 57px;
+  margin: 0 auto 16px;
+  overflow: hidden;
+  border-radius: 50%;
+  background: var(--canvas);
+  color: var(--terracotta-500);
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 57px;
+  font-weight: 800;
+  line-height: 1;
+}
+.td-quote-badge span {
+  display: block;
+  height: 46px;
+  margin-top: 4px;
+}
+.td-kicker {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  margin: 0 0 22px;
+  color: var(--green-700);
+  font-size: 13px;
+  font-weight: 700;
+  line-height: 18px;
+}
+.td-kicker i {
+  width: 32px;
+  height: 0;
+  border-top: 1.5px dashed var(--ink-200);
+}
+.td-kicker .gl-icon {
+  width: 14px;
+  height: 14px;
+  color: var(--ink-500);
+}
+.td-quote-text {
+  position: relative;
+  margin: 0 0 19px;
+  padding: 0 4px;
+  font-size: 17px;
+  font-weight: 600;
+  line-height: 30.45px;
+}
+.td-quote-source {
+  display: block;
+  margin-top: 4px;
+  color: var(--td-muted);
+  font-size: 13px;
+  font-weight: 400;
+  line-height: 1.6;
+}
+.td-quote-start {
+  position: relative;
+  align-self: center;
+  min-width: 180px;
+  min-height: 50px;
+  margin-top: auto;
+  padding: 15px 28px;
+  border: none;
+  border-radius: 999px;
+  background: var(--terracotta-700);
+  color: #fff;
+  font-size: 15px;
+  font-weight: 700;
+  line-height: 20px;
+  cursor: pointer;
+}
+[data-ui="full-glass"] .td-quote-start {
+  align-self: stretch;
+}
+
+/* ---------- Loading placeholders (versions differ in height) ---------- */
+.td-skel {
+  border-radius: 22px;
+  background: var(--td-card-bg);
+  box-shadow: var(--td-card-shadow);
+}
+.td-skel-habits {
+  height: 222px;
+}
+.td-skel-progress {
+  height: 162px;
+  background: var(--td-progress-bg);
+}
+.td-skel-challenge {
+  height: 240px;
+  margin-top: 12px;
+  background: var(--td-challenge-bg);
+}
+[data-ui="glass"] .td-skel-habits {
+  height: 179px;
+}
+[data-ui="glass"] .td-skel-progress {
+  height: 98px;
+}
+[data-ui="glass"] .td-skel-challenge {
+  height: 165px;
+}

@@ -35,6 +35,9 @@ export const SAMPLE_TODAY: TodayData = {
   },
   own_challenge: { id: "o", text: "أن أُطفئ الهاتف ساعة قبل النوم", done: false },
   day: { intention: "أن أكون حاضرًا مع أهلي الليلة", reflection: null, closed_at: null },
+  registered_activities: [
+    { id: "00000000-0000-4000-8000-0000000000e2", title: "نشاط قراءة: أمراض القلوب", mode: "online", next_starts_at: "2026-11-24T15:00:00Z", next_ends_at: null, next_local_date: "2026-11-24", session_count: 4, cancelled: false, dismissed_on: null },
+  ],
   activities: [{ id: "00000000-0000-4000-8000-0000000000e2", title: "نشاط قراءة: أمراض القلوب", starts_at: "2026-11-24T15:00:00Z", ends_at: null, location: null, mode: "online" }],
   desired_state:
     "أستيقظ ولي وقتٌ لنفسي قبل أن يبدأ يومي مع الناس. أمشي بخُطًى ثابتة، وأُنجز ما نويت دون استعجالٍ أو ضغط، وأنام وأنا مطمئن أنّي عشتُ يومي كما أحب.",

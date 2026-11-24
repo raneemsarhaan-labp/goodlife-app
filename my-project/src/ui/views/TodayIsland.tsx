@@ -15,13 +15,13 @@ export type TodayIslandProps = {
   ritual: { show: boolean; quote: { text: string; source: string | null } | null };
 };
 
-/** The designs' interactive «يومك» cards, built with Ionic (spec 002 US2). Browser-only. */
+/** The interactive «يومك» cards (spec 002 US2), drawn as designed; Ionic for the quote modal and the + button. Browser-only. */
 export function TodayIsland({ data, isToday, ritual }: TodayIslandProps) {
   const habits: RowHabit[] = data.habits ?? [];
   const [progress, setProgress] = useState({ done: habits.filter((h) => h.done).length, total: habits.length });
   const closed = Boolean(data.day?.closed_at);
   return (
-    <div className="flex flex-col gap-4">
+    <div className="flex flex-col gap-[14px]">
       {habits.length > 0 && (
         <HabitRow key={data.local_date} habits={habits} localDate={data.local_date} isToday={isToday} onProgress={(done, total) => setProgress({ done, total })} />
       )}

@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { icon, type IconName } from "@/ui/icons";
 
-/** The floating + button with quick actions (FR-024). */
+/** The floating + button with quick actions (FR-024), terracotta as designed. */
 export function QuickActions({ closed }: { closed: boolean }) {
   const t = useTranslations("quick");
   const router = useRouter();
@@ -16,8 +16,8 @@ export function QuickActions({ closed }: { closed: boolean }) {
   ];
   return (
     <IonFab slot="fixed" vertical="bottom" horizontal="start" className="gl-fab">
-      <IonFabButton color="tertiary" aria-label={t("open")}>
-        <IonIcon icon={icon("add")} />
+      <IonFabButton aria-label={t("open")} className="td-fab">
+        <IonIcon icon={icon("add")} aria-hidden="true" />
       </IonFabButton>
       <IonFabList side="top">
         {actions.map((a) => (

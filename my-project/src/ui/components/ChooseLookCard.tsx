@@ -12,14 +12,14 @@ export function ChooseLookCard() {
   const [, start] = useTransition();
   if (hidden) return null;
   return (
-    <section aria-labelledby="choose-look" className="gl-surface flex flex-col gap-2 rounded-[var(--radius-card)] p-4">
-      <h2 id="choose-look" className="font-semibold">{t("inviteTitle")}</h2>
-      <p className="text-sm text-ink-700">{t("inviteBody")}</p>
+    <section aria-labelledby="choose-look" className="td-card flex flex-col gap-2">
+      <h2 id="choose-look" className="td-card-title">{t("inviteTitle")}</h2>
+      <p className="td-empty-body">{t("inviteBody")}</p>
       <div className="flex gap-2">
-        <Link href="/account/appearance" className="inline-flex min-h-11 items-center rounded-full bg-dawn-700 px-4 text-sm font-medium text-white">
+        <Link href="/account/appearance" className="td-cc-btn td-hit td-btn-primary">
           {t("inviteAction")}
         </Link>
-        <button type="button" className="min-h-11 rounded-full px-4 text-sm text-sage-700" onClick={() => { setHidden(true); start(() => skipAppearanceChoice()); }}>
+        <button type="button" className="td-cc-btn td-hit td-cc-quiet" onClick={() => { setHidden(true); start(() => skipAppearanceChoice()); }}>
           {t("inviteDismiss")}
         </button>
       </div>

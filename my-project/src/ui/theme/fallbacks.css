@@ -2,6 +2,17 @@
 
 /* In-app "reduce transparency" (iOS Safari has no media query for it). */
 [data-reduce-transparency="true"] {
+  --td-header-bg: var(--canvas);
+  --td-header-blur: 0px;
+  --td-card-bg: var(--surface);
+  --td-card-blur: 0px;
+  --td-detail-bg: var(--surface);
+  --td-intent-bg: var(--terracotta-100);
+  --td-own-bg: var(--terracotta-100);
+  --td-progress-bg: var(--green-100);
+  --td-challenge-bg: var(--green-100);
+  --td-modal-bg: #f3f0e7;
+  --td-modal-blur: 0px;
   --card-bg: var(--surface);
   --card-bg-strong: var(--surface);
   --card-blur: 0px;
@@ -10,7 +21,19 @@
 }
 
 @media (prefers-reduced-transparency: reduce) {
-  :root {
+  :root,
+  :root[data-ui] {
+    --td-header-bg: var(--canvas);
+    --td-header-blur: 0px;
+    --td-card-bg: var(--surface);
+    --td-card-blur: 0px;
+    --td-detail-bg: var(--surface);
+    --td-intent-bg: var(--terracotta-100);
+    --td-own-bg: var(--terracotta-100);
+    --td-progress-bg: var(--green-100);
+    --td-challenge-bg: var(--green-100);
+    --td-modal-bg: #f3f0e7;
+    --td-modal-blur: 0px;
     --card-bg: var(--surface);
     --card-bg-strong: var(--surface);
     --card-blur: 0px;
@@ -21,7 +44,19 @@
 
 /* Browsers without backdrop blur: solid surfaces rather than unreadable translucency. */
 @supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
-  :root {
+  :root,
+  :root[data-ui] {
+    --td-header-bg: var(--canvas);
+    --td-header-blur: 0px;
+    --td-card-bg: var(--surface);
+    --td-card-blur: 0px;
+    --td-detail-bg: var(--surface);
+    --td-intent-bg: var(--terracotta-100);
+    --td-own-bg: var(--terracotta-100);
+    --td-progress-bg: var(--green-100);
+    --td-challenge-bg: var(--green-100);
+    --td-modal-bg: #f3f0e7;
+    --td-modal-blur: 0px;
     --card-bg: var(--surface);
     --card-bg-strong: var(--surface);
     --nav-bg: var(--surface);
@@ -29,7 +64,11 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-  :root {
+  :root,
+  :root[data-ui] {
+    --td-header-blur: 0px;
+    --td-card-blur: 0px;
+    --td-modal-blur: 0px;
     --card-blur: 0px;
     --nav-blur: 0px;
   }

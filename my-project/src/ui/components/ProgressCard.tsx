@@ -1,25 +1,40 @@
 "use client";
 
-import { IonProgressBar } from "@ionic/react";
+import Link from "next/link";
 import { useTranslations } from "next-intl";
 import { formatNumber } from "@/lib/format";
-import { GlassCard } from "./GlassCard";
+import { icon } from "@/ui/icons";
+import { Icon } from "./Icon";
 
-/** «تقدّمك اليوم»: today's habit completion as a percentage (FR-023). */
+/** «تقدّمك اليوم»: today's habit completion as a percentage (FR-023), drawn as each version designs it. */
 export function ProgressCard({ done, total }: { done: number; total: number }) {
   const t = useTranslations("today");
   const rate = total > 0 ? done / total : 0;
+  const pct = formatNumber(rate, undefined, { style: "percent" });
   return (
-    <GlassCard title={t("progressTitle")} titleId="progress-title">
-      <div className="flex items-center justify-between gap-4">
-        <div className="flex flex-col gap-1">
-          <p className="text-4xl font-bold text-sage-700">{formatNumber(rate, undefined, { style: "percent" })}</p>
-          <p className="text-sm text-ink-700">{t("progressBody")}</p>
-        </div>
-        {/* eslint-disable-next-line @next/next/no-img-element -- decorative, tiny, theme-dependent */}
-        <img src="/ui/art-progress.webp" alt="" width={96} height={64} loading="lazy" className="h-16 w-24 object-contain" />
+    <section aria-labelledby="progress-title" className="td-card td-progress">
+      <span aria-hidden="true" className="td-progress-art" />
+      <div className="td-card-head">
+        <h2 id="progress-title" className="td-progress-title">{t("progressTitle")}</h2>
+        <Link href="/stats" aria-label={t("viewStats")} title={t("viewStats")} className="td-round td-hit td-menu">
+          <Icon src={icon("more_horiz")} />
+        </Link>
       </div>
-      <IonProgressBar value={rate} className="mt-3 h-2 rounded-full [--background:var(--ink-100)] [--progress-background:var(--green-500)]" aria-hidden="true" />
-    </GlassCard>
+      <div className="td-progress-body">
+        <p className="td-progress-title is-compact" aria-hidden="true">{t("progressTitle")}</p>
+        <p className="td-progress-label">{t("progressBody")}</p>
+        <p className="td-progress-pct">{pct}</p>
+        <div
+          className="td-progress-track"
+          role="progressbar"
+          aria-valuemin={0}
+          aria-valuemax={100}
+          aria-valuenow={Math.round(rate * 100)}
+          aria-labelledby="progress-title"
+        >
+          <span style={{ width: `${rate * 100}%` }} />
+        </div>
+      </div>
+    </section>
   );
 }

@@ -98,7 +98,7 @@
       "afternoon": "طاب يومك، {name}",
       "evening": "مساء الخير، {name}"
     },
-    "journeyDay": "اليوم {day} من رحلتك",
+    "journeyDay": "اليوم {day} من الرحلة",
     "yesterdayHeading": "أمس",
     "todayTab": "اليوم",
     "yesterdayTab": "أمس",
@@ -134,7 +134,7 @@
     "viewReviews": "مراجعاتي",
     "editChallenge": "تعديل التحدّي",
     "progressTitle": "تقدّمك اليوم",
-    "progressBody": "من عاداتك اليوم مكتملة",
+    "progressBody": "من عاداتك اليوم\nمكتملة",
     "habitsCount": "{progress}",
     "expandHabits": "تفاصيل العادات",
     "collapseHabits": "إخفاء التفاصيل",
@@ -156,7 +156,15 @@
     "styleReflection": "تأمّل",
     "refreshChallenge": "تحدٍّ آخر",
     "refreshLimit": "اكتفيتَ من التبديل اليوم.",
-    "becomesHabit": "يصير عادة: {name}"
+    "becomesHabit": "يصير عادة: {name}",
+    "habitsTitle": "عاداتي اليومية",
+    "manageHabits": "إدارة العادات",
+    "weekLabel": "التقدّم الأسبوعي",
+    "weekValue": "{done}/{total} أيام",
+    "streakLabel": "سلسلة الاستمراريّة",
+    "streakDays": "{count, plural, =0 {لا أيام بعد} one {يوم واحد} two {يومان} few {{n} أيام} many {{n} يومًا} other {{n} يوم}}",
+    "challengeDoneAction": "أنجزت التحدّي",
+    "habitDetails": "تفاصيل {name}"
   },
   "startDay": {
     "title": "ابدأ يومك",
@@ -821,7 +829,8 @@
     "deleteConfirm": "احذف هذا التأمل؟",
     "none": "لا تأمّلات في هذه الفترة.",
     "older": "الأقدم",
-    "newer": "الأحدث"
+    "newer": "الأحدث",
+    "shortPlaceholder": "اكتب تأمّلك…"
   },
   "activityRegistration": {
     "registeredLabel": "نشاط سجّلت فيه",

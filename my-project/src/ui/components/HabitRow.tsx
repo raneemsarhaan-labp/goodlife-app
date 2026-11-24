@@ -1,16 +1,17 @@
 "use client";
 
-import { IonAccordion, IonAccordionGroup, IonIcon, IonItem, IonLabel, IonList, IonNote } from "@ionic/react";
+import Link from "next/link";
 import { useTranslations } from "next-intl";
-import { useState } from "react";
+import { useId, useState } from "react";
 import { Toast } from "@/components/ui/Toast";
 import { useOutbox } from "@/components/features/today/useOutbox";
 import { formatFraction, formatNumber } from "@/lib/format";
 import { weekdayOf, type TimeOfDay } from "@/lib/days";
-import { habitIcon, icon } from "@/ui/icons";
+import { icon } from "@/ui/icons";
+import { habitIconThin } from "@/ui/icons-thin";
 import { usePrivateNames } from "@/components/features/habits/HabitName";
 import { displayName } from "@/lib/private-habits";
-import { GlassCard } from "./GlassCard";
+import { Icon } from "./Icon";
 
 export type WeekDay = { date: string; scheduled: boolean; done: boolean };
 export type RowHabit = {
@@ -32,11 +33,26 @@ export type RowHabit = {
 
 const GROUPS: TimeOfDay[] = ["morning", "noon", "evening", "any"];
 
+/** The designs' habit illustrations, for the habit detail, by icon. */
+const ART: Record<string, string> = {
+  wb_sunny: "sunrise",
+  menu_book: "quran",
+  auto_stories: "quran",
+  mosque: "quran",
+  bedtime: "moon",
+  nightlight: "moon",
+  family_restroom: "heart",
+  volunteer_activism: "heart",
+  favorite: "heart",
+  fitness_center: "fitness",
+  directions_walk: "fitness",
+};
+
 /**
- * «عاداتي اليومية» (spec 002 FR-021): a horizontal row of circular habit toggles with a done count,
- * expandable to each habit's description, this week's progress and streak. Saving goes through the
- * offline outbox exactly as before (FR-025). Spec 004: grouped by time of day; the detail shows the
- * amount, the week's days, weekly done/scheduled and «سجّل اليوم».
+ * «عاداتي اليومية» (spec 002 FR-021) as designed: a horizontal row of circular habit toggles with a
+ * done count, the day switch and «تفاصيل العادات» with each habit's description, this week's days,
+ * weekly progress and streak. Saving goes through the offline outbox exactly as before (FR-025).
+ * Spec 004: grouped by time of day; the detail shows the amount, the week and «سجّل اليوم».
  */
 export function HabitRow({
   habits,
@@ -52,12 +68,14 @@ export function HabitRow({
   const t = useTranslations("today");
   const tt = useTranslations("times");
   const tw = useTranslations("weekdays");
-  const tws = useTranslations("weekdaysShort");
   const tg = useTranslations("groupChallenge");
+  const id = useId();
   const privateNames = usePrivateNames();
   const nameOf = (h: RowHabit) => displayName(h.id, h.name, Boolean(h.is_private), privateNames);
   const te = useTranslations("errors");
   const [message, setMessage] = useState<string | null>(null);
+  const [open, setOpen] = useState(false);
+  const [closedCards, setClosedCards] = useState<Record<string, boolean>>({});
   const { submit, pendingIds } = useOutbox({ onDropped: () => setMessage(t("dropped")) });
   const [done, setDone] = useState<Record<string, boolean>>(() => Object.fromEntries(habits.map((h) => [h.id, h.done])));
   const doneCount = habits.filter((h) => done[h.id]).length;
@@ -76,65 +94,134 @@ export function HabitRow({
     }
   }
 
+  const tone = (h: RowHabit) => `tone-${h.time_of_day ?? "any"}`;
+
   return (
-    <GlassCard title={t("habits")} titleId="habits-title" actions={<span className="text-sm font-medium text-ink-700" aria-live="polite">{t("habitsCount", { progress: formatFraction(doneCount, habits.length) })}</span>}>
-      {GROUPS.map((g) => {
-        const group = habits.filter((h) => (h.time_of_day ?? "any") === g);
-        if (group.length === 0) return null;
-        const showHeading = group.length !== habits.length || g !== "any";
-        return (
-          <section key={g} aria-label={showHeading ? tt(g) : undefined} className="flex flex-col gap-1">
-            {showHeading && <h3 className="text-xs font-semibold text-ink-700">{tt(g)}</h3>}
-            <ul className="-mx-1 flex snap-x gap-3 overflow-x-auto px-1 pb-2 pt-1">
-              {group.map((h) => (
-                <li key={h.id} data-habit-id={h.id} className="flex w-[4.5rem] shrink-0 snap-start flex-col items-center gap-1.5 text-center">
+    <section aria-labelledby={`${id}-title`} className="td-card td-habits">
+      <div className="td-card-head">
+        <h2 id={`${id}-title`} className="td-card-title">{t("habitsTitle")}</h2>
+        <Link href="/stats" aria-label={t("viewStats")} title={t("viewStats")} className="td-round td-hit td-menu">
+          <Icon src={icon("more_horiz")} />
+        </Link>
+      </div>
+
+      <div className="td-habits-row">
+        {GROUPS.map((g) => {
+          const group = habits.filter((h) => (h.time_of_day ?? "any") === g);
+          if (group.length === 0) return null;
+          const showHeading = group.length !== habits.length || g !== "any";
+          return (
+            <section key={g} aria-label={showHeading ? tt(g) : undefined} className="td-hgroup">
+              {showHeading && <h3 className="td-hgroup-title">{tt(g)}</h3>}
+              <ul>
+                {group.map((h) => (
+                  <li key={h.id} data-habit-id={h.id} className={`td-avatar ${tone(h)}`}>
+                    <button type="button" aria-pressed={Boolean(done[h.id])} aria-label={nameOf(h)} onClick={() => void toggle(h)} className="td-circle">
+                      <Icon src={habitIconThin(h.icon)} />
+                      {done[h.id] && (
+                        <span aria-hidden="true" className="td-circle-check">
+                          <Icon src={icon("check")} />
+                        </span>
+                      )}
+                      {h.challenge && (
+                        <span aria-hidden="true" className="td-circle-flag">
+                          <Icon src={icon("flag")} />
+                        </span>
+                      )}
+                    </button>
+                    <span aria-hidden="true" className="td-avatar-label">{nameOf(h)}</span>
+                    {h.challenge && <span className="sr-only">{tg("flag", { day: formatNumber(h.challenge.day), days: formatNumber(h.challenge.days) })}</span>}
+                    {pendingIds.has(h.id) && <span className="td-avatar-pending">{t("pending")}</span>}
+                  </li>
+                ))}
+              </ul>
+            </section>
+          );
+        })}
+      </div>
+
+      <div className="td-habits-foot">
+        <span className="td-frac" aria-live="polite">{t("habitsCount", { progress: formatFraction(doneCount, habits.length) })}</span>
+        <div className="td-foot-buttons">
+          <nav aria-label={t("habits")} className="td-days-switch">
+            {(["today", "yesterday"] as const).map((d) => (
+              <Link key={d} href={d === "today" ? "/" : "/?day=yesterday"} aria-current={(d === "today") === isToday ? "page" : undefined} className="td-hit">
+                {t(d === "today" ? "todayTab" : "yesterdayTab")}
+              </Link>
+            ))}
+          </nav>
+          <button
+            type="button"
+            aria-expanded={open}
+            aria-controls={`${id}-details`}
+            aria-label={open ? t("collapseHabits") : t("expandHabits")}
+            title={open ? t("collapseHabits") : t("expandHabits")}
+            onClick={() => setOpen((v) => !v)}
+            className="td-round td-hit td-icon-btn"
+          >
+            <Icon src={icon("keyboard_arrow_down")} />
+          </button>
+          <Link href="/habits" aria-label={t("manageHabits")} title={t("manageHabits")} className="td-round td-hit td-icon-btn">
+            <Icon src={icon("settings")} style={{ width: 17, height: 17 }} />
+          </Link>
+        </div>
+      </div>
+
+      <div id={`${id}-details`} hidden={!open} className="td-details">
+        {open &&
+          habits.map((h) => {
+            const week = (h.week ?? []).map((d) => (d.date === localDate ? { ...d, done: Boolean(done[h.id]) } : d));
+            const weekDone = week.length ? week.filter((d) => d.scheduled && d.done).length : (h.week_done ?? 0);
+            const weekTotal = week.length ? (h.week_scheduled ?? 0) : 7;
+            const art = ART[h.icon ?? ""];
+            const cardOpen = !closedCards[h.id];
+            const streak = h.current_streak ?? 0;
+            const desc = [h.amount ? t("amountLabel", { amount: h.amount }) : null, h.description].filter(Boolean).join(" · ");
+            return (
+              <article key={h.id} aria-labelledby={`${id}-${h.id}`} className={`td-detail ${tone(h)}`}>
+                <div className="td-detail-head">
+                  <h3 id={`${id}-${h.id}`} className="td-detail-title">
+                    <span className="td-detail-icon" aria-hidden="true">
+                      {art ? (
+                        // eslint-disable-next-line @next/next/no-img-element -- 40px decorative illustration
+                        <img src={`/design/habit-${art}.webp`} alt="" width={40} height={40} loading="lazy" />
+                      ) : (
+                        <Icon src={habitIconThin(h.icon)} />
+                      )}
+                    </span>
+                    {nameOf(h)}
+                  </h3>
                   <button
                     type="button"
-                    aria-pressed={Boolean(done[h.id])}
-                    aria-label={nameOf(h)}
-                    onClick={() => void toggle(h)}
-                    className={`relative flex size-14 items-center justify-center rounded-full border-2 transition-colors ${
-                      done[h.id] ? "border-gold-500 bg-gold-100" : "border-transparent bg-sage-100"
-                    }`}
+                    aria-expanded={cardOpen}
+                    aria-label={t("habitDetails", { name: nameOf(h) })}
+                    onClick={() => setClosedCards((c) => ({ ...c, [h.id]: cardOpen }))}
+                    className="td-round td-hit td-icon-btn"
                   >
-                    <IonIcon icon={habitIcon(h.icon)} aria-hidden="true" className="size-7 text-ink-700" />
-                    {done[h.id] && (
-                      <span aria-hidden="true" className="absolute -bottom-0.5 -start-0.5 flex size-5 items-center justify-center rounded-full bg-gold-700">
-                        <IonIcon icon={icon("check")} className="size-3.5 text-white" />
-                      </span>
-                    )}
+                    <Icon src={icon("keyboard_arrow_down")} />
                   </button>
-                  <span aria-hidden="true" className="text-xs font-semibold leading-tight text-ink-900">{nameOf(h)}</span>
-                  {h.challenge && (
-                    <span className="rounded-full bg-dawn-50 px-1.5 text-[0.6rem] font-semibold text-ink-900">
-                      {tg("flag", { day: formatNumber(h.challenge.day), days: formatNumber(h.challenge.days) })}
-                    </span>
-                  )}
-                  {pendingIds.has(h.id) && <span className="text-[0.65rem] text-dawn-700">{t("pending")}</span>}
-                </li>
-              ))}
-            </ul>
-          </section>
-        );
-      })}
-      <IonAccordionGroup>
-        <IonAccordion value="details" toggleIcon={icon("keyboard_arrow_down")}>
-          <IonItem slot="header" lines="none" className="[--background:transparent] [--padding-start:0]">
-            <IonLabel className="text-sm text-ink-700">{t("expandHabits")}</IonLabel>
-          </IonItem>
-          <IonList slot="content" lines="inset" className="bg-transparent">
-            {habits.map((h) => {
-              const week = (h.week ?? []).map((d) => (d.date === localDate ? { ...d, done: Boolean(done[h.id]) } : d));
-              const weekDone = week.length ? week.filter((d) => d.scheduled && d.done).length : (h.week_done ?? 0);
-              return (
-                <IonItem key={h.id} className="[--background:transparent]">
-                  <IonIcon slot="start" icon={habitIcon(h.icon)} aria-hidden="true" />
-                  <IonLabel className="whitespace-normal">
-                    <h3 className="font-semibold">{nameOf(h)}</h3>
-                    {h.amount && <p>{t("amountLabel", { amount: h.amount })}</p>}
-                    {h.description && <p>{h.description}</p>}
+                </div>
+                {cardOpen && (
+                  <>
+                    {desc && <p className="td-detail-desc">{desc}</p>}
+                    <div className="td-stats">
+                      <div className="td-stat">
+                        <div className="td-stat-label">{t("weekLabel")}</div>
+                        <div className="td-stat-value">{t("weekValue", { done: formatNumber(weekDone), total: formatNumber(weekTotal) })}</div>
+                        <div className="td-bar" aria-hidden="true">
+                          <span style={{ width: `${weekTotal ? Math.min(100, (weekDone / weekTotal) * 100) : 0}%` }} />
+                        </div>
+                      </div>
+                      <div className="td-stat">
+                        <div className="td-stat-label">{t("streakLabel")}</div>
+                        <div className="td-stat-value">
+                          <Icon src={icon("local_fire_department")} />
+                          {t("streakDays", { count: streak, n: formatNumber(streak) })}
+                        </div>
+                      </div>
+                    </div>
                     {week.length > 0 && (
-                      <ol aria-label={t("weekTitle")} className="my-2 flex gap-1.5">
+                      <ol aria-label={t("weekTitle")} className="td-week">
                         {week.map((d) => {
                           const wd = weekdayOf(d.date);
                           const state = !d.scheduled ? "off" : d.done ? "done" : d.date < localDate ? "missed" : "upcoming";
@@ -144,49 +231,30 @@ export function HabitRow({
                               key={d.date}
                               aria-label={t("dayLabel", { day: tw(String(wd) as "0"), state: stateText })}
                               aria-current={d.date === localDate ? "date" : undefined}
-                              className={`flex size-8 items-center justify-center rounded-full text-[0.6rem] font-semibold ${
-                                state === "done"
-                                  ? "bg-sage-700 text-white"
-                                  : state === "missed"
-                                    ? "bg-dawn-50 text-ink-900"
-                                    : state === "off"
-                                      ? "text-ink-500 opacity-60"
-                                      : "bg-sand-100 text-ink-900"
-                              } ${d.date === localDate ? "ring-2 ring-dawn-700" : ""}`}
+                              className={`is-${state}`}
                             >
-                              <span aria-hidden="true">{tws(String(wd) as "0").slice(0, 2)}</span>
+                              <span className="td-week-dot" aria-hidden="true">
+                                {state === "done" && <Icon src={icon("check")} />}
+                              </span>
+                              <span className="td-week-label" aria-hidden="true">{tw(String(wd) as "0")}</span>
                             </li>
                           );
                         })}
                       </ol>
                     )}
-                    <p>
-                      {week.length > 0
-                        ? t("weekScheduled", { done: formatNumber(weekDone), total: formatNumber(h.week_scheduled ?? 0) })
-                        : t("weekProgress", { done: formatNumber(h.week_done ?? 0) })}
-                    </p>
                     {isToday && (
-                      <button
-                        type="button"
-                        onClick={() => void toggle(h)}
-                        aria-pressed={Boolean(done[h.id])}
-                        className={`mt-2 min-h-11 rounded-full px-4 text-sm font-medium ${done[h.id] ? "text-sage-700 ring-1 ring-sage-600" : "bg-dawn-700 text-white"}`}
-                      >
+                      <button type="button" onClick={() => void toggle(h)} aria-pressed={Boolean(done[h.id])} className="td-log">
+                        <Icon src={icon(done[h.id] ? "close" : "edit")} />
                         {done[h.id] ? t("undoToday") : t("logToday")}
                       </button>
                     )}
-                  </IonLabel>
-                  <IonNote slot="end" className="flex items-center gap-1 text-ink-700">
-                    <IonIcon icon={icon("local_fire_department")} aria-hidden="true" />
-                    {t("streak", { count: formatNumber(h.current_streak ?? 0) })}
-                  </IonNote>
-                </IonItem>
-              );
-            })}
-          </IonList>
-        </IonAccordion>
-      </IonAccordionGroup>
+                  </>
+                )}
+              </article>
+            );
+          })}
+      </div>
       <Toast message={message} />
-    </GlassCard>
+    </section>
   );
 }

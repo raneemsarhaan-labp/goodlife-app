@@ -59,13 +59,13 @@ test("own habit, time-of-day group, week circles and «سجّل اليوم»", a
   await expect(page).toHaveURL("/");
 
   await expect(page.getByRole("region", { name: "الصباح" }).getByRole("button", { name: "قراءة صباحية", exact: true })).toBeVisible();
-  await page.getByText("تفاصيل العادات").click();
+  await page.getByRole("button", { name: "تفاصيل العادات" }).click();
   const week = page.getByRole("list", { name: "هذا الأسبوع" });
   await expect(week.getByRole("listitem")).toHaveCount(7);
   await expect(week.locator("[aria-current=date]")).toHaveCount(1);
   await page.getByRole("button", { name: "سجّل اليوم" }).click();
   await expect(page.getByRole("button", { name: "قراءة صباحية", exact: true })).toHaveAttribute("aria-pressed", "true");
-  await expect(page.getByText(/التقدّم الأسبوعي: ١ من ٧/)).toBeVisible();
+  await expect(page.getByText("١/٧ أيام").first()).toBeVisible();
 });
 
 test("«خطتي» edit: change repeat days", async ({ page }) => {

@@ -6,9 +6,27 @@ import { useId, useState, type FormEvent } from "react";
 import { Toast } from "@/components/ui/Toast";
 import { REFLECTION_MAX } from "@/lib/limits";
 import { icon } from "@/ui/icons";
+import { Icon } from "@/ui/components/Icon";
 import { useOutbox } from "./useOutbox";
 
 const SHORT = 180;
+
+/** The first sentence leads in bold; the rest follows in the quieter style (as designed). */
+export function splitLead(text: string): { lead: string; rest: string } {
+  const m = text.match(/^([\s\S]*?[.!؟?…])(\s+[\s\S]*)?$/);
+  if (!m || !m[2]?.trim()) return { lead: text, rest: "" };
+  return { lead: m[1]!.trim(), rest: m[2].trim() };
+}
+
+function Photo() {
+  return (
+    <span className="td-intent-photo" aria-hidden="true">
+      {/* eslint-disable-next-line @next/next/no-img-element -- decorative 76px illustration */}
+      <img src="/design/desired-state.webp" alt="" width={76} height={76} />
+      <Icon src={icon("self_improvement")} />
+    </span>
+  );
+}
 
 /**
  * «حالي المنشود» on «يومك» (spec 003 US1): the member's own words, a link to edit them in «خطتي»,
@@ -27,12 +45,24 @@ export function DesiredStateCard({ text, localDate }: { text: string; localDate:
   const value = text.trim();
 
   if (!value) {
+    // Empty state: the same card and illustration, inviting the member to write it in «خطتي».
     return (
-      <section aria-labelledby={`${id}-title`} className="gl-surface flex flex-col gap-2 rounded-[var(--radius-card)] p-5">
-        <h2 id={`${id}-title`} className="text-lg font-semibold">{t("emptyTitle")}</h2>
-        <p className="text-ink-700">{t("emptyBody")}</p>
-        <Link href="/plan#desired-state" className="inline-flex min-h-11 items-center self-start rounded-full bg-dawn-700 px-5 font-medium text-white">
-          {t("emptyAction")}
+      <section aria-labelledby={`${id}-title`} className="td-card td-intent">
+        <div className="td-intent-head">
+          <span className="td-label" aria-hidden="true">{t("title")}</span>
+        </div>
+        <div className="td-intent-row">
+          <div className="td-intent-text">
+            <h2 id={`${id}-title`} className="td-intent-lead">{t("emptyTitle")}</h2>
+            <p className="td-intent-sub">{t("emptyBody")}</p>
+          </div>
+          <Photo />
+        </div>
+        <Link href="/plan#desired-state" className="td-pill">
+          <span className="td-pill-text">{t("emptyAction")}</span>
+          <span className="td-round td-pill-go" aria-hidden="true">
+            <Icon src={icon("north_east")} />
+          </span>
         </Link>
       </section>
     );
@@ -40,6 +70,7 @@ export function DesiredStateCard({ text, localDate }: { text: string; localDate:
 
   const long = value.length > SHORT;
   const shown = long && !expanded ? `${value.slice(0, SHORT).replace(/\s+\S*$/, "")}…` : value;
+  const { lead, rest } = splitLead(shown);
 
   async function onSubmit(e: FormEvent) {
     e.preventDefault();
@@ -58,39 +89,41 @@ export function DesiredStateCard({ text, localDate }: { text: string; localDate:
   }
 
   return (
-    <section aria-labelledby={`${id}-title`} className="gl-surface flex flex-col gap-3 rounded-[var(--radius-card)] p-5">
-      <div className="flex items-start justify-between gap-3">
-        <h2 id={`${id}-title`} className="text-sm font-semibold text-sage-700">{t("title")}</h2>
-        <Link href="/plan#desired-state" aria-label={t("edit")} title={t("edit")} className="-m-2 flex size-11 shrink-0 items-center justify-center rounded-full">
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src={icon("north_east")} alt="" aria-hidden="true" width={20} height={20} className="size-5 opacity-80" />
+    <section aria-labelledby={`${id}-title`} className="td-card td-intent">
+      <div className="td-intent-head">
+        <h2 id={`${id}-title`} className="td-label">{t("title")}</h2>
+        <Link href="/plan#desired-state" aria-label={t("edit")} title={t("edit")} className="td-round td-hit td-intent-edit">
+          <Icon src={icon("edit")} />
         </Link>
       </div>
-      <p className="whitespace-pre-line text-lg leading-loose text-ink-900">{shown}</p>
-      {long && (
-        <button type="button" onClick={() => setExpanded((v) => !v)} aria-expanded={expanded} className="min-h-11 self-start text-sm text-sage-700 underline underline-offset-4">
-          {expanded ? t("readLess") : t("readMore")}
-        </button>
-      )}
-      <form onSubmit={onSubmit} className="flex flex-col gap-2 border-t border-sand-200 pt-3">
-        <label htmlFor={`${id}-reflection`} className="text-sm font-medium text-ink-700">{tr("prompt")}</label>
-        <textarea
+      <div className="td-intent-row">
+        <div className="td-intent-text">
+          <p className="td-intent-lead">{lead}</p>
+          {rest && <p className="td-intent-sub">{rest}</p>}
+          {long && (
+            <button type="button" onClick={() => setExpanded((v) => !v)} aria-expanded={expanded} className="td-intent-more">
+              {expanded ? t("readLess") : t("readMore")}
+            </button>
+          )}
+        </div>
+        <Photo />
+      </div>
+      <form onSubmit={onSubmit} className="td-pill">
+        <label htmlFor={`${id}-reflection`} className="sr-only">{tr("prompt")}</label>
+        <input
           id={`${id}-reflection`}
           value={draft}
           onChange={(e) => setDraft(e.target.value)}
           maxLength={REFLECTION_MAX}
-          rows={2}
-          placeholder={tr("placeholder")}
-          className="min-h-20 rounded-xl border border-sand-200 bg-white/80 px-4 py-3 text-base text-ink-900 placeholder:text-ink-500"
+          placeholder={tr("shortPlaceholder")}
+          autoComplete="off"
+          enterKeyHint="send"
         />
-        <div className="flex items-center justify-between gap-3">
-          <Link href="/plan/reflections" className="text-sm text-sage-700 underline underline-offset-4">{tr("historyLink")}</Link>
-          <button type="submit" disabled={!draft.trim() || saving} className="min-h-11 rounded-full bg-dawn-700 px-5 font-medium text-white disabled:opacity-50">
-            {tr("save")}
-          </button>
-        </div>
-        {pendingIds.has("reflection") && <p className="text-sm text-dawn-700">{tr("pending")}</p>}
+        <button type="submit" disabled={!draft.trim() || saving} aria-label={tr("save")} title={tr("save")} className="td-round td-hit td-pill-go">
+          <Icon src={icon("north_east")} />
+        </button>
       </form>
+      {pendingIds.has("reflection") && <p className="td-intent-note">{tr("pending")}</p>}
       <Toast message={message} />
     </section>
   );

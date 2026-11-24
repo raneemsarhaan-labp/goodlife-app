@@ -15,11 +15,12 @@ test("«يومك» text on cards is readable over the background", async ({ page
     { locator: page.getByRole("heading", { level: 1 }).first(), min: 3 },
     { locator: page.locator("[data-habit-id] > span").first(), min: 4.5 },
     { locator: page.locator("main p").first(), min: 4.5 },
-    { locator: page.locator("ion-label p >> visible=true").first(), min: 4.5 },
     // Spec 003 (T031): «حالي المنشود» text and its reflection prompt on glass.
     { locator: page.getByRole("region", { name: "حالي المنشود" }).locator("p").first(), min: 4.5 },
-    { locator: page.getByRole("region", { name: "حالي المنشود" }).locator("label").first(), min: 4.5 },
+    { locator: page.getByRole("region", { name: "حالي المنشود" }).getByRole("heading").first(), min: 4.5 },
     { locator: page.getByRole("heading", { name: "الأنشطة القادمة" }), min: 3 },
+    { locator: page.getByRole("heading", { name: "عاداتي اليومية" }), min: 3 },
+    { locator: page.getByRole("heading", { name: "تحدّي ذاتي" }), min: 4.5 },
     { locator: page.locator("nav[aria-label] a").first(), min: 4.5 },
   ];
   for (const { locator, min } of samples) {
