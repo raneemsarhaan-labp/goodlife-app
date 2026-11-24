@@ -913,14 +913,14 @@ isOneToOne: false
                   ]
                 },"users": {
                   Row: {
-                    "active_role": Database["public"]['Enums']["app_role"],"city": string | null,"created_at": string,"deletion_requested_at": string | null,"email": string | null,"full_name": string,"gender": Database["public"]['Enums']["gender"] | null,"id": string,"notification_prefs": NonNullable<Json>,"phone": string | null,"time_zone": string,"ui_chosen_at": string | null,"ui_reduce_transparency": boolean,"ui_ritual": boolean,"ui_version": Database["public"]['Enums']["ui_version"],"updated_at": string
+                    "active_role": Database["public"]['Enums']["app_role"],"city": string | null,"created_at": string,"deletion_requested_at": string | null,"email": string | null,"full_name": string,"gender": Database["public"]['Enums']["gender"] | null,"id": string,"notification_prefs": NonNullable<Json>,"onboarding_dismissed_at": string | null,"phone": string | null,"setup_completed_at": string | null,"time_zone": string,"ui_chosen_at": string | null,"ui_reduce_transparency": boolean,"ui_ritual": boolean,"ui_version": Database["public"]['Enums']["ui_version"],"updated_at": string
                   }
                   ComputedFields: never
                   Insert: {
-                    "active_role"?: Database["public"]['Enums']["app_role"],"city"?: string | null,"created_at"?: string,"deletion_requested_at"?: string | null,"email"?: string | null,"full_name": string,"gender"?: Database["public"]['Enums']["gender"] | null,"id": string,"notification_prefs"?: NonNullable<Json>,"phone"?: string | null,"time_zone"?: string,"ui_chosen_at"?: string | null,"ui_reduce_transparency"?: boolean,"ui_ritual"?: boolean,"ui_version"?: Database["public"]['Enums']["ui_version"],"updated_at"?: string
+                    "active_role"?: Database["public"]['Enums']["app_role"],"city"?: string | null,"created_at"?: string,"deletion_requested_at"?: string | null,"email"?: string | null,"full_name": string,"gender"?: Database["public"]['Enums']["gender"] | null,"id": string,"notification_prefs"?: NonNullable<Json>,"onboarding_dismissed_at"?: string | null,"phone"?: string | null,"setup_completed_at"?: string | null,"time_zone"?: string,"ui_chosen_at"?: string | null,"ui_reduce_transparency"?: boolean,"ui_ritual"?: boolean,"ui_version"?: Database["public"]['Enums']["ui_version"],"updated_at"?: string
                   }
                   Update: {
-                    "active_role"?: Database["public"]['Enums']["app_role"],"city"?: string | null,"created_at"?: string,"deletion_requested_at"?: string | null,"email"?: string | null,"full_name"?: string,"gender"?: Database["public"]['Enums']["gender"] | null,"id"?: string,"notification_prefs"?: NonNullable<Json>,"phone"?: string | null,"time_zone"?: string,"ui_chosen_at"?: string | null,"ui_reduce_transparency"?: boolean,"ui_ritual"?: boolean,"ui_version"?: Database["public"]['Enums']["ui_version"],"updated_at"?: string
+                    "active_role"?: Database["public"]['Enums']["app_role"],"city"?: string | null,"created_at"?: string,"deletion_requested_at"?: string | null,"email"?: string | null,"full_name"?: string,"gender"?: Database["public"]['Enums']["gender"] | null,"id"?: string,"notification_prefs"?: NonNullable<Json>,"onboarding_dismissed_at"?: string | null,"phone"?: string | null,"setup_completed_at"?: string | null,"time_zone"?: string,"ui_chosen_at"?: string | null,"ui_reduce_transparency"?: boolean,"ui_ritual"?: boolean,"ui_version"?: Database["public"]['Enums']["ui_version"],"updated_at"?: string
                   }
                   Relationships: [
                     
@@ -955,6 +955,9 @@ isOneToOne: false
                            },
 "activity_window_open":
 { Args: { "p_activity": string }; Returns: boolean
+                           },
+"add_library_habits":
+{ Args: { "p_ids": (string)[] }; Returns: number
                            },
 "add_member":
 { Args: { "p_group": string,"p_user": string }; Returns: undefined
@@ -1030,8 +1033,14 @@ isOneToOne: false
 "dismiss_activity_card":
 { Args: { "p_activity": string }; Returns: undefined
                            },
+"dismiss_onboarding":
+{ Args: Record<PropertyKey, never>; Returns: undefined
+                           },
 "export_my_data":
 { Args: Record<PropertyKey, never>; Returns: Json
+                           },
+"finish_setup":
+{ Args: Record<PropertyKey, never>; Returns: undefined
                            },
 "get_today":
 { Args: { "p_which"?: string }; Returns: Json
@@ -1160,6 +1169,9 @@ isOneToOne: false
                            },
 "normalize_invitation_code":
 { Args: { "p_code": string }; Returns: string
+                           },
+"onboarding_status":
+{ Args: Record<PropertyKey, never>; Returns: Json
                            },
 "period_figures":
 { Args: { "p_from": string,"p_to": string,"p_user": string }; Returns: Json

@@ -20,6 +20,8 @@ import { requireUser } from "@/server/auth";
 import { getToday } from "@/server/queries/today";
 import { createClient } from "@/lib/supabase/server";
 import { ChooseLookCard } from "@/ui/components/ChooseLookCard";
+import { OnboardingCard } from "@/components/features/onboarding/OnboardingCard";
+import { getOnboardingStatus } from "@/server/queries/onboarding";
 import { TodayIslandClient } from "@/ui/views/TodayIsland.client";
 
 export const generateMetadata = pageTitle("today");
@@ -48,7 +50,12 @@ export default async function TodayPage({ searchParams }: { searchParams: Promis
 
   const habits = data.habits ?? [];
   const supabase = await createClient();
-  const { data: ritualData } = isToday ? await supabase.rpc("today_ritual") : { data: null };
+  const [{ data: ritualData }, onboarding] = await Promise.all([
+    isToday ? supabase.rpc("today_ritual") : Promise.resolve({ data: null }),
+    isToday ? getOnboardingStatus() : Promise.resolve(null),
+  ]);
+  // «خطوات البداية» until the first steps are done (or hidden); it carries «شكل التطبيق» too.
+  const showOnboarding = Boolean(onboarding && !onboarding.dismissed && data.journey_status !== "ended");
   const ritual = (ritualData as { show: boolean; quote: { text: string; source: string | null } | null } | null) ?? { show: false, quote: null };
 
   const closed = Boolean(data.day?.closed_at);
@@ -57,7 +64,7 @@ export default async function TodayPage({ searchParams }: { searchParams: Promis
     <main id="main" className="mx-auto flex max-w-lg flex-col gap-5 px-5 pt-6">
       <DayRollover timeZone={data.time_zone} shownDate={isToday ? data.local_date : ""} />
       <RoleSwitcher roles={user.roles} active={user.activeRole} />
-      {!user.uiChosenAt && <ChooseLookCard />}
+      {showOnboarding && onboarding ? <OnboardingCard status={onboarding} /> : !user.uiChosenAt && <ChooseLookCard />}
       <Greeting name={user.fullName} timeZone={data.time_zone} localDate={data.local_date} journeyDay={data.journey_status === "active" ? data.journey_day : undefined} />
       {isToday && data.plan_review_due && <ReviewDueCard nextReviewOn={data.next_review_on ?? null} />}
       {isToday && <DesiredStateCard text={data.desired_state ?? ""} localDate={data.local_date} />}

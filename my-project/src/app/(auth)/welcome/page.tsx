@@ -22,8 +22,9 @@ export default async function WelcomePage() {
     <main id="main" className="flex flex-col gap-6 text-center">
       <h1 className="text-2xl font-semibold">{t("title")}</h1>
       <p className="leading-loose text-ink-700">{t("body")}</p>
+      {!user.setupCompletedAt && <p className="leading-loose text-ink-700">{t("setupNote")}</p>}
       {data?.groups?.name && <p className="rounded-2xl bg-sage-50 p-4 text-sage-700">{t("group", { group: data.groups.name })}</p>}
-      <Link href={user.uiChosenAt ? "/" : "/setup/look"} className={buttonClass("primary")}>
+      <Link href={!user.setupCompletedAt ? "/setup/state" : user.uiChosenAt ? "/" : "/setup/look"} className={buttonClass("primary")}>
         {t("start")}
       </Link>
     </main>

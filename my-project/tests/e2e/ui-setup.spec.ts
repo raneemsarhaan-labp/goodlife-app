@@ -8,6 +8,9 @@ test.use({ storageState: { cookies: [], origins: [] } });
 test("choose «زجاج كامل» on setup; another device signs in to the same look", async ({ page, browser }) => {
   const email = await joinNewMember(page);
   await page.getByRole("link", { name: "ابدأ رحلتك" }).click();
+  // «رحلة البداية» comes first; «أكمل لاحقًا» leaves it for the look step.
+  await expect(page).toHaveURL("/setup/state");
+  await page.getByRole("button", { name: "أكمل لاحقًا" }).click();
   await expect(page).toHaveURL("/setup/look");
   await checkA11y(page);
   await expect(page.getByRole("radio")).toHaveCount(3);

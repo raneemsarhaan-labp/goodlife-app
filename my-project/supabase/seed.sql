@@ -33,6 +33,10 @@ insert into public.users (id, full_name, email, phone, time_zone, active_role) v
   ('00000000-0000-4000-8000-000000000003', 'أحمد المشارك', 'member1@example.test', '+966500000003', 'Asia/Riyadh', 'member'),
   ('00000000-0000-4000-8000-000000000004', 'مريم المشاركة', 'member2@example.test', '+966500000004', 'Asia/Riyadh', 'member');
 
+-- Seed people are past «رحلة البداية».
+update public.users set setup_completed_at = now(), onboarding_dismissed_at = now()
+where id::text like '00000000-0000-4000-8000-00000000000%';
+
 insert into public.user_roles (user_id, role) values
   ('00000000-0000-4000-8000-000000000001', 'admin'),
   ('00000000-0000-4000-8000-000000000001', 'member'),

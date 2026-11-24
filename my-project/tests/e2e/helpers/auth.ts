@@ -78,7 +78,7 @@ export async function joinNewMember(page: Page, email = `e2e-${Date.now()}-${Mat
 export async function signInFresh(browser: import("@playwright/test").Browser, email: string) {
   const context = await browser.newContext({ locale: "ar", timezoneId: "Asia/Riyadh", storageState: { cookies: [], origins: [] } });
   const page = await context.newPage();
-  await signIn(page, email);
+  await (email in SEED_PHONES ? signIn(page, email) : signInWithCode(page, email));
   return { context, page };
 }
 

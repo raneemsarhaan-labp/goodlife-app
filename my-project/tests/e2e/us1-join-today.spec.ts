@@ -11,6 +11,9 @@ test("sign up and live a full day on «يومك»", async ({ page }) => {
   await expect(page.getByText("مجموعة النور")).toBeVisible();
   await checkA11y(page);
   await page.getByRole("link", { name: "ابدأ رحلتك" }).click();
+  // «رحلة البداية» comes first; «أكمل لاحقًا» leaves it for the look step.
+  await expect(page).toHaveURL("/setup/state");
+  await page.getByRole("button", { name: "أكمل لاحقًا" }).click();
   // Spec 002: the look step comes next; skipping keeps «رحلة يومي».
   await expect(page).toHaveURL("/setup/look");
   await page.getByRole("button", { name: "تخطَّ الآن" }).click();

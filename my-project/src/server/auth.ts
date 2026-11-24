@@ -19,6 +19,8 @@ export type CurrentUser = {
   uiRitual: boolean;
   uiReduceTransparency: boolean;
   uiChosenAt: string | null;
+  /** «رحلة البداية» finished or skipped (0026). */
+  setupCompletedAt: string | null;
 };
 
 /**
@@ -34,7 +36,7 @@ export const getCurrentUser = cache(async (): Promise<CurrentUser | null> => {
   const [{ data: profile }, { data: roles }] = await Promise.all([
     supabase
       .from("users")
-      .select("id, full_name, email, phone, time_zone, active_role, ui_version, ui_ritual, ui_reduce_transparency, ui_chosen_at")
+      .select("id, full_name, email, phone, time_zone, active_role, ui_version, ui_ritual, ui_reduce_transparency, ui_chosen_at, setup_completed_at")
       .eq("id", userId)
       .maybeSingle(),
     supabase.from("user_roles").select("role").eq("user_id", userId),
@@ -53,6 +55,7 @@ export const getCurrentUser = cache(async (): Promise<CurrentUser | null> => {
     uiRitual: profile.ui_ritual,
     uiReduceTransparency: profile.ui_reduce_transparency,
     uiChosenAt: profile.ui_chosen_at,
+    setupCompletedAt: profile.setup_completed_at,
   };
 });
 
