@@ -5,6 +5,7 @@ import { redirect } from "next/navigation";
 import { publicEnv } from "@/lib/env";
 import { log } from "@/lib/log";
 import { createAdminClient } from "@/lib/supabase/admin";
+import { createMailerClient } from "@/lib/supabase/mailer";
 import { createClient } from "@/lib/supabase/server";
 import { composePhone, identifierSchema, otpSchema, signInSchema, signUpSchema } from "@/lib/validation/onboarding";
 import { finishRegistration } from "@/server/registration";
@@ -51,11 +52,11 @@ async function emailFor(identifier: string): Promise<string | null> {
 async function sendCode(email: string): Promise<{ error?: string }> {
   const login = await loginFor(email);
   if (!login) return {};
-  const supabase = await createClient();
+  const mailer = createMailerClient();
   const emailRedirectTo = await confirmUrl();
   const { error } = login.confirmed
-    ? await supabase.auth.signInWithOtp({ email, options: { shouldCreateUser: false, emailRedirectTo } })
-    : await supabase.auth.resend({ type: "signup", email, options: { emailRedirectTo } });
+    ? await mailer.auth.signInWithOtp({ email, options: { shouldCreateUser: false, emailRedirectTo } })
+    : await mailer.auth.resend({ type: "signup", email, options: { emailRedirectTo } });
   if (error) log.warn("sending a code failed", { code: error.code, status: error.status });
   return error ? { error: error.code ?? String(error.status) } : {};
 }

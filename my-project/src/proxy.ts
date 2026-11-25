@@ -2,7 +2,7 @@ import { NextResponse, type NextRequest } from "next/server";
 import { updateSession } from "@/lib/supabase/proxy";
 
 /** Public routes; everything else requires a signed-in user (contracts/routes.md). */
-const PUBLIC_PATHS = ["/join", "/sign-in", "/auth/confirm", ...(process.env.NODE_ENV === "development" ? ["/dev"] : [])];
+const PUBLIC_PATHS = ["/join", "/sign-in", "/auth/confirm", "/auth/finish", ...(process.env.NODE_ENV === "development" ? ["/dev"] : [])];
 
 function isPublic(pathname: string) {
   return PUBLIC_PATHS.some((p) => pathname === p || pathname.startsWith(`${p}/`));

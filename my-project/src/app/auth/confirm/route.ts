@@ -12,6 +12,14 @@ export async function GET(request: NextRequest) {
   const supabase = await createClient();
   const code = params.get("code");
   const tokenHash = params.get("token_hash");
+  // Implicit-flow links carry the session (or an error) in the #fragment, which only the browser
+  // sees: hand over to the sign-in page, whose LinkSession reads it.
+  if (!code && !tokenHash) {
+    const target = request.nextUrl.clone();
+    target.pathname = "/sign-in";
+    target.search = "";
+    return NextResponse.redirect(target);
+  }
   const { error } = code
     ? await supabase.auth.exchangeCodeForSession(code)
     : tokenHash
