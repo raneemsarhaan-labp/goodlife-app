@@ -1,67 +1,118 @@
+import Link from "next/link";
 import { getTranslations } from "next-intl/server";
-import { StatsTabs } from "@/components/features/stats/StatsTabs";
-import { Card, CardTitle } from "@/components/ui/Card";
+import { NavRow } from "@/components/features/screens/ScreenHeader";
+import { StatsFrame, type StatsHeader } from "@/components/features/stats/StatsView";
 import { formatDate, formatNumber } from "@/lib/format";
-import type { Together } from "@/server/queries/together";
+import type { GroupChallenge, Together } from "@/server/queries/together";
+import { Icon } from "@/ui/components/Icon";
+import { icon } from "@/ui/icons";
 
-/** «مجموعتي» body (spec 007 US1): props only, so it renders the same in the app and in previews. */
-export async function TogetherView({ data }: { data: Together }) {
-  const t = await getTranslations("together");
-  const peers = new Map<string, { name: string; habits: { habit: string; done: boolean; together: number }[] }>();
-  for (const i of data?.items.filter((x) => !x.me) ?? []) {
-    const p = peers.get(i.user_id) ?? { name: i.name, habits: [] };
+type Peer = { name: string; me: boolean; habits: { habit: string; done: boolean; together: number }[] };
+
+/**
+ * «أثرك ← مجموعتي» (spec 007 US1) as the Glass Edition draws it: the group band, who walks the same
+ * habits (you included), what you show, and the group's running challenge. Props only.
+ */
+export async function TogetherView({ header, data, challenge = null }: { header: StatsHeader; data: Together; challenge?: GroupChallenge | null }) {
+  const [t, tc] = await Promise.all([getTranslations("together"), getTranslations("groupChallenge")]);
+  const peers = new Map<string, Peer>();
+  for (const i of data?.items ?? []) {
+    const p = peers.get(i.user_id) ?? { name: i.me ? t("you") : i.name, me: i.me, habits: [] };
     p.habits.push(i);
     peers.set(i.user_id, p);
   }
+  const others = [...peers.entries()].filter(([, p]) => !p.me);
+  const me = [...peers.entries()].filter(([, p]) => p.me);
+  // The design lists you among the others (second row).
+  const rows = others.length ? [others[0]!, ...me, ...others.slice(1)] : me;
   const mine = data?.items.filter((x) => x.me) ?? [];
   return (
-    <main id="main" className="mx-auto flex max-w-lg flex-col gap-5 px-5 pt-6">
-      <h1 className="text-2xl font-semibold">{t("tabs.group")}</h1>
-      <StatsTabs active="group" />
+    <StatsFrame header={header} active="group">
       {!data ? (
-        <Card><p>{t("noGroup")}</p></Card>
+        <section className="sc-card">
+          <p className="sc-text">{t("noGroup")}</p>
+        </section>
       ) : (
         <>
-          <section aria-labelledby="group-hero" className="flex flex-col gap-1 rounded-[var(--radius-card)] bg-sage-100 p-5">
-            <h2 id="group-hero" className="text-xl font-semibold text-ink-900">{data.group.name}</h2>
-            <p className="text-ink-900">{t("startedTogether", { date: formatDate(data.group.start_date, { withYear: true, withWeekday: false }) })}</p>
-            <p className="text-sm text-ink-700">{t("members", { count: data.group.members, n: formatNumber(data.group.members) })}</p>
-          </section>
+          <Link href="/community" className="sc-hero">
+            <Icon src={icon("chevron_right")} className="sc-icon sc-hero-chev" />
+            <div className="sc-hero-text">
+              <h2 id="group-hero">{data.group.name}</h2>
+              <p>
+                {t("startedTogether", { date: formatDate(data.group.start_date, { withWeekday: false }) })} ·{" "}
+                {t("members", { count: data.group.members, n: formatNumber(data.group.members) })}
+              </p>
+            </div>
+            <span aria-hidden="true" className="sc-hero-icon">
+              <Icon src={icon("groups")} className="sc-icon" />
+            </span>
+          </Link>
 
-          <Card aria-labelledby="peers" className="flex flex-col gap-3">
-            <CardTitle id="peers">{t("peersTitle")}</CardTitle>
+          <section aria-labelledby="peers" className="sc-card">
+            <div className="sc-card-section-head">
+              <h2 id="peers">{t("peersTitle")}</h2>
+              <span aria-hidden="true" className="sc-line" />
+              <Icon src={icon("groups")} className="sc-icon" />
+            </div>
             {!data.sharing ? (
-              <p className="text-ink-700">{t("sharingOff")}</p>
-            ) : peers.size === 0 ? (
-              <p className="text-ink-700">{t("peersEmpty")}</p>
+              <p className="sc-text sc-muted">{t("sharingOff")}</p>
+            ) : others.length === 0 ? (
+              <p className="sc-text sc-muted">{t("peersEmpty")}</p>
             ) : (
-              <ul className="flex flex-col gap-3">
-                {[...peers.entries()].map(([id, p]) => (
-                  <li key={id} className="flex flex-col gap-2">
-                    <span className="font-medium text-ink-900">{p.name}</span>
-                    <ul className="flex flex-wrap gap-2">
-                      {p.habits.map((h) => (
-                        <li key={h.habit} className={`flex items-center gap-1 rounded-full px-3 py-1 text-sm text-ink-900 ${h.done ? "bg-sage-100" : "bg-sand-100"}`}>
-                          <span aria-hidden="true">{h.done ? "✓" : "○"}</span>
-                          <span>{h.habit}</span>
-                          <span className="sr-only">: {h.done ? t("doneToday") : t("notYet")}</span>
-                          {h.together > 1 && <span className="text-xs text-ink-700">· {t("together", { n: formatNumber(h.together) })}</span>}
-                        </li>
-                      ))}
-                    </ul>
-                  </li>
-                ))}
+              <ul className="sc-peers">
+                {rows.map(([id, p], i) => {
+                  const together = Math.max(...p.habits.map((h) => h.together));
+                  return (
+                    <li key={id} className="sc-peer">
+                      <span aria-hidden="true" className={`sc-avatar${i % 3 === 2 || i % 5 === 4 ? " is-warm" : ""}`}>
+                        {p.me ? "!" : p.name.trim().charAt(0)}
+                      </span>
+                      <span className="sc-peer-name">{p.name}</span>
+                      <ul className="sc-peer-chips">
+                        {p.habits.map((h) => (
+                          <li key={h.habit} className={`sc-chip-tag${h.done ? " is-done" : ""}`}>
+                            {h.done && <span aria-hidden="true">✓ </span>}
+                            {h.habit}
+                            <span className="sc-sr">: {h.done ? t("doneToday") : t("notYet")}</span>
+                          </li>
+                        ))}
+                      </ul>
+                      {together > 1 && (
+                        <span className="sc-peer-meta">
+                          {t("together", { n: formatNumber(together) })}
+                          <Icon src={icon("group")} className="sc-icon" />
+                        </span>
+                      )}
+                    </li>
+                  );
+                })}
               </ul>
             )}
-          </Card>
+          </section>
 
-          <Card aria-labelledby="you-show" className="flex flex-col gap-2">
-            <CardTitle id="you-show">{t("youShowTitle")}</CardTitle>
-            <p className="text-ink-900">{mine.length === 0 ? t("youShowNone") : t("youShowList", { list: mine.map((m) => m.habit).join("، ") })}</p>
-            <p className="text-sm text-ink-700">{t("youShowNote")}</p>
-          </Card>
+          <section aria-labelledby="you-show" className="sc-note-card">
+            <span aria-hidden="true" className="sc-note-icon">
+              <Icon src={icon("eco")} className="sc-icon" />
+            </span>
+            <div>
+              <h2 id="you-show">{t("youShowTitle")}</h2>
+              <p>
+                {mine.length === 0 ? t("youShowNone") : t("youShowList", { list: mine.map((m) => m.habit).join("، ") })} {t("youShowNote")}
+              </p>
+            </div>
+          </section>
+
+          {challenge && (
+            <NavRow
+              href="/stats/challenge"
+              name={t("challengeNow")}
+              sub={[challenge.title, tc("dayOf", { day: formatNumber(challenge.day), days: formatNumber(challenge.duration_days) }), challenge.habit_name].join(" · ")}
+              iconName="calendar_month"
+              chev="chevron_left"
+            />
+          )}
         </>
       )}
-    </main>
+    </StatsFrame>
   );
 }

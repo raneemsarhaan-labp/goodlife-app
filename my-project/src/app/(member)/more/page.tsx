@@ -1,37 +1,19 @@
 import { pageTitle } from "@/i18n/metadata";
-import Link from "next/link";
-import { getTranslations } from "next-intl/server";
-import { InstallHint } from "@/components/features/install/InstallHint";
-import { Card } from "@/components/ui/Card";
+import { MoreView } from "@/components/features/more/MoreView";
 import { requireUser } from "@/server/auth";
+import { getScreenDay } from "@/server/queries/header";
 
 export const generateMetadata = pageTitle("more");
 
 /** «المزيد» (FR-082). */
 export default async function MorePage() {
   const user = await requireUser();
-  const t = await getTranslations("more");
-  const links = [
-    { href: "/resources", key: "resources" },
-    { href: "/groups", key: "groups" },
-    { href: "/reviews", key: "reviews" },
-    { href: "/account", key: "account" },
-    { href: "/account/appearance", key: "appearance" },
-    ...(user.roles.includes("admin") ? [{ href: "/admin", key: "admin" }] : []),
-  ];
+  const day = await getScreenDay(user.id, user.timeZone);
   return (
-    <main id="main" className="mx-auto flex max-w-lg flex-col gap-5 px-5 pt-6">
-      <h1 className="text-2xl font-semibold">{t("title")}</h1>
-      <ul className="flex flex-col gap-2">
-        {links.map((l) => (
-          <li key={l.key}>
-            <Link href={l.href} className="block">
-              <Card className="flex min-h-14 items-center py-3 text-lg ">{t(l.key)}</Card>
-            </Link>
-          </li>
-        ))}
-      </ul>
-      <InstallHint />
-    </main>
+    <MoreView
+      header={{ name: user.fullName, timeZone: user.timeZone, localDate: day.localDate, journeyDay: day.journeyDay }}
+      user={user}
+      cohortName={day.cohortName}
+    />
   );
 }

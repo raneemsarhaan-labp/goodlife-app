@@ -35,7 +35,7 @@ test("admin uploads a cohort-only recording; members of that cohort play it, oth
   await page.goto("/resources/map");
   await expect(page.locator("[aria-current=step]")).toContainText("أنت هنا");
   await page.goto("/resources/guidelines");
-  await expect(page.getByText("عشرة أعراف تحكم الرحلة")).toBeVisible();
+  await expect(page.getByText("تُقرأ في أوّل الرحلة")).toBeVisible();
   await expect(page.getByRole("listitem")).toHaveCount(10);
 
   // A user outside the cohort (fresh account in another cohort is not seeded): an admin-less,

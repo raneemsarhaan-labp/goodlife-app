@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/Button";
 import { PasswordField } from "@/components/ui/PasswordField";
 import { Card, CardTitle } from "@/components/ui/Card";
 import { RoleSwitcher } from "@/components/ui/RoleSwitcher";
+import { SubHeader } from "@/components/features/screens/ScreenHeader";
 import { createClient } from "@/lib/supabase/server";
 import { setOwnPassword } from "@/server/actions/account";
 import { signOut } from "@/server/actions/onboarding";
@@ -26,8 +27,9 @@ export default async function AccountPage() {
     supabase.from("group_memberships").select("groups(name, cohorts(name))").eq("user_id", user.id).eq("role", "member").is("ended_on", null).maybeSingle(),
   ]);
   return (
-    <main id="main" className="mx-auto flex max-w-lg flex-col gap-5 px-5 pt-6">
-      <h1 className="text-2xl font-semibold">{t("title")}</h1>
+    <main id="main" className="sc-page is-sub">
+      <SubHeader title={t("title")} subtitle={t("subtitle")} backHref="/more" />
+      <div className="sc-content sc-forms">
       <Card aria-labelledby="journey" className="flex flex-col gap-2">
         <CardTitle id="journey">{t("journeyTitle")}</CardTitle>
         {membership?.groups ? (
@@ -78,6 +80,7 @@ export default async function AccountPage() {
       <form action={signOut}>
         <Button type="submit" variant="secondary">{t("signOut")}</Button>
       </form>
+      </div>
     </main>
   );
 }

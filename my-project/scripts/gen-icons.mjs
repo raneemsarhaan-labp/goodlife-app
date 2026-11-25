@@ -8,6 +8,9 @@ const HABIT_ICONS = ["wb_sunny", "menu_book", "auto_stories", "bedtime", "nightl
 const APP_ICONS = ["repeat", "videocam", "location_on", "delete", "check_box", "star", "bar_chart", "groups", "more_horiz", "add", "close", "settings", "keyboard_arrow_down",
   "keyboard_arrow_up", "check", "check_circle", "format_quote", "autorenew", "north_east", "chevron_left", "local_fire_department",
   "event", "edit", "flag", "bolt", "palette", "visibility", "visibility_off", "today", "local_florist"];
+// «أثرك»، «المجتمع»، «المزيد» (src/ui/theme/screens.css).
+const SCREEN_ICONS = ["person", "calendar_month", "trending_up", "arrow_back", "chevron_right", "notifications", "diamond",
+  "south", "space_dashboard", "description", "play_arrow", "logout", "group", "map", "rate_review", "account_circle", "inventory_2"];
 // The designs draw habit and navigation icons at weight 200. Those outlines are checked in under
 // scripts/icons-thin/ (instanced at wght 200 from the Material Symbols Rounded variable font the
 // designs embed; Apache-2.0), so no second icon package is needed.
@@ -18,7 +21,7 @@ const toDataUrl = (svg) => `data:image/svg+xml;utf8,${svg.replace(/\s+/g, " ").r
 const read = (name) => readFileSync(new URL(`../node_modules/@material-symbols/svg-400/rounded/${name}.svg`, import.meta.url), "utf8");
 
 const readThin = (name) => readFileSync(new URL(`./icons-thin/${name}.svg`, import.meta.url), "utf8");
-const entries = [...new Set([...HABIT_ICONS, ...APP_ICONS])].map((n) => `  ${JSON.stringify(n)}: ${JSON.stringify(toDataUrl(read(n)))},`);
+const entries = [...new Set([...HABIT_ICONS, ...APP_ICONS, ...SCREEN_ICONS])].map((n) => `  ${JSON.stringify(n)}: ${JSON.stringify(toDataUrl(read(n)))},`);
 const thin = (names) => names.map((n) => `  ${JSON.stringify(n)}: ${JSON.stringify(toDataUrl(readThin(n)))},`).join("\n");
 writeFileSync(
   new URL("../src/ui/icons.generated.ts", import.meta.url),

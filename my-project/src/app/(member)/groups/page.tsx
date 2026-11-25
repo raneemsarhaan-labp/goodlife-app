@@ -1,8 +1,9 @@
 import { pageTitle } from "@/i18n/metadata";
 import Link from "next/link";
 import { getTranslations } from "next-intl/server";
-import { Card } from "@/components/ui/Card";
-import { EmptyState } from "@/components/ui/EmptyState";
+import { SubHeader } from "@/components/features/screens/ScreenHeader";
+import { Icon } from "@/ui/components/Icon";
+import { icon } from "@/ui/icons";
 import { requireUser } from "@/server/auth";
 import { getMyGroups } from "@/server/queries/community";
 
@@ -14,30 +15,29 @@ export default async function MyGroupsPage() {
   const [t, groups] = await Promise.all([getTranslations("groups"), getMyGroups(user.id)]);
   const sorted = [...groups].sort((a, b) => (a.role === b.role ? a.groupName.localeCompare(b.groupName, "ar") : a.role === "facilitator" ? -1 : 1));
   return (
-    <main id="main" className="mx-auto flex max-w-lg flex-col gap-5 px-5 pt-6">
-      <header className="flex flex-col gap-1">
-        <h1 className="text-2xl font-semibold">{t("title")}</h1>
-        <p className="text-ink-700">{t("intro")}</p>
-      </header>
-      {sorted.length === 0 && <EmptyState title={t("none")} />}
-      <ul className="flex flex-col gap-3">
-        {sorted.map((g) => (
-          <li key={`${g.groupId}-${g.role}`}>
-            <Card className="flex items-center justify-between gap-3">
-              <div>
-                <p className="font-semibold">{g.groupName}</p>
-                <p className="text-sm text-ink-700">{g.cohortName}</p>
-                <p className={`mt-1 w-fit rounded-full px-2 py-0.5 text-xs ${g.role === "facilitator" ? "bg-sage-50 text-sage-700" : "bg-sand-100 text-ink-700"}`}>
-                  {g.role === "facilitator" ? t("roleFacilitator") : t("roleMember")}
+    <main id="main" className="sc-page is-sub">
+      <SubHeader title={t("title")} subtitle={t("intro")} backHref="/more" />
+      <div className="sc-content">
+        {sorted.length === 0 && <p className="sc-text sc-muted">{t("none")}</p>}
+        <ul className="sc-rows">
+          {sorted.map((g) => (
+            <li key={`${g.groupId}-${g.role}`} className="sc-row">
+              <span aria-hidden="true" className="sc-row-icon">
+                <Icon src={icon("groups")} className="sc-icon" />
+              </span>
+              <div className="sc-row-text">
+                <p className="sc-row-name">{g.groupName}</p>
+                <p className="sc-row-sub">
+                  {g.cohortName} · {g.role === "facilitator" ? t("roleFacilitator") : t("roleMember")}
                 </p>
               </div>
-              <Link href={g.role === "facilitator" ? `/groups/${g.groupId}` : "/community"} className="text-sage-700 underline underline-offset-4" aria-label={`${t("open")}: ${g.groupName}`}>
+              <Link href={g.role === "facilitator" ? `/groups/${g.groupId}` : "/community"} className="sc-row-end" aria-label={`${t("open")}: ${g.groupName}`}>
                 {g.role === "facilitator" ? t("open") : t("openCommunity")}
               </Link>
-            </Card>
-          </li>
-        ))}
-      </ul>
+            </li>
+          ))}
+        </ul>
+      </div>
     </main>
   );
 }

@@ -50,7 +50,7 @@ test("«المجتمع» lists every upcoming activity with presenter and badges
   await checkA11y(page);
   const list = page.getByRole("region", { name: "أنشطة قادمة" });
   await list.getByText("نشاط قراءة: أمراض القلوب").click();
-  await expect(list.getByText("المُقدِّم: أ. سارة الأحمد")).toBeVisible();
+  await expect(list.getByRole("definition").filter({ hasText: "أ. سارة الأحمد" })).toBeVisible();
   await expect(list.getByText("أونلاين").first()).toBeVisible();
 });
 

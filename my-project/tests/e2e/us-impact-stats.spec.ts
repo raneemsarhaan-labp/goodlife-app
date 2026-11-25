@@ -3,19 +3,16 @@ import { checkA11y } from "./helpers/axe";
 import { signIn } from "./helpers/auth";
 
 // Spec 006 (T008): «أثرك ← أنا» for the seeded member1 (ten days of history, two plan domains).
-test("tiles, bars with values and table, plan vs others, life areas", async ({ page }) => {
+test("tiles, bars with values, plan vs others, life areas", async ({ page }) => {
   await signIn(page, "member1@example.test");
   await page.goto("/stats");
   await checkA11y(page);
-  await expect(page.getByText("أيامٌ متتالية أنجزت فيها عادة")).toBeVisible();
-  await expect(page.getByText("عادات نشطة")).toBeVisible();
+  await expect(page.getByRole("region", { name: "لمحة" }).getByRole("listitem")).toHaveCount(4);
 
   const bars = page.getByRole("list", { name: "التزامك مع الوقت" });
   await expect(bars.getByRole("listitem")).toHaveCount(7);
   await bars.getByRole("listitem").first().focus();
   await expect(bars.getByRole("listitem").first()).toHaveAccessibleName(/من/);
-  await page.getByText("اعرض الأرقام جدولًا").click();
-  await expect(page.getByRole("table").getByRole("row")).toHaveCount(8);
 
   await expect(page.getByRole("heading", { name: "خطتي مقابل ما سواها" })).toBeVisible();
 

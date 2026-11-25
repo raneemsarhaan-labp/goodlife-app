@@ -1,65 +1,43 @@
 import { pageTitle } from "@/i18n/metadata";
 import { getTranslations } from "next-intl/server";
-import { ChallengeSummary } from "@/components/features/stats/ChallengeSummary";
-import { HabitRateList } from "@/components/features/stats/HabitRateList";
-import { PeriodTabs } from "@/components/features/stats/PeriodTabs";
-import { RateBar } from "@/components/features/stats/RateBar";
-import { StreakCard } from "@/components/features/stats/StreakCard";
-import { Card, CardTitle } from "@/components/ui/Card";
-import { formatDate, formatNumber } from "@/lib/format";
+import { StatsFrame, StatsView } from "@/components/features/stats/StatsView";
+import { createClient } from "@/lib/supabase/server";
+import { localDate } from "@/lib/journey";
 import { PERIODS, periodRange, type Period } from "@/lib/period";
-import { CompletionBars } from "@/components/features/stats/CompletionBars";
-import { LifeAreas } from "@/components/features/stats/LifeAreas";
-import { PlanVsOther } from "@/components/features/stats/PlanVsOther";
-import { StatTiles } from "@/components/features/stats/StatTiles";
-import { StatsTabs } from "@/components/features/stats/StatsTabs";
+import { requireUser } from "@/server/auth";
 import { getMemberInsights, getMemberStats } from "@/server/queries/stats";
 import { getToday } from "@/server/queries/today";
 
 export const generateMetadata = pageTitle("stats");
 
-/** «الإحصاءات» (US5, FR-035/036). */
+/** «أثرك» ← «أنا» (US5, FR-035/036; spec 006). Member-only figures, never a ranking. */
 export default async function StatsPage({ searchParams }: { searchParams: Promise<{ period?: string }> }) {
   const requested = (await searchParams).period as Period;
   const period: Period = PERIODS.includes(requested) ? requested : "week";
-  const [t, today] = await Promise.all([getTranslations("stats"), getToday()]);
+  const [user, today] = await Promise.all([requireUser(), getToday()]);
+  const header = {
+    name: user.fullName,
+    timeZone: user.timeZone,
+    localDate: today?.local_date ?? localDate(user.timeZone),
+    journeyDay: today?.journey_status === "active" ? today.journey_day : undefined,
+  };
   if (!today?.cohort) {
+    const t = await getTranslations("today");
     return (
-      <main id="main" className="mx-auto flex max-w-lg flex-col gap-5 px-5 pt-6">
-        <h1 className="text-2xl font-semibold">{t("title")}</h1>
-        <Card><p>{(await getTranslations("today"))("noJourney")}</p></Card>
-      </main>
+      <StatsFrame header={header} active="me">
+        <section className="sc-card">
+          <p className="sc-text">{t("noJourney")}</p>
+        </section>
+      </StatsFrame>
     );
   }
   const { from, to } = periodRange(period, today.local_date, today.cohort.start_date);
-  const [stats, insights] = await Promise.all([getMemberStats(from, to), getMemberInsights(from, to)]);
-  const rate = stats && stats.habits_possible > 0 ? stats.habits_done / stats.habits_possible : 0;
-  return (
-    <main id="main" className="mx-auto flex max-w-lg flex-col gap-5 px-5 pt-6">
-      <header className="flex flex-col gap-1">
-        <h1 className="text-2xl font-semibold">{t("title")}</h1>
-        <p className="text-ink-700">{t("intro")}</p>
-      </header>
-      <StatsTabs active="me" />
-      <PeriodTabs active={period} basePath="/stats" />
-      <p className="text-sm text-ink-500">{t("range", { from: formatDate(from, { withWeekday: false }), to: formatDate(to, { withWeekday: false }) })}</p>
-      {stats && insights && (
-        <>
-          <StatTiles consecutive={insights.consecutive_days} rate={rate} activeHabits={insights.active_habits} challengesDone={stats.journey_done + stats.own_done} />
-          <CompletionBars buckets={insights.buckets} />
-          <PlanVsOther data={insights.plan_vs_other} />
-          <Card aria-labelledby="overall" className="flex flex-col gap-2">
-            <CardTitle id="overall">{t("overallTitle")}</CardTitle>
-            <p className="text-3xl font-semibold text-sage-700">{t("overall", { rate: formatNumber(rate, undefined, { style: "percent" }) })}</p>
-            <RateBar rate={rate} />
-            <p className="text-sm text-ink-500">{t("overallDetail", { done: formatNumber(stats.habits_done), possible: formatNumber(stats.habits_possible) })}</p>
-          </Card>
-          <StreakCard stats={stats} />
-          <HabitRateList stats={stats} />
-          <ChallengeSummary stats={stats} />
-          <LifeAreas domains={insights.domains} />
-        </>
-      )}
-    </main>
-  );
+  const supabase = await createClient();
+  const [stats, insights, { data: habitIcons }] = await Promise.all([
+    getMemberStats(from, to),
+    getMemberInsights(from, to),
+    supabase.from("habits").select("id, icon"),
+  ]);
+  const icons = Object.fromEntries((habitIcons ?? []).map((h) => [h.id, h.icon]));
+  return <StatsView header={header} period={period} today={today.local_date} stats={stats} insights={insights} icons={icons} />;
 }

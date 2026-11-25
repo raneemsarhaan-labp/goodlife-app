@@ -1,0 +1,1779 @@
+/*
+ * «أثرك» (الإحصاءات)، «المجتمع» and «المزيد» with their sub-pages, as the Glass Edition design draws
+ * them (2026-11-21). Measurements are the design's own CSS values; line heights are the heights the
+ * design's text renders at, so spacing holds in Cairo. One markup for the three versions: «زجاجي»
+ * uses the design's glass values, «رحلة يومي» the solid surfaces of its «يومك», «زجاج كامل» the
+ * stronger glass of its «يومك» (the `--td-*` tokens in today.css, with their fallbacks).
+ * Text keeps WCAG AA: terracotta text is terracotta-700 (the design's terracotta-500 stays on
+ * graphics), secondary text is `--td-muted`, and the design's ink-300 labels are ink-500.
+ * Physical `left`/`right` appear only where the design pins art to a physical corner.
+ */
+
+:root,
+[data-ui="journey"] {
+  --sc-header-bg: transparent;
+  --sc-header-border: transparent;
+  --sc-header-blur: 0px;
+  --sc-seg-bg: var(--ink-50);
+  --sc-seg-border: transparent;
+  --sc-seg-active: var(--surface);
+  --sc-seg-active-shadow: var(--shadow-sm);
+  --sc-inset-bg: rgb(240 239 232 / 0.6);
+  --sc-row-bg: var(--surface);
+  --sc-row-border: transparent;
+  --sc-row-shadow: var(--shadow-sm);
+  --sc-row-icon-bg: var(--ink-50);
+  --sc-note-bg: var(--green-100);
+  --sc-sub-bg: var(--canvas);
+  --sc-illus-bg: var(--surface);
+}
+
+[data-ui="glass"] {
+  --sc-header-bg: #f0f2ee;
+  --sc-header-border: rgb(255 255 255 / 0.5);
+  --sc-header-blur: 18px;
+  --sc-seg-bg: rgb(255 255 255 / 0.35);
+  --sc-seg-border: rgb(255 255 255 / 0.5);
+  --sc-seg-active: rgb(255 255 255 / 0.85);
+  --sc-seg-active-shadow: none;
+  --sc-inset-bg: rgb(255 255 255 / 0.35);
+  --sc-row-bg: rgb(255 255 255 / 0.4);
+  --sc-row-border: rgb(255 255 255 / 0.55);
+  --sc-row-shadow: none;
+  --sc-row-icon-bg: rgb(255 255 255 / 0.6);
+  --sc-note-bg: rgb(220 230 223 / 0.4);
+  --sc-sub-bg: var(--canvas);
+  --sc-illus-bg: rgb(255 255 255 / 0.5);
+}
+
+[data-ui="full-glass"] {
+  --sc-header-bg: rgb(255 255 255 / 0.6);
+  --sc-header-border: rgb(255 255 255 / 0.5);
+  --sc-header-blur: 18px;
+  --sc-seg-bg: rgb(255 255 255 / 0.5);
+  --sc-seg-border: rgb(255 255 255 / 0.6);
+  --sc-seg-active: rgb(255 255 255 / 0.9);
+  --sc-seg-active-shadow: none;
+  --sc-inset-bg: rgb(255 255 255 / 0.45);
+  --sc-row-bg: rgb(255 255 255 / 0.62);
+  --sc-row-border: rgb(255 255 255 / 0.55);
+  --sc-row-shadow: none;
+  --sc-row-icon-bg: rgb(255 255 255 / 0.7);
+  --sc-note-bg: rgb(220 230 223 / 0.75);
+  --sc-sub-bg: rgb(243 240 231 / 0.92);
+  --sc-illus-bg: rgb(255 255 255 / 0.62);
+}
+
+[data-reduce-transparency="true"] {
+  --sc-header-bg: var(--canvas);
+  --sc-header-blur: 0px;
+  --sc-seg-bg: var(--ink-50);
+  --sc-seg-active: var(--surface);
+  --sc-row-bg: var(--surface);
+  --sc-note-bg: var(--green-100);
+  --sc-sub-bg: var(--canvas);
+  --sc-illus-bg: var(--surface);
+}
+@media (prefers-reduced-transparency: reduce) {
+  :root,
+  :root[data-ui] {
+    --sc-header-bg: var(--canvas);
+    --sc-header-blur: 0px;
+    --sc-seg-bg: var(--ink-50);
+    --sc-seg-active: var(--surface);
+    --sc-row-bg: var(--surface);
+    --sc-note-bg: var(--green-100);
+    --sc-sub-bg: var(--canvas);
+    --sc-illus-bg: var(--surface);
+  }
+}
+
+/* ---------- Page ---------- */
+/* Like «يومك», these screens show the background art as designed: their cards carry their own glass. */
+[data-ui="glass"] body:has(.sc-page) {
+  --page-scrim: rgb(245 241 232 / 0.15);
+}
+/* «زجاج كامل» keeps the page's own scrim: its photo has dark leaves behind the section titles. */
+/* Sub-pages sit on the canvas (the design's sub-page sheet). */
+body:has(.sc-page.is-sub) {
+  --page-scrim: var(--sc-sub-bg);
+}
+.sc-page {
+  margin-inline: auto;
+  max-width: 32rem;
+  padding-bottom: 24px;
+  color: var(--ink-900);
+  line-height: 1.4;
+}
+.sc-content {
+  padding-inline: 18px;
+}
+.sc-sr {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+/* Icons are `<Icon className="sc-icon">` (the masked `.gl-icon` from today.css); size per context. */
+.sc-icon {
+  width: 22px;
+  height: 22px;
+}
+
+/* ---------- Header («أثرك»، «المجتمع»: light band; «المزيد»: the dark band) ---------- */
+.sc-header {
+  position: relative;
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+  overflow: hidden;
+  padding: 22px 22px 20px;
+  border-bottom: 1px solid var(--sc-header-border);
+  background: var(--sc-header-bg);
+  -webkit-backdrop-filter: blur(var(--sc-header-blur));
+  backdrop-filter: blur(var(--sc-header-blur));
+}
+.sc-header-text {
+  position: relative;
+  flex: 1;
+  min-width: 0;
+}
+.sc-greet {
+  margin: 0 0 6px;
+  color: var(--td-muted);
+  font-size: 13px;
+  line-height: 18px;
+}
+.sc-title {
+  margin: 0 0 6px;
+  color: var(--ink-900);
+  font-size: 24px;
+  font-weight: 700;
+  line-height: 45px;
+}
+.sc-date {
+  margin: 0;
+  color: var(--td-muted);
+  font-size: 12.5px;
+  line-height: 17px;
+}
+.sc-logo {
+  position: relative;
+  display: flex;
+  flex-shrink: 0;
+  width: 52px;
+  height: 52px;
+  overflow: hidden;
+  border-radius: 50%;
+  background: rgb(255 255 255 / 0.9);
+  box-shadow: var(--shadow-sm);
+}
+.sc-logo img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.sc-header.is-dark,
+.sc-subheader {
+  border-bottom-color: rgb(255 255 255 / 0.15);
+  background: linear-gradient(135deg, rgb(31 51 41 / 0.92), rgb(46 74 61 / 0.85));
+  -webkit-backdrop-filter: blur(18px);
+  backdrop-filter: blur(18px);
+}
+.sc-header.is-dark .sc-title {
+  color: #fff;
+}
+.sc-header.is-dark .sc-greet,
+.sc-header.is-dark .sc-date {
+  color: rgb(255 255 255 / 0.75);
+}
+/* The design's soft circle, pinned to the band's top-left corner. */
+.sc-blob {
+  position: absolute;
+  top: -40px;
+  left: -40px;
+  width: 150px;
+  height: 150px;
+  border-radius: 50%;
+  background: rgb(255 255 255 / 0.08);
+}
+
+/* Sub-page band: title, subtitle, back button. */
+.sc-subheader {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 22px 22px 20px;
+  border-bottom: 0;
+}
+.sc-subheader-text {
+  flex: 1;
+  min-width: 0;
+}
+.sc-subheader h1 {
+  margin: 0 0 5px;
+  color: #fff;
+  font-size: 18px;
+  font-weight: 700;
+  line-height: 34px;
+}
+.sc-subheader p {
+  margin: 0;
+  color: rgb(255 255 255 / 0.75);
+  font-size: 12px;
+  line-height: 16px;
+}
+.sc-back {
+  display: flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 12px;
+  background: rgb(255 255 255 / 0.15);
+  color: #fff;
+}
+.sc-back .sc-icon {
+  width: 18px;
+  height: 18px;
+}
+/* The design's sub-pages start their content right under the band; forms keep a little air. */
+.sc-page.is-sub .sc-forms {
+  padding-top: 18px;
+}
+
+/* ---------- Segmented tabs «أنا · مجموعتي · التحدّي» ---------- */
+.sc-seg {
+  display: flex;
+  gap: 6px;
+  margin: 16px 0;
+  padding: 6px;
+  border: 1px solid var(--sc-seg-border);
+  border-radius: 16px;
+  background: var(--sc-seg-bg);
+  -webkit-backdrop-filter: blur(14px);
+  backdrop-filter: blur(14px);
+}
+.sc-seg li {
+  flex: 1;
+}
+.sc-seg a {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  min-height: 39px;
+  padding: 10px 0;
+  border-radius: 12px;
+  color: var(--td-muted);
+  font-size: 13.5px;
+  font-weight: 700;
+  line-height: 19px;
+}
+.sc-seg a[aria-current="page"] {
+  background: var(--sc-seg-active);
+  box-shadow: var(--sc-seg-active-shadow);
+  color: var(--ink-900);
+}
+.sc-seg .sc-icon {
+  width: 16px;
+  height: 16px;
+}
+/* 44px target: the 39px tab plus the bar's padding around it. */
+.sc-seg a {
+  position: relative;
+}
+.sc-seg a::after {
+  content: "";
+  position: absolute;
+  inset: -3px 0;
+}
+
+/* ---------- Cards ---------- */
+.sc-card {
+  position: relative;
+  padding: 18px;
+  border: var(--td-card-bw) solid var(--td-card-border);
+  border-radius: 22px;
+  background: var(--td-card-bg);
+  box-shadow: var(--td-card-shadow);
+  -webkit-backdrop-filter: blur(var(--td-card-blur));
+  backdrop-filter: blur(var(--td-card-blur));
+}
+.sc-card-title {
+  margin: 20px 0 0;
+  color: var(--ink-900);
+  font-size: 24px;
+  font-weight: 700;
+  line-height: 32px;
+}
+.sc-card-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+.sc-card-head .sc-card-title {
+  margin: 0;
+}
+.sc-note {
+  margin: 12.5px 0;
+  color: var(--td-muted);
+  font-size: 12.5px;
+  line-height: 1.9;
+}
+.sc-hr {
+  margin: 8px 0;
+  border: 0;
+  border-top: 1px dashed var(--ink-100);
+}
+.sc-hr + .sc-note {
+  margin-top: 12.5px;
+}
+
+/* Pill switch inside a card head («أسبوع · شهر · سنة», «التوزيع · الالتزام»). */
+.sc-pills {
+  display: flex;
+  flex-shrink: 0;
+  gap: 4px;
+  padding: 4px;
+  border-radius: 12px;
+  background: var(--sc-seg-bg);
+}
+.sc-pill {
+  position: relative;
+  display: block;
+  padding: 6px 12px;
+  border: 0;
+  border-radius: 9px;
+  background: none;
+  color: var(--td-muted);
+  font: inherit;
+  font-size: 12px;
+  font-weight: 700;
+  line-height: 16px;
+  cursor: pointer;
+}
+.sc-pill[aria-current="page"],
+.sc-pill[aria-pressed="true"] {
+  background: rgb(255 255 255 / 0.9);
+  box-shadow: var(--sc-seg-active-shadow);
+  color: var(--ink-900);
+}
+.sc-pill::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: max(100%, 44px);
+  height: 44px;
+  transform: translate(-50%, -50%);
+}
+
+/* Section heading on the page: title, a hairline, and an optional count or icon. */
+.sc-section-head {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 22px 0 14px;
+}
+.sc-section-head h2 {
+  margin: 0;
+  color: var(--ink-900);
+  font-size: 24px;
+  font-weight: 700;
+  line-height: 32px;
+  white-space: nowrap;
+}
+.sc-section-head .sc-line {
+  flex: 1;
+  height: 1px;
+  background: var(--ink-100);
+}
+.sc-badge {
+  display: flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  background: var(--ink-50);
+  color: var(--td-muted);
+  font-size: 12px;
+  font-weight: 700;
+}
+.sc-section-icon {
+  display: flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  border-radius: 13px;
+  background: var(--sc-row-icon-bg);
+  color: var(--ink-700);
+}
+.sc-section-icon .sc-icon {
+  width: 16px;
+  height: 16px;
+}
+
+/* ---------- «أنا»: tiles ---------- */
+.sc-tiles {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  margin: 0 0 10px;
+  padding: 0;
+  list-style: none;
+}
+.sc-tile {
+  min-height: 112px;
+  padding: 10px 8px;
+  border: 1px solid var(--td-card-border);
+  border-radius: 16px;
+  background: var(--td-card-bg);
+  box-shadow: var(--td-card-shadow);
+  text-align: center;
+  -webkit-backdrop-filter: blur(var(--td-card-blur));
+  backdrop-filter: blur(var(--td-card-blur));
+}
+.sc-tile.is-ring {
+  background: oklch(95% 0.02 60 / var(--sc-ring-alpha, 1));
+}
+[data-ui="glass"] .sc-tile.is-ring {
+  --sc-ring-alpha: 1;
+}
+.sc-tile-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 30px;
+  margin: 0 auto 12px;
+  border-radius: 50%;
+  background: var(--sc-tile-circle, rgb(255 255 255 / 0.6));
+  color: var(--sc-tile-fg, var(--green-700));
+}
+.sc-tile-icon .sc-icon {
+  width: 15px;
+  height: 15px;
+}
+.sc-tile-num {
+  margin: 0 0 2px;
+  color: var(--ink-900);
+  font-size: 18px;
+  font-weight: 700;
+  line-height: 33px;
+}
+.sc-tile-label {
+  margin: 0;
+  color: var(--td-muted);
+  font-size: 9.5px;
+  line-height: 13px;
+}
+.sc-ring {
+  display: block;
+  width: 42px;
+  height: 42px;
+  margin: 0 auto 6px;
+}
+.sc-ring text {
+  font-family: "Cairo", sans-serif;
+  font-weight: 700;
+}
+
+/* «خطتي مقابل ما سواها» */
+.sc-compare {
+  padding: 12px 14px;
+}
+.sc-accent {
+  width: 28px;
+  height: 2px;
+  margin: 0 0 6px;
+  margin-inline-end: auto;
+  border-radius: 2px;
+  background: var(--gold-500);
+}
+.sc-compare h2 {
+  margin: 10.8px 0 8px;
+  color: var(--ink-900);
+  font-size: 13px;
+  font-weight: 700;
+  line-height: 18px;
+}
+.sc-compare-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  margin: 0 0 8px;
+  padding: 0;
+  list-style: none;
+}
+.sc-compare-grid.is-single {
+  grid-template-columns: 1fr;
+}
+.sc-compare-box {
+  padding: 10px 8px;
+  border-radius: 12px;
+  background: var(--sc-inset-bg);
+  text-align: center;
+}
+.sc-compare-num {
+  margin: 0 0 2px;
+  font-size: 17px;
+  font-weight: 700;
+  line-height: 32px;
+}
+.sc-compare-label {
+  margin: 0;
+  color: var(--td-muted);
+  font-size: 9.5px;
+  line-height: 13px;
+}
+.sc-bar {
+  height: 4px;
+  margin-top: 6px;
+  overflow: hidden;
+  border-radius: 3px;
+  background: rgb(0 0 0 / 0.08);
+}
+.sc-bar i {
+  display: block;
+  height: 100%;
+  border-radius: 4px;
+}
+
+/* «هذا الأسبوع»: one pill per day / week / month, filled from the bottom. */
+.sc-chips {
+  display: flex;
+  flex-direction: row-reverse;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.sc-chip {
+  position: relative;
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+  outline: none;
+}
+.sc-chip-bar {
+  position: relative;
+  width: 100%;
+  height: 54px;
+  overflow: hidden;
+  border-radius: 999px;
+  background: var(--ink-50);
+}
+.sc-chip-bar i {
+  position: absolute;
+  inset-inline: 0;
+  bottom: 0;
+  border-radius: 999px;
+  background: var(--green-300);
+}
+.sc-chip.is-full .sc-chip-bar i {
+  background: var(--green-700);
+}
+.sc-chip.is-today .sc-chip-bar {
+  border: 2px solid var(--terracotta-500);
+}
+.sc-chip-label {
+  max-width: 100%;
+  overflow: hidden;
+  color: var(--td-muted);
+  font-size: 11px;
+  line-height: 15px;
+  text-overflow: clip;
+  white-space: nowrap;
+}
+.sc-chip:hover .sc-chip-bar,
+.sc-chip:focus-visible .sc-chip-bar {
+  outline: 3px solid var(--terracotta-700);
+  outline-offset: 2px;
+}
+.sc-chip-tip {
+  position: absolute;
+  bottom: 100%;
+  z-index: 10;
+  display: none;
+  margin-bottom: 4px;
+  padding: 4px 8px;
+  border-radius: 8px;
+  background: var(--ink-900);
+  color: #fff;
+  font-size: 12px;
+  line-height: 18px;
+  white-space: nowrap;
+  pointer-events: none;
+}
+.sc-chip:hover .sc-chip-tip,
+.sc-chip:focus-visible .sc-chip-tip {
+  display: block;
+}
+
+/* «السلاسل» */
+.sc-streaks {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  margin: 16px 0 0;
+  padding: 0;
+  list-style: none;
+}
+.sc-streak {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.sc-streak-icon {
+  display: flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  background: var(--sc-si-bg);
+  color: var(--sc-si-fg);
+}
+.sc-streak-icon .sc-icon {
+  width: 18px;
+  height: 18px;
+}
+.sc-streak-body {
+  flex: 1;
+  min-width: 0;
+}
+.sc-streak-top {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+.sc-streak-name {
+  min-width: 0;
+  overflow: hidden;
+  color: var(--ink-900);
+  font-size: 14px;
+  font-weight: 700;
+  line-height: 19px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.sc-streak-days {
+  flex-shrink: 0;
+  color: var(--td-muted);
+  font-size: 12.5px;
+  line-height: 19px;
+}
+.sc-streak-bar {
+  height: 6px;
+  overflow: hidden;
+  border-radius: 5px;
+  background: var(--ink-50);
+}
+.sc-streak-bar i {
+  display: block;
+  height: 100%;
+  border-radius: 5px;
+  background: var(--sc-si-bar);
+}
+.sc-tone-0 {
+  --sc-si-bg: oklch(95% 0.03 90);
+  --sc-si-fg: oklch(65% 0.13 80);
+  --sc-si-bar: var(--green-700);
+}
+.sc-tone-1 {
+  --sc-si-bg: oklch(93% 0.025 290);
+  --sc-si-fg: oklch(45% 0.09 290);
+  --sc-si-bar: var(--green-500);
+}
+.sc-tone-2 {
+  --sc-si-bg: var(--terracotta-100);
+  --sc-si-fg: var(--terracotta-500);
+  --sc-si-bar: var(--terracotta-500);
+}
+.sc-tone-3 {
+  --sc-si-bg: oklch(93% 0.02 260);
+  --sc-si-fg: oklch(50% 0.08 260);
+  --sc-si-bar: oklch(55% 0.09 300);
+}
+
+/* «أين تعيش حياتك»: the radial wheel. Labels are the list items (name and value as text). */
+.sc-wheel-wrap {
+  display: flex;
+  justify-content: center;
+  padding: 10px 0;
+}
+.sc-wheel {
+  position: relative;
+  width: 260px;
+  height: 260px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.sc-wheel svg {
+  display: block;
+}
+.sc-wheel-label {
+  position: absolute;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  color: var(--sc-wl, var(--td-muted));
+  font-size: 12px;
+  font-weight: 700;
+  line-height: 16px;
+  text-align: center;
+  white-space: nowrap;
+  transform: translate(-50%, -50%);
+}
+.sc-wheel-label .sc-icon {
+  width: 16px;
+  height: 16px;
+}
+.sc-wheel-center {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  transform: translate(-50%, -50%);
+  text-align: center;
+  pointer-events: none;
+}
+.sc-wheel-center b {
+  color: var(--green-700);
+  font-size: 20px;
+  font-weight: 700;
+  line-height: 26px;
+}
+.sc-wheel-center span {
+  max-width: 64px;
+  color: var(--td-muted);
+  font-size: 10px;
+  line-height: 13px;
+  white-space: nowrap;
+}
+.sc-d-sage {
+  --sc-wc: var(--green-700);
+  --sc-wb: var(--green-100);
+  --sc-wl: var(--green-700);
+}
+.sc-d-gold {
+  --sc-wc: oklch(45% 0.09 70);
+  --sc-wb: oklch(90% 0.03 70);
+  --sc-wl: oklch(45% 0.09 70);
+}
+.sc-d-dawn {
+  --sc-wc: var(--terracotta-500);
+  --sc-wb: var(--terracotta-100);
+  --sc-wl: var(--terracotta-700);
+}
+.sc-d-ink {
+  --sc-wc: var(--ink-500);
+  --sc-wb: var(--ink-50);
+  --sc-wl: var(--ink-700);
+}
+.sc-d-violet {
+  --sc-wc: oklch(50% 0.09 290);
+  --sc-wb: oklch(92% 0.03 290);
+  --sc-wl: oklch(50% 0.09 290);
+}
+.sc-wheel-label.is-empty {
+  --sc-wl: var(--td-muted);
+}
+
+/* Challenges summary (not in the design; drawn with its compare boxes). */
+.sc-mini-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  margin: 16px 0 8px;
+  padding: 0;
+  list-style: none;
+}
+
+/* ---------- «مجموعتي» ---------- */
+.sc-hero {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-bottom: 14px;
+  padding: 16px 18px;
+  border-radius: 20px;
+  background: linear-gradient(135deg, rgb(31 51 41 / 0.92), rgb(46 74 61 / 0.85));
+  color: #fff;
+}
+.sc-hero-icon {
+  display: flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  background: rgb(255 255 255 / 0.15);
+}
+.sc-hero-icon .sc-icon {
+  width: 20px;
+  height: 20px;
+}
+.sc-hero-text {
+  flex: 1;
+  min-width: 0;
+}
+.sc-hero h2 {
+  margin: 0 0 4px;
+  color: #fff;
+  font-size: 15.5px;
+  font-weight: 700;
+  line-height: 21px;
+}
+.sc-hero p {
+  margin: 0;
+  color: rgb(255 255 255 / 0.8);
+  font-size: 12px;
+  line-height: 16px;
+}
+.sc-hero-chev {
+  width: 18px;
+  height: 18px;
+  color: rgb(255 255 255 / 0.7);
+}
+a.sc-hero::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+}
+.sc-card-section-head {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 0 0 14px;
+}
+.sc-card-section-head h2 {
+  margin: 0;
+  color: var(--ink-900);
+  font-size: 14.5px;
+  font-weight: 700;
+  line-height: 20.3px;
+}
+.sc-card-section-head .sc-line {
+  flex: 1;
+  height: 1px;
+  background: var(--ink-100);
+}
+.sc-card-section-head > .sc-icon {
+  width: 22px;
+  height: 22px;
+  color: var(--td-muted);
+}
+.sc-peers {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.sc-peer {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 32px;
+}
+.sc-avatar {
+  display: flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: var(--green-100);
+  color: var(--green-700);
+  font-size: 13px;
+  font-weight: 700;
+}
+.sc-avatar.is-warm {
+  background: var(--terracotta-100);
+  color: var(--terracotta-700);
+}
+.sc-peer-name {
+  flex-shrink: 0;
+  width: 46px;
+  overflow: hidden;
+  color: var(--ink-900);
+  font-size: 12.5px;
+  font-weight: 700;
+  line-height: 17px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.sc-peer-chips {
+  display: flex;
+  flex: 1;
+  gap: 5px;
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+  list-style: none;
+}
+.sc-chip-tag {
+  flex-shrink: 0;
+  padding: 4px 8px;
+  border-radius: 999px;
+  background: var(--ink-50);
+  color: var(--td-muted);
+  font-size: 10px;
+  line-height: 14px;
+  white-space: nowrap;
+}
+.sc-chip-tag.is-done {
+  background: var(--green-100);
+  color: var(--green-700);
+}
+.sc-peer-meta {
+  display: flex;
+  flex-shrink: 0;
+  align-items: center;
+  gap: 3px;
+  color: var(--td-accent-text);
+  font-size: 10.5px;
+  font-weight: 700;
+  line-height: 15px;
+  white-space: nowrap;
+}
+.sc-peer-meta .sc-icon {
+  width: 14px;
+  height: 14px;
+}
+.sc-note-card {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  margin: 14px 0;
+  padding: 16px 18px;
+  border-radius: 18px;
+  background: var(--sc-note-bg);
+}
+.sc-note-icon {
+  display: flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  background: rgb(255 255 255 / 0.7);
+  color: var(--green-700);
+}
+.sc-note-icon .sc-icon {
+  width: 18px;
+  height: 18px;
+}
+.sc-note-card h2 {
+  margin: 0 0 6px;
+  color: var(--ink-900);
+  font-size: 13.5px;
+  font-weight: 700;
+  line-height: 19px;
+}
+.sc-note-card p {
+  margin: 0;
+  color: var(--td-muted-tint);
+  font-size: 12px;
+  line-height: 1.8;
+}
+
+/* ---------- Rows («المزيد», links) ---------- */
+.sc-rows {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin: 0 0 8px;
+  padding: 0;
+  list-style: none;
+}
+.sc-row {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  width: 100%;
+  min-height: 72px;
+  padding: 14px 16px;
+  border: 1px solid var(--sc-row-border);
+  border-radius: 18px;
+  background: var(--sc-row-bg);
+  box-shadow: var(--sc-row-shadow);
+  color: inherit;
+  font: inherit;
+  text-align: start;
+  -webkit-backdrop-filter: blur(14px);
+  backdrop-filter: blur(14px);
+}
+button.sc-row {
+  cursor: pointer;
+}
+.sc-row-icon {
+  display: flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  width: 42px;
+  height: 42px;
+  border-radius: 13px;
+  background: var(--sc-row-icon-bg);
+  color: var(--ink-700);
+}
+.sc-row-icon .sc-icon {
+  width: 22px;
+  height: 22px;
+}
+.sc-row-text {
+  flex: 1;
+  min-width: 0;
+}
+.sc-row-name {
+  display: block;
+  margin-bottom: 4px;
+  color: var(--ink-900);
+  font-size: 14.5px;
+  font-weight: 700;
+  line-height: 20px;
+}
+.sc-row-sub {
+  display: block;
+  color: var(--td-muted);
+  font-size: 12px;
+  line-height: 16px;
+}
+.sc-row-chev {
+  width: 22px;
+  height: 22px;
+  color: var(--ink-500);
+}
+.sc-row-end {
+  flex-shrink: 0;
+  min-height: 44px;
+  border: 0;
+  background: none;
+  color: var(--green-700);
+  font: inherit;
+  font-size: 12.5px;
+  font-weight: 700;
+  text-decoration: underline;
+  text-underline-offset: 4px;
+  cursor: pointer;
+}
+
+/* Profile card */
+.sc-profile {
+  position: relative;
+  margin: 0 0 22px;
+  padding: 28px 20px 22px;
+  box-shadow: none;
+  text-align: center;
+}
+.sc-profile-btn {
+  position: absolute;
+  top: 18px;
+  inset-inline-start: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 38px;
+  height: 38px;
+  border: 1px solid rgb(255 255 255 / 0.6);
+  border-radius: 12px;
+  background: rgb(255 255 255 / 0.5);
+  color: var(--green-700);
+}
+[data-ui="journey"] .sc-profile-btn {
+  border-color: var(--ink-100);
+  background: var(--canvas);
+}
+.sc-profile-btn .sc-icon {
+  width: 22px;
+  height: 22px;
+}
+.sc-profile-avatar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 88px;
+  height: 88px;
+  margin: 0 auto 16px;
+  border-radius: 50%;
+  background: var(--green-700);
+  color: var(--gold-100);
+  font-size: 36px;
+  font-weight: 700;
+  line-height: 1;
+}
+.sc-profile h2 {
+  margin: 0 0 8px;
+  color: var(--ink-900);
+  font-size: 19px;
+  font-weight: 700;
+  line-height: 36px;
+}
+.sc-profile p {
+  margin: 0 0 16px;
+  color: var(--td-muted);
+  font-size: 13px;
+  line-height: 18px;
+}
+.sc-profile-role {
+  display: inline-block;
+  padding: 8px 20px;
+  border-radius: 999px;
+  background: var(--green-700);
+  color: #fff;
+  font-size: 12px;
+  font-weight: 700;
+  line-height: 16px;
+}
+
+/* ---------- Resources ---------- */
+.sc-illus-card {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 14px;
+  padding: 20px;
+  overflow: hidden;
+  border: 1px solid var(--sc-row-border);
+  border-radius: 20px;
+  background: var(--sc-illus-bg);
+  box-shadow: var(--sc-row-shadow);
+}
+.sc-illus-body {
+  flex: 1;
+  min-width: 0;
+}
+.sc-illus-card h2 {
+  margin: 0 0 8px;
+  color: var(--ink-900);
+  font-size: 16.5px;
+  font-weight: 700;
+  line-height: 31px;
+}
+.sc-illus-card p {
+  margin: 0 0 14px;
+  color: var(--td-muted);
+  font-size: 12.5px;
+  line-height: 1.7;
+}
+.sc-illus-art {
+  display: flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  width: 88px;
+  height: 88px;
+  border-radius: 50%;
+  background: var(--terracotta-100);
+  color: var(--terracotta-500);
+}
+.sc-illus-art.is-green {
+  background: var(--green-100);
+  color: var(--green-500);
+}
+.sc-illus-art .sc-icon {
+  width: 40px;
+  height: 40px;
+}
+.sc-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 44px;
+  padding: 10px 18px;
+  border: 0;
+  border-radius: 12px;
+  background: var(--terracotta-700);
+  color: #fff;
+  font: inherit;
+  font-size: 13px;
+  font-weight: 700;
+  line-height: 18px;
+  cursor: pointer;
+}
+.sc-btn.is-dark {
+  background: var(--green-700);
+}
+.sc-btn .sc-icon {
+  width: 15px;
+  height: 15px;
+}
+.sc-btn:disabled {
+  opacity: 0.5;
+}
+.sc-norms {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.sc-norm {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 16px 0;
+  border-bottom: 1px dashed var(--ink-100);
+}
+.sc-norm p {
+  margin: 0;
+  color: var(--ink-900);
+  font-size: 14.5px;
+  font-weight: 700;
+  line-height: 1.6;
+}
+.sc-norm-num {
+  flex-shrink: 0;
+  color: var(--terracotta-700);
+  font-size: 20px;
+  font-style: italic;
+  font-weight: 700;
+  line-height: 27px;
+}
+.sc-item {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.sc-item h3 {
+  margin: 0;
+  color: var(--ink-900);
+  font-size: 14.5px;
+  font-weight: 700;
+  line-height: 20px;
+}
+.sc-item p {
+  margin: 0;
+  color: var(--td-muted);
+  font-size: 12.5px;
+  line-height: 1.7;
+}
+
+/* ---------- «التحدّي» ---------- */
+.sc-chal {
+  position: relative;
+  margin-bottom: 14px;
+  padding: 20px;
+  overflow: hidden;
+  border-radius: 22px;
+  background: linear-gradient(135deg, rgb(31 51 41 / 0.92), rgb(46 74 61 / 0.85));
+  color: #fff;
+}
+.sc-chal-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 14px;
+}
+.sc-chal-badge {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  padding: 6px 12px;
+  border-radius: 999px;
+  background: rgb(255 255 255 / 0.15);
+  font-size: 12px;
+  font-weight: 700;
+  line-height: 16px;
+}
+.sc-chal-badge .sc-icon {
+  width: 13px;
+  height: 13px;
+}
+.sc-chal-day {
+  color: rgb(255 255 255 / 0.75);
+  font-size: 12.5px;
+  line-height: 17px;
+}
+.sc-chal h2 {
+  margin: 0 0 8px;
+  color: #fff;
+  font-size: 19px;
+  font-weight: 700;
+  line-height: 36px;
+}
+.sc-chal p {
+  margin: 0 0 16px;
+  color: rgb(255 255 255 / 0.8);
+  font-size: 13px;
+  line-height: 1.7;
+}
+.sc-chal-bar {
+  height: 8px;
+  margin-bottom: 12px;
+  overflow: hidden;
+  border-radius: 5px;
+  background: rgb(255 255 255 / 0.2);
+}
+.sc-chal-bar i {
+  display: block;
+  height: 100%;
+  border-radius: 5px;
+  background: var(--terracotta-500);
+}
+.sc-chal-bottom {
+  color: rgb(255 255 255 / 0.75);
+  font-size: 12.5px;
+  line-height: 17px;
+}
+.sc-chal-stats {
+  display: flex;
+  gap: 12px;
+  margin: 16px 0 6px;
+  padding: 0;
+  list-style: none;
+}
+.sc-chal-stat {
+  display: flex;
+  flex: 1;
+  align-items: center;
+  gap: 12px;
+  padding: 14px;
+  border-radius: 16px;
+  background: var(--sc-inset-bg);
+}
+.sc-chal-stat-icon {
+  display: flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  background: var(--sc-cs-bg);
+  color: var(--sc-cs-fg);
+}
+.sc-chal-stat-icon .sc-icon {
+  width: 20px;
+  height: 20px;
+}
+.sc-chal-num {
+  display: block;
+  color: var(--ink-900);
+  font-size: 22px;
+  font-weight: 700;
+  line-height: 41px;
+}
+.sc-chal-label {
+  display: block;
+  color: var(--td-muted);
+  font-size: 11.5px;
+  line-height: 16px;
+}
+.sc-withdraw {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  min-height: 48px;
+  margin-top: 14px;
+  padding: 14px 18px;
+  border: 0;
+  border-radius: 14px;
+  background: var(--terracotta-100);
+  color: var(--terracotta-700);
+  font: inherit;
+  font-size: 13.5px;
+  font-weight: 700;
+  line-height: 19px;
+  cursor: pointer;
+}
+.sc-withdraw .sc-icon {
+  width: 16px;
+  height: 16px;
+}
+.sc-status {
+  margin: 8px 0 0;
+  color: var(--green-700);
+  font-size: 12.5px;
+  line-height: 18px;
+}
+.sc-status:empty {
+  display: none;
+}
+.sc-status.is-error {
+  color: var(--terracotta-700);
+}
+.sc-upcoming {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 16px;
+  border: 1px solid var(--sc-row-border);
+  border-radius: 20px;
+  background: var(--sc-row-bg);
+  box-shadow: var(--sc-row-shadow);
+  -webkit-backdrop-filter: blur(14px);
+  backdrop-filter: blur(14px);
+}
+.sc-upcoming-body {
+  flex: 1;
+  min-width: 0;
+}
+.sc-upcoming-art {
+  flex-shrink: 0;
+  width: 88px;
+  height: 88px;
+  overflow: hidden;
+  border-radius: 50%;
+  background: var(--ink-50);
+}
+.sc-upcoming-art img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.sc-upcoming-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  margin-bottom: 8px;
+  padding: 5px 12px;
+  border-radius: 999px;
+  background: var(--terracotta-100);
+  color: var(--terracotta-700);
+  font-size: 11.5px;
+  font-weight: 700;
+  line-height: 16px;
+}
+.sc-upcoming-badge .sc-icon {
+  width: 13px;
+  height: 13px;
+}
+.sc-upcoming h3 {
+  margin: 0 0 6px;
+  color: var(--ink-900);
+  font-size: 15px;
+  font-weight: 700;
+  line-height: 28px;
+}
+.sc-upcoming p {
+  margin: 0 0 12px;
+  color: var(--td-muted);
+  font-size: 12px;
+  line-height: 16px;
+}
+
+/* ---------- «المجتمع»: activity cards ---------- */
+.sc-events {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.sc-event {
+  --ev: var(--terracotta-500);
+  --ev-text: var(--td-accent-text);
+  --ev-tint: var(--terracotta-100);
+  position: relative;
+  padding: 12px;
+  border: 1.5px solid color-mix(in oklab, var(--ev) 35%, white 65%);
+  border-radius: 16px;
+  background: var(--td-card-bg);
+  -webkit-backdrop-filter: blur(16px);
+  backdrop-filter: blur(16px);
+}
+.sc-event.is-registered {
+  --ev: var(--green-700);
+  --ev-text: var(--green-700);
+  --ev-tint: var(--green-100);
+}
+[data-ui="journey"] .sc-event {
+  box-shadow: var(--shadow-sm);
+}
+.sc-event summary {
+  display: block;
+  cursor: pointer;
+  list-style: none;
+}
+.sc-event summary::-webkit-details-marker {
+  display: none;
+}
+.sc-event-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 8px;
+}
+.sc-event-badges {
+  display: flex;
+  gap: 8px;
+}
+.sc-event-badge {
+  padding: 4px 10px;
+  border: 1.5px solid var(--ev-text);
+  border-radius: 999px;
+  color: var(--ev-text);
+  font-size: 10px;
+  font-weight: 700;
+  line-height: 14px;
+}
+.sc-event-badge.is-fill {
+  background: var(--ev-text);
+  color: #fff;
+}
+.sc-event-chev {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: rgb(255 255 255 / 0.6);
+  color: var(--ink-500);
+  transition: transform 0.25s;
+}
+[data-ui="journey"] .sc-event-chev {
+  background: var(--ink-50);
+}
+.sc-event-chev .sc-icon {
+  width: 16px;
+  height: 16px;
+}
+.sc-event[open] .sc-event-chev,
+details[open] > summary .sc-event-chev {
+  transform: rotate(180deg);
+}
+.sc-event-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  margin-bottom: 14px;
+  border-radius: 50%;
+  background: var(--ev-tint);
+  color: var(--ev);
+}
+.sc-event-icon .sc-icon {
+  width: 26px;
+  height: 26px;
+}
+.sc-event h3 {
+  margin: 0 0 6px;
+  color: var(--ink-900);
+  font-size: 14px;
+  font-weight: 700;
+  line-height: 1.3;
+}
+.sc-event-desc {
+  display: block;
+  margin: 0;
+  color: var(--ink-700);
+  font-size: 11.5px;
+  line-height: 1.5;
+}
+.sc-event-rows {
+  margin: 2px 0 0;
+  padding: 0;
+}
+/* The design puts the value on the start side and the label on the end side. */
+.sc-event-row {
+  display: flex;
+  flex-direction: row-reverse;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 12px 0;
+  border-bottom: 1px dashed var(--ink-100);
+  font-size: 13px;
+  line-height: 19px;
+}
+.sc-event-row dt {
+  color: var(--td-muted);
+  font-weight: 700;
+}
+.sc-event-row dt {
+  flex-shrink: 0;
+}
+.sc-event-row dd {
+  margin: 0;
+  color: var(--ink-900);
+}
+.sc-event-seats {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin-top: 16px;
+}
+.sc-event-seats > p {
+  margin: 0;
+  color: var(--td-muted);
+  font-size: 12.5px;
+  line-height: 18px;
+}
+.sc-join {
+  min-height: 44px;
+  padding: 12px 22px;
+  border: 0;
+  border-radius: 14px;
+  background: var(--green-700);
+  color: #fff;
+  font: inherit;
+  font-size: 13.5px;
+  font-weight: 700;
+  line-height: 19px;
+  cursor: pointer;
+}
+.sc-join.is-quiet {
+  background: none;
+  box-shadow: inset 0 0 0 1.5px var(--terracotta-700);
+  color: var(--terracotta-700);
+}
+.sc-join:disabled {
+  opacity: 0.5;
+}
+.sc-event-foot {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  margin-top: 8px;
+  padding-top: 8px;
+  border-top: 1px dashed var(--ink-100);
+  font-size: 10.5px;
+  line-height: 15px;
+}
+.sc-event-when {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 6px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.sc-event-when li {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--td-muted);
+}
+.sc-event-when .sc-icon {
+  width: 15px;
+  height: 15px;
+}
+.sc-event-link {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  color: var(--ev-text);
+  font-weight: 700;
+}
+.sc-event-link .sc-icon {
+  width: 15px;
+  height: 15px;
+}
+.sc-event-link::after {
+  content: "";
+  position: absolute;
+  inset: -14px -8px;
+}
+
+/* Community extras (group, encouragement) on the same cards. */
+.sc-stack {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  margin-top: 14px;
+}
+.sc-card h2.sc-h {
+  margin: 0 0 12px;
+  color: var(--ink-900);
+  font-size: 16px;
+  font-weight: 700;
+  line-height: 28px;
+}
+.sc-text {
+  margin: 0;
+  color: var(--ink-900);
+  font-size: 13.5px;
+  line-height: 1.8;
+}
+.sc-muted {
+  color: var(--td-muted);
+}
+.sc-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.sc-list > li + li {
+  padding-top: 12px;
+  border-top: 1px dashed var(--ink-100);
+}
+
+/* Sub-page forms (account, appearance): the app's controls on the design's cards. */
+.sc-forms {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+.sc-forms .gl-surface,
+.sc-forms .gl-surface-strong {
+  border: var(--td-card-bw) solid var(--td-card-border);
+  background-color: var(--td-card-bg);
+  box-shadow: var(--td-card-shadow);
+}
+.sc-wheel-labels {
+  position: absolute;
+  inset: 0;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.sc-bar {
+  display: block;
+}
+.sc-streak-bar,
+.sc-chip-bar {
+  display: block;
+}
+.sc-chal-bottom {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+.sc-chal-habit {
+  min-width: 0;
+  overflow: hidden;
+  color: rgb(255 255 255 / 0.9);
+  font-weight: 700;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}

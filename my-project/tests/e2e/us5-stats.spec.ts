@@ -7,15 +7,15 @@ import { signIn } from "./helpers/auth";
 test("member stats show rates, streaks, and challenges by period", async ({ page }) => {
   await signIn(page, "member1@example.test");
   await page.goto("/stats");
-  await expect(page.getByRole("heading", { name: "الالتزام بالعادات" })).toBeVisible();
-  await expect(page.getByText(/المتتالية الحالية/).first()).toBeVisible();
+  await expect(page.getByRole("heading", { name: "السلاسل" })).toBeVisible();
+  await expect(page.getByRole("region", { name: "السلاسل" }).getByRole("listitem").first()).toBeVisible();
   await expect(page.getByText(/تحدّيات الرحلة:/)).toBeVisible();
   await expect(page.getByText(/تحدّياتك الذاتية:/)).toBeVisible();
   await checkA11y(page);
-  for (const period of ["هذا الشهر", "الرحلة كلها"]) {
-    await page.getByRole("link", { name: period }).click();
-    await expect(page.getByRole("link", { name: period })).toHaveAttribute("aria-current", "page");
-    await expect(page.getByRole("heading", { name: "عاداتك" })).toBeVisible();
+  for (const period of ["شهر", "سنة"]) {
+    await page.getByRole("link", { name: period, exact: true }).click();
+    await expect(page.getByRole("link", { name: period, exact: true })).toHaveAttribute("aria-current", "page");
+    await expect(page.getByRole("heading", { name: "السلاسل" })).toBeVisible();
   }
 });
 
