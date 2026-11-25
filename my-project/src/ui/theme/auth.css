@@ -1,0 +1,834 @@
+/*
+ * The entry screens — «أهلًا بك», «تسجيل الدخول», «حساب جديد», the email code, «رحلة البداية» and
+ * «كيف تحب أن يبدو تطبيقك؟» — drawn in the language of «يومك» and «خطتي» (no mock-ups of their own):
+ * the header band with the logo, the cards and fields of today.css / plan.css, the habit flow's header,
+ * progress bar and footer for the setup steps. One markup for the three versions; only tokens differ.
+ * Text keeps WCAG AA (terracotta-700 for buttons and small labels, the muted inks of today.css).
+ * Classes: `au-`.
+ */
+
+:root,
+[data-ui="journey"] {
+  --au-field-bg: var(--canvas);
+  --au-field-border: var(--ink-100);
+  --au-hero-bg: var(--terracotta-100);
+  --au-group-bg: var(--green-100);
+  --au-soft-bg: rgb(255 255 255 / 0.7);
+  --au-pick-bg: var(--surface);
+}
+[data-ui="glass"] {
+  --au-field-bg: rgb(255 255 255 / 0.62);
+  --au-field-border: rgb(255 255 255 / 0.75);
+  --au-hero-bg: rgb(251 227 214 / 0.72);
+  --au-group-bg: rgb(220 230 223 / 0.72);
+  --au-soft-bg: rgb(255 255 255 / 0.5);
+  --au-pick-bg: rgb(255 255 255 / 0.55);
+}
+[data-ui="full-glass"] {
+  --au-field-bg: rgb(255 255 255 / 0.82);
+  --au-field-border: rgb(255 255 255 / 0.7);
+  --au-hero-bg: rgb(251 227 214 / 0.82);
+  --au-group-bg: rgb(220 230 223 / 0.8);
+  --au-soft-bg: rgb(255 255 255 / 0.62);
+  --au-pick-bg: rgb(255 255 255 / 0.66);
+}
+[data-reduce-transparency="true"] {
+  --au-field-bg: var(--canvas);
+  --au-hero-bg: var(--terracotta-100);
+  --au-group-bg: var(--green-100);
+  --au-soft-bg: var(--surface);
+  --au-pick-bg: var(--surface);
+}
+
+/* ---------- Shell ---------- */
+/* The column is centred by the shell itself (a flex column that centres its pages), not by margins
+   on the page: it stays in the middle at every width, whatever the direction or the page's own
+   margins. Pages never get wider than the member screens' 32rem column, and nothing in them may
+   widen the document sideways (a phone would zoom out and show the column off to one side). */
+.au-shell {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+  min-height: 100dvh;
+  overflow-x: clip;
+}
+/* …nor the document: a wider-than-the-screen element anywhere on these pages (outside the shell
+   too) must not widen the layout viewport, which moves the centred column off to one side and leaves
+   the fixed art layer covering only part of the screen. */
+html:has(.au-shell),
+body:has(.au-shell) {
+  overflow-x: clip; /* clip, not hidden: no scroll container, so the sticky header and footer still work */
+}
+body:has(.au-shell) {
+  position: relative; /* absolutely placed elements are clipped by the body too */
+}
+.au-shell > :is(main, .au-page, .af-page) {
+  box-sizing: border-box;
+  width: 100%;
+  max-width: 32rem;
+  margin-inline: 0;
+  min-width: 0;
+}
+
+/* The background art shows as on «خطتي», with the same scrim for text placed on the page. */
+[data-ui="glass"] body:has(.au-shell) {
+  --page-scrim: rgb(245 241 232 / 0.3);
+}
+[data-ui="full-glass"] body:has(.au-shell) {
+  --page-scrim: rgb(233 236 228 / 0.72);
+}
+/* Wider than a phone, the art stays at the edges of the screen, away from the column: the middle of
+   the page is washed with the canvas, so no leaf runs behind the cards. */
+@media (min-width: 640px) {
+  [data-ui="glass"] body:has(.au-shell),
+  [data-ui="full-glass"] body:has(.au-shell) {
+    --page-scrim: transparent;
+  }
+  body:has(.au-shell)::after {
+    content: "";
+    position: fixed;
+    inset: 0;
+    z-index: -1;
+    pointer-events: none;
+  }
+  [data-ui="glass"] body:has(.au-shell)::after {
+    background: linear-gradient(to right, transparent, rgb(245 241 232 / 0.9) calc(50% - 20rem), rgb(245 241 232 / 0.9) calc(50% + 20rem), transparent);
+  }
+  [data-ui="full-glass"] body:has(.au-shell)::after {
+    background: linear-gradient(to right, rgb(233 236 228 / 0.55), rgb(233 236 228 / 0.92) calc(50% - 20rem), rgb(233 236 228 / 0.92) calc(50% + 20rem), rgb(233 236 228 / 0.55));
+  }
+}
+
+.au-page {
+  display: flex;
+  flex-direction: column;
+  padding-bottom: 28px;
+  color: var(--ink-900);
+  line-height: 1.4;
+}
+.au-content {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: 14px;
+  padding: 22px 18px 0;
+}
+
+/* ---------- Header (as «خطتي»: kicker, title, a line, the logo) ---------- */
+.au-head {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+  padding: 26px 22px 22px;
+  border-bottom: 1px solid var(--pn-header-border);
+  background: var(--pn-header-bg);
+  -webkit-backdrop-filter: blur(var(--pn-header-blur));
+  backdrop-filter: blur(var(--pn-header-blur));
+}
+.au-head-text {
+  flex: 1;
+  min-width: 0;
+}
+.au-kicker {
+  margin: 0 0 4px;
+  color: var(--td-accent-text);
+  font-size: 13px;
+  font-weight: 700;
+  line-height: 18px;
+}
+.au-title {
+  margin: 0 0 6px;
+  color: var(--ink-900);
+  font-size: 24px;
+  font-weight: 800;
+  line-height: 40px;
+  outline: none;
+}
+.au-intro {
+  margin: 0;
+  color: var(--td-muted);
+  font-size: 13.5px;
+  line-height: 1.75;
+  overflow-wrap: anywhere;
+}
+.au-logo {
+  width: 56px;
+  height: 56px;
+  overflow: hidden;
+  flex-shrink: 0;
+  border: 1.5px solid var(--ink-100);
+  border-radius: 50%;
+  background: var(--surface);
+  box-shadow: var(--shadow-sm);
+}
+.au-logo img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* ---------- Cards and forms ---------- */
+.au-card {
+  position: relative;
+  padding: 20px 18px;
+  border: var(--td-card-bw) solid var(--td-card-border);
+  border-radius: 22px;
+  background: var(--td-card-bg);
+  box-shadow: var(--td-card-shadow);
+  color: var(--ink-900);
+  -webkit-backdrop-filter: blur(var(--td-card-blur));
+  backdrop-filter: blur(var(--td-card-blur));
+}
+.au-form {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+/* The shared Field / PasswordField / PhoneField / TextArea, drawn as the habit flow's fields. */
+.au-form label,
+.au-label {
+  color: var(--green-700);
+  font-size: 13.5px;
+  font-weight: 700;
+  line-height: 19px;
+}
+.au-form p[id$="-hint"] {
+  color: var(--td-muted);
+  font-size: 12px;
+  line-height: 1.6;
+}
+.au-form :is(input, select, textarea).gl-surface {
+  min-height: 50px;
+  border: 1px solid var(--au-field-border);
+  border-radius: 16px;
+  background-color: var(--au-field-bg);
+  box-shadow: none;
+  color: var(--ink-900);
+  font-size: 15px;
+}
+.au-form textarea.gl-surface {
+  min-height: 140px;
+  padding: 14px 16px;
+  line-height: 1.8;
+}
+.au-form :is(input, select, textarea).gl-surface:focus {
+  border-color: var(--green-300);
+}
+.au-form :is(input, select, textarea)[aria-invalid="true"] {
+  border-color: var(--terracotta-700);
+}
+.au-form p[role="alert"],
+.au-alert {
+  color: var(--terracotta-700);
+  font-size: 13px;
+  font-weight: 700;
+  line-height: 1.6;
+}
+/* The 6-digit code: one large field, digits spaced. */
+.au-code {
+  min-height: 60px !important;
+  font-size: 26px !important;
+  font-weight: 700;
+  letter-spacing: 0.45em;
+  text-align: center;
+}
+
+/* Buttons: the flows' terracotta pill (.af-next) and a quiet outlined pill beside it. */
+.au-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.af-next.is-link {
+  text-decoration: none;
+}
+.au-alt {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: 100%;
+  min-height: 48px;
+  padding: 12px 16px;
+  border: 1.5px solid var(--au-field-border);
+  border-radius: 999px;
+  background: var(--au-soft-bg);
+  color: var(--green-700);
+  font-size: 14px;
+  font-weight: 700;
+  line-height: 20px;
+  cursor: pointer;
+}
+.au-alt:disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+.au-alt .gl-icon,
+.af-next .gl-icon {
+  width: 18px;
+  height: 18px;
+}
+.au-text-btn {
+  align-self: center;
+  min-height: 44px;
+  padding: 0 12px;
+  border: none;
+  background: none;
+  color: var(--td-accent-text);
+  font-size: 13.5px;
+  font-weight: 700;
+  text-decoration: underline;
+  text-underline-offset: 4px;
+  cursor: pointer;
+}
+.au-text-btn:disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+/* «ليس لديك حساب؟ أنشئ حسابًا» under the card. */
+.au-switch {
+  margin: 4px 0 0;
+  color: var(--pn-offcard);
+  font-size: 13.5px;
+  line-height: 44px;
+  text-align: center;
+}
+.au-switch a {
+  display: inline-block;
+  min-height: 44px;
+  color: var(--td-accent-text);
+  font-weight: 700;
+  text-decoration: underline;
+  text-underline-offset: 4px;
+}
+
+/* A small leaf divider with a note («لم يصلك الرمز؟»). */
+.au-aside {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  padding: 14px 16px 8px;
+  border-radius: 18px;
+  background: var(--au-soft-bg);
+  text-align: center;
+}
+.au-aside p {
+  margin: 0;
+  color: var(--td-muted);
+  font-size: 12.5px;
+  line-height: 1.7;
+}
+.au-aside .au-status {
+  min-height: 0;
+  color: var(--green-700);
+  font-size: 12.5px;
+  font-weight: 700;
+}
+
+/* The page's closing art (sprout in the hills), behind nothing. */
+.au-art {
+  display: block;
+  width: 190px;
+  height: auto;
+  margin: 6px auto 0;
+  pointer-events: none;
+}
+[data-ui="full-glass"] .au-art {
+  opacity: 0.9;
+}
+
+/* «انتهت صلاحية الرابط» and other notes above the card. */
+.au-notice {
+  display: flex;
+  gap: 10px;
+  padding: 12px 14px;
+  border: 1px solid var(--pn-reminder-border);
+  border-radius: 14px;
+  background: var(--pn-reminder-bg);
+  color: var(--ink-900);
+  font-size: 13.5px;
+  line-height: 1.7;
+}
+
+/* ---------- «أهلًا بك» ---------- */
+.au-hero {
+  position: relative;
+  overflow: hidden;
+  padding: 30px 22px 0;
+  border: var(--td-card-bw) solid var(--td-card-border);
+  border-radius: 26px;
+  background: var(--au-hero-bg);
+  box-shadow: var(--td-card-shadow);
+  text-align: center;
+  -webkit-backdrop-filter: blur(var(--td-card-blur));
+  backdrop-filter: blur(var(--td-card-blur));
+}
+.au-hero > * {
+  position: relative;
+}
+.au-badge {
+  display: block;
+  width: 72px;
+  height: 72px;
+  margin: 0 auto 16px;
+  overflow: hidden;
+  border: 4px solid rgb(255 255 255 / 0.85);
+  border-radius: 50%;
+  background: var(--surface);
+  box-shadow: var(--shadow-md);
+}
+.au-badge img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+/* «— ✿ الحياة الطيبة ✿ —», as the opening quote card's kicker. */
+.au-hero-kicker {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  margin: 0 0 10px;
+  color: var(--td-accent-text);
+  font-size: 13px;
+  font-weight: 700;
+  line-height: 18px;
+}
+.au-hero-kicker i {
+  width: 28px;
+  height: 0;
+  border-top: 1.5px dashed var(--terracotta-300);
+}
+.au-hero-kicker .gl-icon {
+  width: 14px;
+  height: 14px;
+}
+.au-hero-title {
+  margin: 0 0 12px;
+  font-size: 25px;
+  font-weight: 800;
+  line-height: 1.55;
+  outline: none;
+}
+.au-hero-body {
+  margin: 0 auto;
+  max-width: 21rem;
+  color: var(--td-muted-tint);
+  font-size: 14.5px;
+  line-height: 1.95;
+}
+[data-ui="glass"] .au-hero-body,
+[data-ui="full-glass"] .au-hero-body {
+  color: var(--ink-700);
+}
+/* The art: plants climbing the steps, over the hills at sunrise. */
+.au-hero-art {
+  position: relative;
+  height: 172px;
+  margin: 8px -22px 0;
+  background: url("/design/desired-glass.webp") center bottom / contain no-repeat;
+}
+.au-hero-art img {
+  position: absolute;
+  bottom: -6px;
+  left: 50%;
+  width: 176px;
+  height: 176px;
+  transform: translateX(-50%);
+}
+
+/* «يومك في الرحلة»: the four parts of a day, in the habit circles' tones. */
+.au-day-title {
+  margin: 0 0 14px;
+  font-size: 17px;
+  font-weight: 600;
+  line-height: 28px;
+}
+.au-day {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.au-day li {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  font-size: 12.5px;
+  font-weight: 700;
+  line-height: 17px;
+  text-align: center;
+}
+.au-day-circle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  background: var(--tone-bg);
+  color: var(--tone);
+}
+.au-day-circle .gl-icon {
+  width: 26px;
+  height: 26px;
+}
+.au-day .tone-close {
+  --tone-bg: oklch(93% 0.025 290);
+  --tone: oklch(55% 0.12 290);
+}
+
+/* «مجموعتك»: the green row with the group's icon. */
+.au-group {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 16px 18px;
+  border: var(--td-card-bw) solid var(--td-card-border);
+  border-radius: 22px;
+  background: var(--au-group-bg);
+  -webkit-backdrop-filter: blur(var(--td-card-blur));
+  backdrop-filter: blur(var(--td-card-blur));
+}
+.au-group-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 46px;
+  height: 46px;
+  flex-shrink: 0;
+  border-radius: 50%;
+  background: rgb(255 255 255 / 0.75);
+  color: var(--green-500);
+}
+.au-group-icon .gl-icon {
+  width: 24px;
+  height: 24px;
+}
+.au-group-text {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+.au-group-label {
+  color: var(--td-muted-tint);
+  font-size: 12.5px;
+  font-weight: 700;
+  line-height: 18px;
+}
+.au-group-name {
+  font-size: 16px;
+  font-weight: 800;
+  line-height: 26px;
+  overflow-wrap: anywhere;
+}
+/* «سنساعدك الآن…»: a quiet note with a leaf, on the page. */
+.au-note {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  margin: 2px 4px 0;
+  color: var(--pn-offcard);
+  font-size: 13.5px;
+  line-height: 1.85;
+}
+.au-note .gl-icon {
+  width: 18px;
+  height: 18px;
+  margin-top: 4px;
+  color: var(--green-500);
+}
+.au-cta {
+  margin-top: 6px;
+}
+
+/* ---------- «رحلة البداية» (the habit flow's header, body and footer) ---------- */
+.au-setup .af-header {
+  padding-top: 18px;
+}
+.au-setup .af-title {
+  color: var(--ink-900);
+  font-size: 21px;
+  font-weight: 800;
+}
+.au-later {
+  display: inline-flex;
+  flex-shrink: 0;
+  align-items: center;
+  min-height: 44px;
+  padding: 0 14px;
+  border: none;
+  border-radius: 999px;
+  background: rgb(255 255 255 / 0.6);
+  color: var(--td-accent-text);
+  font-size: 12.5px;
+  font-weight: 700;
+  white-space: nowrap;
+  cursor: pointer;
+}
+[data-ui="journey"] .au-later,
+:root:not([data-ui]) .au-later {
+  background: var(--surface);
+}
+.au-step-form {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+}
+.au-setup .af-body {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  padding-top: 20px;
+}
+.au-setup .af-footer {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding-bottom: 14px;
+}
+/* The question's intro with its illustration, as «حالي المنشود» on «يومك». */
+.au-lead {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+.au-lead p {
+  flex: 1;
+  margin: 0;
+  color: var(--pn-offcard);
+  font-size: 14px;
+  line-height: 1.85;
+}
+.au-lead-art {
+  width: 84px;
+  height: 84px;
+  flex-shrink: 0;
+  overflow: hidden;
+  border-radius: 50%;
+  background: var(--surface);
+  box-shadow: var(--shadow-sm);
+}
+.au-lead-art img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.au-lead-art.is-plain {
+  background: var(--green-100);
+}
+.au-lead-art.is-plain img {
+  object-fit: contain;
+  padding: 6px;
+}
+.au-later-note {
+  margin: 0;
+  color: var(--pn-offcard);
+  font-size: 12.5px;
+  line-height: 1.7;
+  text-align: center;
+}
+
+/* Domains: the habit flow's illustrated cards, each one a checkbox. */
+.au-domains {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+.au-domain {
+  position: relative;
+  display: block;
+  min-height: 132px;
+  overflow: hidden;
+  padding: 16px;
+  border: 1.5px solid transparent;
+  border-radius: 20px;
+  background: var(--dom-bg);
+  color: var(--ink-900);
+  cursor: pointer;
+}
+.au-domain:has(:checked) {
+  border-color: var(--dom-border);
+  box-shadow: 0 0 0 1px var(--dom-border);
+}
+.au-domain:has(:focus-visible) {
+  outline: 3px solid var(--terracotta-700);
+  outline-offset: 2px;
+}
+.au-domain-name {
+  position: relative;
+  z-index: 1;
+  display: block;
+  max-width: 100%;
+  font-size: 15px;
+  font-weight: 700;
+  line-height: 24px;
+}
+.au-domain .dc-art {
+  width: 92px;
+  height: 92px;
+}
+.au-domain-icon {
+  position: absolute;
+  bottom: 14px;
+  inset-inline-start: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: var(--dom-circle);
+  color: var(--dom-icon);
+}
+.au-domain-icon .gl-icon {
+  width: 20px;
+  height: 20px;
+}
+/* The round check, drawn on the real checkbox (keeps its label, role and keyboard). */
+.au-check {
+  appearance: none;
+  -webkit-appearance: none;
+  position: relative;
+  display: inline-flex;
+  flex-shrink: 0;
+  width: 30px;
+  height: 30px;
+  margin: 0;
+  border: 1.5px solid var(--ink-500); /* ≥ 3:1 on every card tint (WCAG 1.4.11) */
+  border-radius: 50%;
+  background: rgb(255 255 255 / 0.85);
+  cursor: pointer;
+}
+/* A drawn tick, centred (so `left` here is direction-neutral). */
+.au-check::after {
+  content: "";
+  position: absolute;
+  top: 6px;
+  left: 50%;
+  width: 7px;
+  height: 13px;
+  margin-left: -3.5px;
+  border: solid #fff;
+  border-width: 0 2.5px 2.5px 0;
+  transform: rotate(45deg);
+  opacity: 0;
+}
+.au-check:checked {
+  border-color: var(--green-500);
+  background: var(--green-500);
+}
+.au-check:checked::after {
+  opacity: 1;
+}
+.au-check:disabled {
+  cursor: default;
+}
+.au-check:focus-visible {
+  outline: 3px solid var(--terracotta-700);
+  outline-offset: 2px;
+}
+.au-domain .au-check {
+  position: absolute;
+  bottom: 14px;
+  inset-inline-end: 14px;
+  z-index: 1;
+}
+.au-domain .au-check:disabled:checked {
+  opacity: 0.75;
+}
+
+/* Habits: the suggestion rows of the habit flow, grouped by domain. */
+.au-habits {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+.au-habits legend {
+  float: inline-start;
+  width: 100%;
+  padding: 0;
+}
+.au-habits legend + * {
+  clear: both;
+}
+.au-habits .dg-label {
+  margin: 4px 0 2px;
+}
+.au-habit {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-height: 60px;
+  padding: 10px 14px 10px 14px;
+  border: 1.5px solid rgb(255 255 255 / 0.5);
+  border-radius: 18px;
+  background: var(--au-pick-bg);
+  box-shadow: var(--shadow-sm);
+  cursor: pointer;
+  -webkit-backdrop-filter: blur(var(--pn-soft-blur));
+  backdrop-filter: blur(var(--pn-soft-blur));
+}
+[data-ui="journey"] .au-habit,
+:root:not([data-ui]) .au-habit {
+  border-color: var(--ink-100);
+}
+.au-habit:has(:checked) {
+  border-color: var(--green-300);
+  box-shadow: 0 0 0 1px var(--green-300), var(--shadow-sm);
+}
+.au-habit-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  flex-shrink: 0;
+  border-radius: 50%;
+  background: var(--dom-bg, var(--green-100));
+  color: var(--dom-icon, var(--green-500));
+}
+.au-habit-icon .gl-icon {
+  width: 22px;
+  height: 22px;
+}
+.au-habit-text {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  min-width: 0;
+}
+.au-habit-name {
+  font-size: 14.5px;
+  font-weight: 700;
+  line-height: 24px;
+}
+.au-habit-sub {
+  color: var(--td-muted);
+  font-size: 12px;
+  line-height: 17px;
+}
+
+/* «كيف تحب أن يبدو تطبيقك؟»: the version cards get the flow's radius and a softer frame. */
+.au-look fieldset label {
+  border-radius: 20px;
+  box-shadow: var(--shadow-sm);
+}
+.au-look .af-footer .au-text-btn {
+  color: var(--green-700);
+}

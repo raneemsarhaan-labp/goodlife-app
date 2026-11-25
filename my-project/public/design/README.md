@@ -19,3 +19,8 @@ licensed or commissioned art of the same style before release. Styles: `src/ui/t
 | `domain-*.webp` | 96 px, bottom corner | plan-domain cards in «عادة جديدة» step 1, by domain key (faith, self, family, work, learning, giving) |
 
 «خطتي» reuses `logo.webp` and `desired-glass.webp`. Styles: `src/ui/theme/plan.css`.
+
+The entry screens (sign-in, sign-up, «أهلًا بك», «رحلة البداية»; styles in `src/ui/theme/auth.css`) reuse
+`logo.webp`, `challenge-journey.webp` + `desired-glass.webp` (welcome card), `progress-journey.webp`
+(sign-in), `identity.webp`, `desired-state.webp`, `challenge-upcoming.webp` (step illustrations) and the
+`domain-*.webp` cards.

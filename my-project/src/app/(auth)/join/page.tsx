@@ -5,20 +5,16 @@ import { SignUpForm } from "@/components/features/auth/SignUpForm";
 
 export const generateMetadata = pageTitle("join");
 
-/** New account: name, mobile, password. */
+/** New account: name, email, mobile. */
 export default async function JoinPage() {
   const t = await getTranslations("join");
   return (
-    <main id="main" className="flex flex-col gap-6">
-      <h1 className="text-2xl font-semibold">{t("title")}</h1>
-      <p className="text-ink-700">{t("intro")}</p>
-      <SignUpForm />
-      <p className="text-center text-ink-700">
-        {t("haveAccount")}{" "}
-        <Link href="/sign-in" className="font-medium text-sage-700 underline underline-offset-4">
-          {t("signInLink")}
-        </Link>
-      </p>
+    <main id="main" className="au-page">
+      <SignUpForm>
+        <p className="au-switch">
+          {t("haveAccount")} <Link href="/sign-in">{t("signInLink")}</Link>
+        </p>
+      </SignUpForm>
     </main>
   );
 }

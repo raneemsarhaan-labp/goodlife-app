@@ -9,19 +9,22 @@ export default async function SignInPage({ searchParams }: { searchParams: Promi
   const t = await getTranslations("signIn");
   const { link } = await searchParams;
   return (
-    <main id="main" className="flex flex-col gap-6">
-      {link === "expired" && (
-        <p role="alert" className="rounded-2xl bg-dawn-50 p-4 text-ink-900">
-          {t("linkExpired")}
+    <main id="main" className="au-page">
+      <SignInForm
+        notice={
+          link === "expired" && (
+            <p role="alert" className="au-notice">
+              {t("linkExpired")}
+            </p>
+          )
+        }
+      >
+        <p className="au-switch">
+          {t("noAccount")} <Link href="/join">{t("joinLink")}</Link>
         </p>
-      )}
-      <SignInForm />
-      <p className="text-center text-ink-700">
-        {t("noAccount")}{" "}
-        <Link href="/join" className="font-medium text-sage-700 underline underline-offset-4">
-          {t("joinLink")}
-        </Link>
-      </p>
+        {/* eslint-disable-next-line @next/next/no-img-element -- decorative art, as on «يومك» */}
+        <img src="/design/progress-journey.webp" alt="" width={190} height={127} className="au-art" />
+      </SignInForm>
     </main>
   );
 }

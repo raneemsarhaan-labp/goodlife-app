@@ -1,7 +1,5 @@
 import { pageTitle } from "@/i18n/metadata";
-import Link from "next/link";
-import { getTranslations } from "next-intl/server";
-import { buttonClass } from "@/components/ui/Button";
+import { WelcomeView } from "@/components/features/auth/WelcomeView";
 import { createClient } from "@/lib/supabase/server";
 import { requireUser } from "@/server/auth";
 
@@ -17,16 +15,11 @@ export default async function WelcomePage() {
     .eq("role", "member")
     .is("ended_on", null)
     .maybeSingle();
-  const t = await getTranslations("welcome");
   return (
-    <main id="main" className="flex flex-col gap-6 text-center">
-      <h1 className="text-2xl font-semibold">{t("title")}</h1>
-      <p className="leading-loose text-ink-700">{t("body")}</p>
-      {!user.setupCompletedAt && <p className="leading-loose text-ink-700">{t("setupNote")}</p>}
-      {data?.groups?.name && <p className="rounded-2xl bg-sage-50 p-4 text-sage-700">{t("group", { group: data.groups.name })}</p>}
-      <Link href={!user.setupCompletedAt ? "/setup/state" : user.uiChosenAt ? "/" : "/setup/look"} className={buttonClass("primary")}>
-        {t("start")}
-      </Link>
-    </main>
+    <WelcomeView
+      groupName={data?.groups?.name}
+      setupPending={!user.setupCompletedAt}
+      href={!user.setupCompletedAt ? "/setup/state" : user.uiChosenAt ? "/" : "/setup/look"}
+    />
   );
 }
