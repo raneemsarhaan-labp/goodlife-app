@@ -4,8 +4,10 @@ import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { useState, useTransition } from "react";
 import { joinChallenge, withdrawChallenge } from "@/server/actions/together";
+import { Icon } from "@/ui/components/Icon";
+import { icon } from "@/ui/icons";
 
-/** «انضمّ» / «انسحب من التحدّي» with a calm status line (spec 007 US2). */
+/** «انضمّ» / «انسحب من التحدّي» with a calm status line (spec 007 US2), drawn as the design's buttons. */
 export function ChallengeActions({ challengeId, joined }: { challengeId: string; joined: boolean }) {
   const t = useTranslations("groupChallenge");
   const te = useTranslations("errors");
@@ -21,17 +23,19 @@ export function ChallengeActions({ challengeId, joined }: { challengeId: string;
     });
   }
   return (
-    <div className="flex flex-col gap-2">
+    <div>
       {joined ? (
-        <button type="button" disabled={pending} onClick={() => run(false)} className="min-h-11 self-start rounded-full px-5 text-sm font-medium text-dawn-700 ring-1 ring-dawn-700 disabled:opacity-50">
+        <button type="button" disabled={pending} onClick={() => run(false)} className="sc-withdraw">
           {t("withdraw")}
+          <Icon src={icon("logout")} className="sc-icon" />
         </button>
       ) : (
-        <button type="button" disabled={pending} onClick={() => run(true)} className="min-h-12 self-start rounded-full bg-dawn-700 px-6 font-medium text-white disabled:opacity-50">
+        <button type="button" disabled={pending} onClick={() => run(true)} className="sc-btn is-dark">
+          <Icon src={icon("arrow_back")} className="sc-icon" />
           {t("join")}
         </button>
       )}
-      <p role={status?.error ? "alert" : "status"} className={`text-sm ${status?.error ? "text-dawn-700" : "text-sage-700"}`}>{status?.text}</p>
+      <p role={status?.error ? "alert" : "status"} className={`sc-status${status?.error ? " is-error" : ""}`}>{status?.text}</p>
     </div>
   );
 }

@@ -22,8 +22,10 @@ function isActive(pathname: string, href: string) {
   return href === "/" ? pathname === "/" : pathname === href || pathname.startsWith(`${href}/`);
 }
 
-export function BottomNav() {
-  const pathname = usePathname();
+/** `current` stands in for the path in development previews (which live under /dev). */
+export function BottomNav({ current }: { current?: string } = {}) {
+  const path = usePathname();
+  const pathname = current ?? path;
   const t = useTranslations("nav");
   return (
     <nav aria-label={t("label")} className="gl-nav fixed inset-x-0 bottom-0 z-30 pb-[env(safe-area-inset-bottom)]">

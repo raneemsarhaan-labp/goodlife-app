@@ -1,24 +1,23 @@
 import Link from "next/link";
 import { getTranslations } from "next-intl/server";
+import { Icon } from "@/ui/components/Icon";
+import { icon } from "@/ui/icons";
 
-/** «أنا / مجموعتي / التحدّي» (spec 007): the design's «أثرك» tabs as links. */
+/** «أنا / مجموعتي / التحدّي» (spec 007): the design's «أثرك» segmented tabs, as links. */
 export async function StatsTabs({ active }: { active: "me" | "group" | "challenge" }) {
   const t = await getTranslations("together");
   const tabs = [
-    { key: "me", href: "/stats" },
-    { key: "group", href: "/stats/group" },
-    { key: "challenge", href: "/stats/challenge" },
+    { key: "me", href: "/stats", icon: "person" },
+    { key: "group", href: "/stats/group", icon: "groups" },
+    { key: "challenge", href: "/stats/challenge", icon: "flag" },
   ] as const;
   return (
     <nav aria-label={t("tabsLabel")}>
-      <ul className="flex gap-2">
+      <ul className="sc-seg">
         {tabs.map((tab) => (
-          <li key={tab.key} className="flex-1">
-            <Link
-              href={tab.href}
-              aria-current={active === tab.key ? "page" : undefined}
-              className={`flex min-h-11 items-center justify-center rounded-full text-sm font-medium ${active === tab.key ? "bg-ink-900 text-white" : "gl-surface text-ink-700 ring-1 ring-sand-200"}`}
-            >
+          <li key={tab.key}>
+            <Link href={tab.href} aria-current={active === tab.key ? "page" : undefined}>
+              <Icon src={icon(tab.icon)} className="sc-icon" />
               {t(`tabs.${tab.key}`)}
             </Link>
           </li>

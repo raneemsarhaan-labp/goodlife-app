@@ -1,48 +1,75 @@
 import { getTranslations } from "next-intl/server";
+import type { CSSProperties } from "react";
 import { formatNumber } from "@/lib/format";
+import type { Period } from "@/lib/period";
+import { Icon } from "@/ui/components/Icon";
+import { icon, type IconName } from "@/ui/icons";
 
 const pct = (r: number) => formatNumber(r, undefined, { style: "percent" });
 
-/** Hero ring: decorative; the value is the text inside it (dataviz: hero number, not a chart). */
-function Ring({ rate }: { rate: number }) {
-  const r = 34;
+/** The commitment ring (decorative; the value is the text inside it). The design's 64-unit ring. */
+function Ring({ rate, label }: { rate: number; label: string }) {
+  const r = 27;
   const c = 2 * Math.PI * r;
+  const v = Math.min(Math.max(rate, 0), 1);
   return (
-    <svg viewBox="0 0 80 80" className="size-20 -rotate-90" aria-hidden="true">
-      <circle cx="40" cy="40" r={r} fill="none" stroke="var(--ink-100)" strokeWidth="8" />
-      <circle cx="40" cy="40" r={r} fill="none" stroke="var(--chart-mark)" strokeWidth="8" strokeLinecap="round" strokeDasharray={`${c * Math.min(Math.max(rate, 0), 1)} ${c}`} />
+    <svg viewBox="0 0 64 64" className="sc-ring" aria-hidden="true">
+      <circle cx="32" cy="32" r={r} fill="none" stroke="rgb(0 0 0 / 0.08)" strokeWidth="7" />
+      {v > 0 && (
+        <circle cx="32" cy="32" r={r} fill="none" stroke="var(--green-700)" strokeWidth="7" strokeLinecap="round" strokeDasharray={c} strokeDashoffset={c * (1 - v)} transform="rotate(-90 32 32)" />
+      )}
+      <text x="32" y="37" textAnchor="middle" fontSize="15" fill="var(--ink-900)">
+        {label}
+      </text>
     </svg>
   );
 }
 
+type TileStyle = CSSProperties & { "--sc-tile-circle"?: string; "--sc-tile-fg"?: string };
+
 /** «لمحة» (spec 006 US1): consecutive days, commitment ring, active habits, challenges done. */
-export async function StatTiles({ consecutive, rate, activeHabits, challengesDone }: { consecutive: number; rate: number; activeHabits: number; challengesDone: number }) {
-  const t = await getTranslations("impact");
-  const tile = "gl-surface flex flex-col justify-center gap-1 rounded-[var(--radius-card)] p-4";
+export async function StatTiles({
+  consecutive,
+  rate,
+  done,
+  possible,
+  activeHabits,
+  challengesDone,
+  period,
+}: {
+  consecutive: number;
+  rate: number;
+  done: number;
+  possible: number;
+  activeHabits: number;
+  challengesDone: number;
+  period: Period;
+}) {
+  const [t, ts] = await Promise.all([getTranslations("impact"), getTranslations("stats")]);
+  const tile = (key: string, n: number, label: string, iconName: IconName, style: TileStyle) => (
+    <li key={key} className="sc-tile">
+      <span aria-hidden="true" className="sc-tile-icon" style={style}>
+        <Icon src={icon(iconName)} className="sc-icon" />
+      </span>
+      <p className="sc-tile-num">{formatNumber(n)}</p>
+      <p className="sc-tile-label">{label}</p>
+    </li>
+  );
   return (
-    <section aria-labelledby="tiles" className="flex flex-col gap-2">
-      <h2 id="tiles" className="sr-only">{t("tilesTitle")}</h2>
-      <div className="grid grid-cols-2 gap-3">
-        <div className={tile}>
-          <p className="text-3xl font-semibold text-ink-900">{formatNumber(consecutive)}</p>
-          <p className="text-sm text-ink-700">{t("consecutiveLabel")}</p>
-        </div>
-        <div className={`${tile} flex-row items-center gap-3`}>
-          <div className="relative flex size-20 shrink-0 items-center justify-center">
-            <Ring rate={rate} />
-            <span className="absolute text-lg font-semibold text-ink-900">{pct(rate)}</span>
-          </div>
-          <p className="text-sm text-ink-700">{t("commitment")}</p>
-        </div>
-        <div className={tile}>
-          <p className="text-3xl font-semibold text-ink-900">{formatNumber(activeHabits)}</p>
-          <p className="text-sm text-ink-700">{t("activeHabits")}</p>
-        </div>
-        <div className={tile}>
-          <p className="text-3xl font-semibold text-ink-900">{formatNumber(challengesDone)}</p>
-          <p className="text-sm text-ink-700">{t("challengesDone")}</p>
-        </div>
-      </div>
+    <section aria-labelledby="tiles">
+      <h2 id="tiles" className="sc-sr">{t("tilesTitle")}</h2>
+      <ul className="sc-tiles">
+        {tile("consecutive", consecutive, t("consecutiveUnit", { count: consecutive }), "calendar_month", { "--sc-tile-circle": "oklch(93% 0.03 150)" })}
+        <li className="sc-tile is-ring">
+          <Ring rate={rate} label={pct(rate)} />
+          <p className="sc-tile-label">
+            {t(`commitmentFor.${period}`)}
+            <span className="sc-sr"> {pct(rate)} · {ts("overallDetail", { done: formatNumber(done), possible: formatNumber(possible) })}</span>
+          </p>
+        </li>
+        {tile("active", activeHabits, t("activeUnit", { count: activeHabits }), "bolt", { "--sc-tile-circle": "oklch(92% 0.03 240)" })}
+        {tile("challenges", challengesDone, t("challengesUnit", { count: challengesDone }), "star", { "--sc-tile-circle": "var(--terracotta-100)", "--sc-tile-fg": "var(--terracotta-500)" })}
+      </ul>
     </section>
   );
 }

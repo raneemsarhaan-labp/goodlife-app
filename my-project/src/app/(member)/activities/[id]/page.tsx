@@ -4,11 +4,11 @@ import { getTranslations } from "next-intl/server";
 import { RegistrationButton } from "@/components/features/activities/RegistrationButton";
 import { Registrants } from "@/components/features/activities/Registrants";
 import { Card } from "@/components/ui/Card";
+import { SubHeader } from "@/components/features/screens/ScreenHeader";
 import { formatDateTime, formatNumber } from "@/lib/format";
 import { uuidSchema } from "@/lib/validation/common";
 import { requireUser } from "@/server/auth";
 import { getActivityDetails, getRegistrants } from "@/server/queries/activity";
-import { icon } from "@/ui/icons";
 
 export const generateMetadata = pageTitle("activity");
 
@@ -26,16 +26,14 @@ export default async function ActivityPage({ params }: { params: Promise<{ id: s
   const canRegister = a.registration_open && a.window_open && !full && !a.cancelled_at;
 
   return (
-    <main id="main" className="mx-auto flex max-w-lg flex-col gap-5 px-5 pt-6">
-      <header className="flex flex-col gap-2">
-        <p className="flex items-center gap-1.5 text-sm font-semibold text-sage-700">
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src={icon(a.mode === "online" ? "videocam" : "location_on")} alt="" aria-hidden="true" width={18} height={18} className="size-[18px]" />
-          {a.mode === "online" ? t("online") : t("inPerson")} · {t("sessions", { count: a.sessions.length, n: formatNumber(a.sessions.length) })}
-        </p>
-        <h1 className="text-2xl font-semibold">{a.title}</h1>
-        {a.cancelled_at && <p role="status" className="font-semibold text-dawn-700">{t("activityCancelled")}</p>}
-      </header>
+    <main id="main" className="sc-page is-sub">
+      <SubHeader
+        title={a.title}
+        subtitle={`${a.mode === "online" ? t("online") : t("inPerson")} · ${t("sessions", { count: a.sessions.length, n: formatNumber(a.sessions.length) })}`}
+        backHref="/community"
+      />
+      <div className="sc-content sc-forms">
+      {a.cancelled_at && <p role="status" className="sc-text" style={{ color: "var(--terracotta-700)", fontWeight: 700 }}>{t("activityCancelled")}</p>}
 
       {a.description && (
         <Card>
@@ -82,6 +80,7 @@ export default async function ActivityPage({ params }: { params: Promise<{ id: s
       </Card>
 
       {registrants && <Registrants rows={registrants} scope={user.roles.includes("admin") ? "admin" : "facilitator"} timeZone={user.timeZone} />}
+      </div>
     </main>
   );
 }

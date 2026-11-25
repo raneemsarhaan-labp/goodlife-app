@@ -1,8 +1,7 @@
 import { pageTitle } from "@/i18n/metadata";
 import { getTranslations } from "next-intl/server";
 import { Button } from "@/components/ui/Button";
-import { EmptyState } from "@/components/ui/EmptyState";
-import { Sheet } from "@/components/ui/Sheet";
+import { SubHeader } from "@/components/features/screens/ScreenHeader";
 import { formatDate } from "@/lib/format";
 import { localDate } from "@/lib/journey";
 import { createClient } from "@/lib/supabase/server";
@@ -21,16 +20,18 @@ export default async function ArchivedHabitsPage() {
     ? await supabase.from("habits").select("id, name, archived_at").eq("plan_id", planId).not("archived_at", "is", null).order("archived_at", { ascending: false })
     : { data: [] };
   return (
-    <Sheet title={t("archivedTitle")}>
+    <main id="main" className="sc-page is-sub">
+      <SubHeader title={t("archivedTitle")} backHref="/account" />
+      <div className="sc-content">
       {(habits ?? []).length === 0 ? (
-        <EmptyState title={t("noArchived")} />
+        <p className="sc-text sc-muted">{t("noArchived")}</p>
       ) : (
-        <ul className="flex flex-col gap-2">
+        <ul className="sc-rows">
           {(habits ?? []).map((h) => (
-            <li key={h.id} className="flex items-center justify-between gap-3 rounded-2xl gl-surface px-4 py-2">
-              <div>
-                <p>{h.name}</p>
-                <p className="text-sm text-ink-500">{t("archivedOn", { date: formatDate(localDate(user.timeZone, new Date(h.archived_at!)), { withYear: true }) })}</p>
+            <li key={h.id} className="sc-row">
+              <div className="sc-row-text">
+                <p className="sc-row-name">{h.name}</p>
+                <p className="sc-row-sub">{t("archivedOn", { date: formatDate(localDate(user.timeZone, new Date(h.archived_at!)), { withYear: true }) })}</p>
               </div>
               <form action={restoreHabit}>
                 <input type="hidden" name="id" value={h.id} />
@@ -40,6 +41,7 @@ export default async function ArchivedHabitsPage() {
           ))}
         </ul>
       )}
-    </Sheet>
+      </div>
+    </main>
   );
 }

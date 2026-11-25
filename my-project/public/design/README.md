@@ -14,3 +14,4 @@ licensed or commissioned art of the same style before release. Styles: `src/ui/t
 | `challenge-journey.webp` | 170 px, mirrored | «تحدّي اليوم» (رحلة يومي) |
 | `quote-art.webp` | 342 × 170 px | opening quote card |
 | `habit-*.webp` | 40 px circle | habit detail, by habit icon |
+| `challenge-upcoming.webp` | 88 px circle | «أثرك ← التحدّي», upcoming challenge (Glass Edition; styles in `src/ui/theme/screens.css`) |
