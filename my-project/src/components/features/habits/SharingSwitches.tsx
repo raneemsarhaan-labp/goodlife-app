@@ -1,10 +1,14 @@
 "use client";
 
 import { useTranslations } from "next-intl";
+import { Icon } from "@/ui/components/Icon";
+import { flowIcon } from "@/ui/icons-flow";
+import { FieldLabel } from "./FieldLabel";
 
 /**
  * «الخصوصيّة» (spec 007 FR-001, FR-006): share with the group (peers see name and today's state), or a
- * private habit whose name stays on this device. The two exclude each other.
+ * private habit whose name stays on this device. The two exclude each other. Drawn as the designed
+ * tinted rows with a switch.
  */
 export function SharingSwitches({
   shared,
@@ -19,37 +23,51 @@ export function SharingSwitches({
 }) {
   const t = useTranslations("privateHabit");
   return (
-    <fieldset className="flex flex-col gap-2">
-      <legend className="mb-1 font-medium">{t("privacyTitle")}</legend>
-      <label className="flex min-h-11 items-start gap-3 rounded-2xl bg-sage-50 p-3">
+    <fieldset className="mt-0.5">
+      <FieldLabel as="legend" text={t("privacyTitle")} plain />
+      <label className="toggle-row is-share">
+        <span className="tr-icon" aria-hidden="true">
+          <Icon src={flowIcon("group")} />
+        </span>
+        <span className="tr-text">
+          <span id="share-title" className="tr-title">{t("shareLabel")}</span>
+          <span id="share-hint" className="tr-hint">
+            {t("shareHint")}
+          </span>
+        </span>
         <input
           type="checkbox"
+          role="switch"
           name="shared"
           checked={shared}
           disabled={isPrivate}
           onChange={(e) => onChange({ shared: e.target.checked, isPrivate: false })}
+          aria-labelledby="share-title"
           aria-describedby="share-hint"
-          className="mt-1 size-5 accent-sage-700"
+          className="switch"
         />
-        <span className="flex flex-col">
-          <span className="font-medium text-ink-900">{t("shareLabel")}</span>
-          <span id="share-hint" className="text-sm text-ink-700">{t("shareHint")}</span>
-        </span>
       </label>
-      <label className="flex min-h-11 items-start gap-3 rounded-2xl bg-sand-100 p-3">
+      <label className="toggle-row is-private">
+        <span className="tr-icon" aria-hidden="true">
+          <Icon src={flowIcon("lock")} />
+        </span>
+        <span className="tr-text">
+          <span id="private-title" className="tr-title">{t("privateLabel")}</span>
+          <span id="private-hint" className="tr-hint">
+            {t("privateHint")}
+          </span>
+        </span>
         <input
           type="checkbox"
+          role="switch"
           name="isPrivate"
           checked={isPrivate}
           disabled={privateLocked}
           onChange={(e) => onChange({ shared: false, isPrivate: e.target.checked })}
+          aria-labelledby="private-title"
           aria-describedby="private-hint"
-          className="mt-1 size-5 accent-sage-700"
+          className="switch"
         />
-        <span className="flex flex-col">
-          <span className="font-medium text-ink-900">{t("privateLabel")}</span>
-          <span id="private-hint" className="text-sm text-ink-700">{t("privateHint")}</span>
-        </span>
       </label>
     </fieldset>
   );

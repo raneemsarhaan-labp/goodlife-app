@@ -1,7 +1,6 @@
 import { pageTitle } from "@/i18n/metadata";
 import { getTranslations } from "next-intl/server";
 import { AddHabitFlow } from "@/components/features/habits/AddHabitFlow";
-import { Sheet } from "@/components/ui/Sheet";
 import { habitNameFromChallenge, hasHabitNamed } from "@/lib/make-habit";
 import { getDomains, getLibrary, getPlanDomains } from "@/server/queries/domains";
 import { getToday } from "@/server/queries/today";
@@ -33,7 +32,7 @@ export default async function NewHabitPage({ searchParams }: { searchParams: Pro
     }
   }
   return (
-    <Sheet title={t("title")}>
+    <main id="main" aria-label={t("title")}>
       <AddHabitFlow
         key={prefill?.name ?? "new"}
         domains={domains}
@@ -43,6 +42,6 @@ export default async function NewHabitPage({ searchParams }: { searchParams: Pro
         initialDomainId={areaDomain ?? challengeDomain}
         returnTo={returnTo === "plan" ? "plan" : undefined}
       />
-    </Sheet>
+    </main>
   );
 }

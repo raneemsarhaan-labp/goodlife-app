@@ -38,6 +38,7 @@ test("a member without a desired state is invited to write it", async ({ page })
   await expect(page.getByRole("region", { name: "حالي المنشود" })).toContainText("أنام مبكرًا");
   // Leave the seed as it was for other specs.
   await page.goto("/plan");
+  await page.getByRole("button", { name: "عدّل «حالي المنشود»" }).click();
   await page.getByLabel("حالي المنشود", { exact: true }).fill("");
   await page.getByRole("region", { name: "حالي المنشود" }).getByRole("button", { name: "احفظ" }).click();
 });

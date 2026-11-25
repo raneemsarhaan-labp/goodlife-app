@@ -22,6 +22,8 @@ test("«هويّتي» and a domain card are saved and stay private", async ({ p
   await page.getByRole("button", { name: "احفظ المجال" }).click();
   await expect(page.getByRole("status").filter({ hasText: "تمّ الحفظ." }).first()).toBeVisible();
   await page.reload();
+  // Written texts show as designed; the edit control opens them again.
+  await page.getByRole("button", { name: "عدّل «هويّتي»" }).click();
   await expect(page.getByLabel("هويّتي")).toHaveValue("أنا ساعٍ إلى يومٍ أهدأ.");
 
   const fac = await browser.newContext({ storageState: { cookies: [], origins: [] }, locale: "ar", timezoneId: "Asia/Riyadh" });
