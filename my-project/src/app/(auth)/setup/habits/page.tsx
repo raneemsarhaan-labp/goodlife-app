@@ -11,15 +11,16 @@ export const generateMetadata = pageTitle("setup");
 const PER_DOMAIN = 4;
 
 /** «رحلة البداية» 4/5: first habits, suggested from «مكتبة العادات» for the chosen domains. */
-export default async function SetupHabitsPage({ searchParams }: { searchParams: Promise<{ from?: string }> }) {
+export default async function SetupHabitsPage({ searchParams }: { searchParams: Promise<{ from?: string; error?: string }> }) {
   await requireUser();
-  const fromToday = (await searchParams).from === "today";
+  const params = await searchParams;
+  const fromToday = params.from === "today";
   const [t, domains, planDomains, library] = await Promise.all([getTranslations("setup"), getDomains(), getPlanDomains(), getLibrary()]);
   // The plan's domains; with none chosen, a taste of every domain.
   const shown = planDomains.length ? domains.filter((d) => planDomains.some((p) => p.domainId === d.id)) : domains;
   const perDomain = planDomains.length ? PER_DOMAIN : 2;
   return (
-    <SetupFrame step={4} title={t("habitsTitle")} intro={t("habitsIntro")} fromToday={fromToday}>
+    <SetupFrame step={4} title={t("habitsTitle")} intro={t("habitsIntro")} fromToday={fromToday} error={params.error?.slice(0, 60)}>
       <form action={setupHabits} className="flex flex-col gap-6">
         {fromToday && <input type="hidden" name="from" value="today" />}
         {shown.map((d) => {

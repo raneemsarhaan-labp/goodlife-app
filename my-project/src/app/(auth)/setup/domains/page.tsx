@@ -10,13 +10,14 @@ import { habitIcon } from "@/ui/icons";
 export const generateMetadata = pageTitle("setup");
 
 /** «رحلة البداية» 3/5: up to three life domains for the year. */
-export default async function SetupDomainsPage({ searchParams }: { searchParams: Promise<{ from?: string }> }) {
+export default async function SetupDomainsPage({ searchParams }: { searchParams: Promise<{ from?: string; error?: string }> }) {
   await requireUser();
-  const fromToday = (await searchParams).from === "today";
+  const params = await searchParams;
+  const fromToday = params.from === "today";
   const [t, domains, planDomains] = await Promise.all([getTranslations("setup"), getDomains(), getPlanDomains()]);
   const chosen = new Set(planDomains.map((d) => d.domainId));
   return (
-    <SetupFrame step={3} title={t("domainsTitle")} intro={t("domainsIntro")} fromToday={fromToday}>
+    <SetupFrame step={3} title={t("domainsTitle")} intro={t("domainsIntro")} fromToday={fromToday} error={params.error?.slice(0, 60)}>
       <form action={setupDomains} className="flex flex-col gap-5">
         {fromToday && <input type="hidden" name="from" value="today" />}
         <fieldset className="grid grid-cols-2 gap-3">

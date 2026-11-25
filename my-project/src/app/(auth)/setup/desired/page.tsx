@@ -9,12 +9,13 @@ import { getPlanTexts } from "@/server/queries/setup";
 export const generateMetadata = pageTitle("setup");
 
 /** «رحلة البداية» 2/5: «حالي المنشود». */
-export default async function SetupDesiredPage({ searchParams }: { searchParams: Promise<{ from?: string }> }) {
+export default async function SetupDesiredPage({ searchParams }: { searchParams: Promise<{ from?: string; error?: string }> }) {
   await requireUser();
-  const fromToday = (await searchParams).from === "today";
+  const params = await searchParams;
+  const fromToday = params.from === "today";
   const [t, texts] = await Promise.all([getTranslations("setup"), getPlanTexts()]);
   return (
-    <SetupFrame step={2} title={t("desiredTitle")} intro={t("desiredIntro")} fromToday={fromToday}>
+    <SetupFrame step={2} title={t("desiredTitle")} intro={t("desiredIntro")} fromToday={fromToday} error={params.error?.slice(0, 60)}>
       <form action={setupDesiredState} className="flex flex-col gap-5">
         {fromToday && <input type="hidden" name="from" value="today" />}
         <TextArea name="text" label={t("desiredLabel")} hint={t("desiredHint")} defaultValue={texts.desiredState} maxLength={2000} rows={5} />

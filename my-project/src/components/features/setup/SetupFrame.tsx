@@ -11,12 +11,15 @@ export async function SetupFrame({
   title,
   intro,
   fromToday = false,
+  error,
   children,
 }: {
   step: number;
   title: string;
   intro: string;
   fromToday?: boolean;
+  /** Set when saving this step failed (?error=code). */
+  error?: string;
   children: React.ReactNode;
 }) {
   const t = await getTranslations("setup");
@@ -41,6 +44,11 @@ export async function SetupFrame({
       )}
       <h1 className="text-2xl font-semibold">{title}</h1>
       <p className="leading-loose text-ink-700">{intro}</p>
+      {error && (
+        <p role="alert" className="rounded-2xl bg-dawn-50 p-4 text-ink-900">
+          {t("saveFailed")} <span dir="ltr" className="text-xs text-ink-700">({error})</span>
+        </p>
+      )}
       {children}
     </main>
   );
