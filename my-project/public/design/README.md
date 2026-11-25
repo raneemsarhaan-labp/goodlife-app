@@ -1,4 +1,4 @@
-# «يومك» art from the designs (development placeholders)
+# Art from the designs (development placeholders)
 
 Taken from the product owner's design files (My Day Journey, Glass Edition, Full Glass; 2026-11-21),
 cropped and resized to 2–3× their drawn size, WebP. Placeholders like `public/ui/`: replace with
@@ -15,3 +15,7 @@ licensed or commissioned art of the same style before release. Styles: `src/ui/t
 | `quote-art.webp` | 342 × 170 px | opening quote card |
 | `habit-*.webp` | 40 px circle | habit detail, by habit icon |
 | `challenge-upcoming.webp` | 88 px circle | «أثرك ← التحدّي», upcoming challenge (Glass Edition; styles in `src/ui/theme/screens.css`) |
+| `identity.webp` | 56 px | «هويّتي» on «خطتي» (Glass Edition) |
+| `domain-*.webp` | 96 px, bottom corner | plan-domain cards in «عادة جديدة» step 1, by domain key (faith, self, family, work, learning, giving) |
+
+«خطتي» reuses `logo.webp` and `desired-glass.webp`. Styles: `src/ui/theme/plan.css`.

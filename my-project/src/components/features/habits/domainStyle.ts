@@ -11,3 +11,17 @@ export const DOMAIN_TINT: Record<DomainColor, string> = {
   ink: "bg-sand-100",
   violet: "bg-[oklch(93%_0.025_290)]",
 };
+
+/** The designs' domain palette (tint, icon circle, icon, selected border) as a `dom-*` class (plan.css). */
+export const domainClass = (color: DomainColor | undefined): string => `dom-${color ?? "ink"}`;
+
+/** The designs' domain illustrations (public/design), by domain key; none for other domains. */
+const ART: Record<string, string> = {
+  faith: "/design/domain-faith.webp",
+  self: "/design/domain-self.webp",
+  family: "/design/domain-family.webp",
+  work: "/design/domain-work.webp",
+  learning: "/design/domain-learning.webp",
+  giving: "/design/domain-giving.webp",
+};
+export const domainArt = (key: string | undefined): string | undefined => (key ? ART[key] : undefined);

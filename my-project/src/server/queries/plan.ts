@@ -1,7 +1,7 @@
 import "server-only";
 import { createClient } from "@/lib/supabase/server";
 
-export type PlanHabit = { id: string; name: string; description: string | null; focus_area_id: string | null; sort_order: number; is_private?: boolean };
+export type PlanHabit = { id: string; name: string; description: string | null; focus_area_id: string | null; sort_order: number; is_private?: boolean; icon?: string | null };
 export type FocusArea = {
   id: string;
   title: string;
@@ -23,7 +23,7 @@ export async function getPlan() {
     supabase.from("focus_areas").select("id, title, description, sort_order, domain_id, sign, review_on").eq("plan_id", planId).order("sort_order"),
     supabase
       .from("habits")
-      .select("id, name, description, focus_area_id, sort_order, is_private")
+      .select("id, name, description, focus_area_id, sort_order, is_private, icon")
       .eq("plan_id", planId)
       .is("archived_at", null)
       .order("sort_order"),

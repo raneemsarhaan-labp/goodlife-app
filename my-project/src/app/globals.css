@@ -9,6 +9,7 @@
 @import "../ui/theme/versions.css";
 @import "../ui/theme/today.css";
 @import "../ui/theme/screens.css";
+@import "../ui/theme/plan.css";
 @import "../ui/theme/fallbacks.css";
 
 /* Tailwind color names mapped onto the designs' palette, so every screen follows it. */

@@ -6,71 +6,104 @@ import { formatDate, formatNumber } from "@/lib/format";
 import { saveDomainArea } from "@/server/actions/plan";
 import type { LifeDomain } from "@/server/queries/domains";
 import type { FocusArea, PlanHabit } from "@/server/queries/plan";
-import { habitIcon } from "@/ui/icons";
-import { DOMAIN_TINT } from "../habits/domainStyle";
+import { habitIcon, icon } from "@/ui/icons";
+import { Icon } from "@/ui/components/Icon";
+import { domainClass } from "../habits/domainStyle";
 import { HabitName } from "../habits/HabitName";
 
+/** The form that writes a plan domain's texts and review date (shared by «خطتي» and the review). */
+export async function DomainForm({ area }: { area: FocusArea }) {
+  const t = await getTranslations("domainCard");
+  return (
+    <ActionForm action={saveDomainArea} submitLabel={t("save")} successText={t("saved")} className="pn-form flex flex-col gap-3">
+      <input type="hidden" name="id" value={area.id} />
+      <TextArea name="description" label={t("whoLabel")} defaultValue={area.description ?? ""} maxLength={500} />
+      <TextArea name="sign" label={t("signLabel")} defaultValue={area.sign ?? ""} maxLength={300} className="min-h-20" />
+      <Field name="reviewOn" type="date" label={t("reviewOn")} defaultValue={area.review_on ?? ""} />
+    </ActionForm>
+  );
+}
+
 /**
- * «مجالات عملي هذه السنة» (spec 005 US1): up to three domain cards with habit counts; each opens to
- * «من أريد أن أكون», «العلامة», its habits and the review date.
+ * «مجالات عملي هذه السنة» (spec 005 US1) as designed: up to three tinted rows with habit counts; each
+ * opens to «من أريد أن أكون», «العلامة», its habits and the review date, then the edit form and a way
+ * to add a habit in that domain.
  */
 export async function DomainCards({ areas, habits, domains }: { areas: FocusArea[]; habits: PlanHabit[]; domains: LifeDomain[] }) {
   const t = await getTranslations("domainCard");
   const ta = await getTranslations("addFlow");
   const plan = areas.filter((a) => a.domain_id);
   return (
-    <section aria-labelledby="plan-domains" className="flex flex-col gap-3">
-      <div className="flex items-center justify-between gap-2">
-        <h2 id="plan-domains" className="text-lg font-semibold">{t("sectionTitle")}</h2>
-        <span className="rounded-full bg-sand-100 px-3 py-1 text-sm font-semibold">{t("count", { n: formatNumber(plan.length) })}</span>
+    <section aria-labelledby="plan-domains" className="pn-section">
+      <div className="pn-section-head">
+        <h2 id="plan-domains">{t("sectionTitle")}</h2>
+        <span className="pn-line" aria-hidden="true" />
+        <span className="pn-badge" role="img" aria-label={t("count", { n: formatNumber(plan.length) })}>
+          {formatNumber(plan.length)}
+        </span>
       </div>
-      {plan.length === 0 && <p className="text-ink-700">{t("noDomains")}</p>}
-      {plan.map((a) => {
-        const d = domains.find((x) => x.id === a.domain_id);
-        const own = habits.filter((h) => h.focus_area_id === a.id);
-        return (
-          <details key={a.id} className={`rounded-[var(--radius-card)] ${d ? DOMAIN_TINT[d.color] : "bg-sand-100"} p-4`}>
-            <summary className="flex min-h-12 cursor-pointer items-center gap-3">
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src={habitIcon(d?.icon)} alt="" aria-hidden="true" width={28} height={28} className="size-7" />
-              <span className="flex flex-1 flex-col">
-                <span className="font-semibold text-ink-900">{d?.name ?? a.title}</span>
-                <span className="text-sm text-ink-700">
-                  {ta("habitsCount", { count: own.length, n: formatNumber(own.length) })}
-                  {a.review_on && ` · ${t("reviewOnValue", { date: formatDate(a.review_on, { withWeekday: false }) })}`}
-                </span>
-              </span>
-            </summary>
-            <div className="mt-3 flex flex-col gap-4 rounded-2xl bg-white/80 p-4">
-              <ActionForm action={saveDomainArea} submitLabel={t("save")} successText={t("saved")}>
-                <input type="hidden" name="id" value={a.id} />
-                <TextArea name="description" label={t("whoLabel")} defaultValue={a.description ?? ""} maxLength={500} />
-                <TextArea name="sign" label={t("signLabel")} defaultValue={a.sign ?? ""} maxLength={300} className="min-h-20" />
-                <Field name="reviewOn" type="date" label={t("reviewOn")} defaultValue={a.review_on ?? ""} />
-              </ActionForm>
-              <div className="flex flex-col gap-2">
-                <h3 className="text-sm font-semibold text-ink-700">{t("habitsTitle")}</h3>
-                {own.length === 0 ? (
-                  <p className="text-sm text-ink-700">{t("noHabits")}</p>
-                ) : (
-                  <ul className="flex flex-col gap-1">
-                    {own.map((h) => (
-                      <li key={h.id}>
-                        <Link href={`/habits/${h.id}`} className="inline-flex min-h-11 items-center text-ink-900 underline underline-offset-4">
+      {plan.length === 0 && <p className="pn-empty-row">{t("noDomains")}</p>}
+      <ul className="pn-domains">
+        {plan.map((a) => {
+          const d = domains.find((x) => x.id === a.domain_id);
+          const own = habits.filter((h) => h.focus_area_id === a.id);
+          const blank = !a.description?.trim() && !a.sign?.trim();
+          return (
+            <li key={a.id}>
+              <details className={`pn-domain ${domainClass(d?.color)}`}>
+                <summary className="pn-domain-top">
+                  <span className="pn-domain-icon" aria-hidden="true">
+                    <Icon src={habitIcon(d?.icon)} />
+                  </span>
+                  <span className="pn-domain-names">
+                    <span className="pn-domain-name">{d?.name ?? a.title}</span>
+                    <span className="pn-domain-count">{ta("habitsCount", { count: own.length, n: formatNumber(own.length) })}</span>
+                  </span>
+                  <span className="pn-domain-chev" aria-hidden="true">
+                    <Icon src={icon("keyboard_arrow_down")} />
+                  </span>
+                </summary>
+                <div className="pn-domain-body">
+                  {a.description?.trim() && (
+                    <>
+                      <h3 className="pn-domain-label">{t("whoShort")}</h3>
+                      <p className="pn-domain-text">{a.description}</p>
+                    </>
+                  )}
+                  {a.sign?.trim() && (
+                    <>
+                      <h3 className="pn-domain-label">{t("signShort")}</h3>
+                      <p className="pn-domain-text">{a.sign}</p>
+                    </>
+                  )}
+                  {own.length > 0 && (
+                    <ul className="pn-domain-habits" aria-label={t("habitsTitle")}>
+                      {own.map((h) => (
+                        <li key={h.id}>
                           <HabitName id={h.id} name={h.name} isPrivate={h.is_private} />
-                        </Link>
-                      </li>
-                    ))}
-                  </ul>
-                )}
-                <Link href={`/habits/new?returnTo=plan&area=${a.id}`} className="self-start text-sm text-sage-700 underline underline-offset-4">
-                  {t("addDomain")}
-                </Link>
-              </div>
-            </div>
-          </details>
-        );
-      })}
+                        </li>
+                      ))}
+                    </ul>
+                  )}
+                  <p className="pn-domain-foot">
+                    <span>{t("reviewLabel")}</span>
+                    <span>{a.review_on ? formatDate(a.review_on, { withWeekday: false }) : "—"}</span>
+                  </p>
+                  <div className="pn-domain-actions">
+                    <details className="pn-more" open={blank}>
+                      <summary>{t("edit")}</summary>
+                      <DomainForm area={a} />
+                    </details>
+                    <Link href={`/habits/new?returnTo=plan&area=${a.id}`} className="pn-link">
+                      {t("addHabit")}
+                    </Link>
+                  </div>
+                </div>
+              </details>
+            </li>
+          );
+        })}
+      </ul>
     </section>
   );
 }

@@ -9,13 +9,16 @@ import { copyHabitsFromPreviousPlan } from "@/server/actions/plan";
 export function CopyPreviousHabits({ count }: { count: number }) {
   const t = useTranslations("plan");
   return (
-    <section aria-labelledby="copy-previous" className="flex flex-col gap-3 rounded-[var(--radius-card)] border border-sage-100 bg-sage-50 p-5">
-      <h2 id="copy-previous" className="text-lg font-semibold text-sage-700">{t("copyTitle")}</h2>
-      <p>{t("copyBody", { count, n: formatNumber(count) })}</p>
+    <section aria-labelledby="copy-previous" className="pn-card pn-copy flex flex-col gap-2">
+      <h2 id="copy-previous" className="pn-label">
+        {t("copyTitle")}
+      </h2>
+      <p className="m-0 text-[13.5px] leading-[1.75]">{t("copyBody", { count, n: formatNumber(count) })}</p>
       <ActionForm
         action={copyHabitsFromPreviousPlan}
         submitLabel={t("copy")}
-        renderSuccess={({ count: copied }) => <p role="status" className="text-sage-700">{t("copied", { count: copied, n: formatNumber(copied) })}</p>}
+        className="pn-form flex flex-col gap-2"
+        renderSuccess={({ count: copied }) => <p role="status">{t("copied", { count: copied, n: formatNumber(copied) })}</p>}
       >
         {null}
       </ActionForm>
